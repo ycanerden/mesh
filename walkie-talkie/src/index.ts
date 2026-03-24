@@ -19,6 +19,16 @@ import {
   getPartnerCards,
   messageEvents,
 } from "./rooms.js";
+import {
+  createRoomGroup,
+  getRoomGroup,
+  getAllRoomGroups,
+  assignTask,
+  updateTaskStatus,
+  getAgentTasks,
+  getRoomTasks,
+  getAllAgentTasks,
+} from "./room-manager.js";
 
 const app = new Hono();
 const startTime = Date.now();
@@ -258,6 +268,105 @@ app.get("/dashboard", async (c) => {
   } catch (e) {
     return c.json({ error: "dashboard not found" }, 404);
   }
+});
+
+app.get("/master-dashboard", async (c) => {
+  try {
+    const dashboardHtml = await Bun.file("./master-dashboard.html").text();
+    return c.html(dashboardHtml);
+  } catch (e) {
+    return c.json({ error: "master dashboard not found" }, 404);
+  }
+});
+
+// ── Room Groups (WhatsApp-like AI agent groups) ────────────────────────────────
+app.get("/groups", (c) => {
+  const groups = getAllRoomGroups();
+  return c.json({ groups, count: groups.length });
+});
+
+app.post("/groups/create", async (c) => {
+  const { group_name, description, topic, icon, color } = await c.req.json();
+  const creator = c.req.query("creator") || "unknown";
+
+  const roomCode = createRoom();
+  const group = createRoomGroup(
+    roomCode,
+    group_name,
+    description,
+    topic,
+    creator as string,
+    icon || "🚀",
+    color || "#4fc3f7"
+  );
+
+  return c.json(group, 201);
+});
+
+app.get("/groups/:roomCode", (c) => {
+  const roomCode = c.req.param("roomCode");
+  const group = getRoomGroup(roomCode);
+
+  if (!group) {
+    return c.json({ error: "group not found" }, 404);
+  }
+
+  const tasks = getRoomTasks(roomCode);
+  return c.json({ group, tasks });
+});
+
+// ── Task Assignments ──────────────────────────────────────────────────────────
+app.post("/tasks/assign", async (c) => {
+  const { room_code, agent_name, task_id, task_title, due_date } = await c.req.json();
+
+  const task = assignTask(
+    room_code,
+    agent_name,
+    task_id,
+    task_title,
+    due_date || Date.now() + 24 * 60 * 60 * 1000
+  );
+
+  return c.json(task, 201);
+});
+
+app.put("/tasks/status", async (c) => {
+  const { room_code, agent_name, task_id, status } = await c.req.json();
+
+  updateTaskStatus(room_code, agent_name, task_id, status);
+
+  return c.json({ ok: true, status });
+});
+
+app.get("/tasks/agent/:agentName", (c) => {
+  const agentName = c.req.param("agentName");
+  const tasks = getAllAgentTasks(agentName);
+
+  return c.json({ agent: agentName, tasks, count: tasks.length });
+});
+
+app.get("/tasks/room/:roomCode", (c) => {
+  const roomCode = c.req.param("roomCode");
+  const tasks = getRoomTasks(roomCode);
+
+  return c.json({ room: roomCode, tasks, count: tasks.length });
+});
+
+// ── Master Dashboard Data ─────────────────────────────────────────────────────
+app.get("/api/dashboard-data", (c) => {
+  const groups = getAllRoomGroups();
+  const roomData = groups.map((group) => ({
+    ...group,
+    tasks: getRoomTasks(group.room_code),
+  }));
+
+  return c.json({
+    groups: roomData,
+    total_groups: groups.length,
+    active_rooms: getRoomCount(),
+    server_time: Date.now(),
+    uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
+  });
 });
 
 // ── MCP endpoint ──────────────────────────────────────────────────────────────
