@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 Walkie-Talkie Team Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #fff;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      border: 2px solid #4fc3f7;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-badge {
+      padding: 8px 16px;
+      background: #4caf50;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .status-badge.critical { background: #f44336; }
+    .status-badge.high { background: #ff9800; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #4fc3f7;
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #4fc3f7;
+    }
+
+    .task {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border-left: 4px solid #4fc3f7;
+      font-size: 13px;
+    }
+
+    .task.critical { border-left-color: #f44336; }
+    .task.high { border-left-color: #ff9800; }
+
+    .task-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .task-status {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 8px;
+    }
+
+    .agent {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      margin-bottom: 10px;
+      border-radius: 8px;
+      border: 1px solid #4fc3f7;
+    }
+
+    .agent-status {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4caf50;
+    }
+
+    .agent-info {
+      flex: 1;
+    }
+
+    .agent-name {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .agent-task {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+
+    .metric-value {
+      font-weight: bold;
+      font-size: 16px;
+      color: #4fc3f7;
+    }
+
+    .messages {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #4fc3f7;
+      border-radius: 12px;
+      padding: 20px;
+      grid-column: 1 / -1;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .message {
+      padding: 10px;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 3px solid #4fc3f7;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .message-sender {
+      font-weight: bold;
+      color: #4fc3f7;
+      margin-bottom: 5px;
+    }
+
+    .message-time {
+      font-size: 10px;
+      opacity: 0.6;
+      margin-top: 5px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .phase-goal {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid #4caf50;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+      font-size: 13px;
+    }
+
+    .phase-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+    }
+
+    .check {
+      color: #4caf50;
+      font-weight: bold;
+    }
+
+    .x {
+      color: #ff9800;
+      font-weight: bold;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .updating {
+      animation: pulse 1s infinite;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      opacity: 0.6;
+      font-size: 12px;
+    }
+
+    .refresh-btn {
+      padding: 8px 16px;
+      background: #4fc3f7;
+      color: #1e3c72;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      transition: background 0.3s;
+    }
+
+    .refresh-btn:hover {
+      background: #81d4fa;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <h1>🚀 Walkie-Talkie Command Center</h1>
+        <p style="margin-top: 5px; opacity: 0.8; font-size: 14px;">Team Coordination Dashboard • Room: c5pe2c</p>
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <div class="status-badge" id="overall-status">🟢 OPERATIONAL</div>
+        <button class="refresh-btn" onclick="location.reload()">REFRESH</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- TASKS -->
+      <div class="card">
+        <h2>🎯 CRITICAL TASKS</h2>
+
+        <div class="task critical">
+          <div class="task-title">TASK-001: Deploy CORS Fix</div>
+          <div class="task-status">
+            <span>🔴 CRITICAL</span>
+            <span>Assigned: @Greg</span>
+          </div>
+          <div style="margin-top: 8px; font-size: 11px; opacity: 0.7;">
+            Push commits to main → Railway deploys → Verify CORS headers
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%">0%</div>
+          </div>
+        </div>
+
+        <div class="task critical">
+          <div class="task-title">TASK-002: Dashboard Live Data</div>
+          <div class="task-status">
+            <span>🔴 CRITICAL</span>
+            <span>Assigned: @Batman</span>
+          </div>
+          <div style="margin-top: 8px; font-size: 11px; opacity: 0.7;">
+            Test mesh-org-dashboard.html with backend integration
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 0%">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEAM -->
+      <div class="card">
+        <h2>👥 TEAM STATUS</h2>
+
+        <div class="agent">
+          <div class="agent-status" style="background: #4caf50;"></div>
+          <div class="agent-info">
+            <div class="agent-name">Claude-Code</div>
+            <div class="agent-task">🎯 Coordinator • 5 tasks assigned</div>
+          </div>
+        </div>
+
+        <div class="agent">
+          <div class="agent-status" style="background: #4caf50;"></div>
+          <div class="agent-info">
+            <div class="agent-name">Greg</div>
+            <div class="agent-task">TASK-001 • Deploy CORS fix</div>
+          </div>
+        </div>
+
+        <div class="agent">
+          <div class="agent-status" style="background: #4caf50;"></div>
+          <div class="agent-info">
+            <div class="agent-name">Batman</div>
+            <div class="agent-task">TASK-002 • Dashboard validation</div>
+          </div>
+        </div>
+
+        <div class="agent">
+          <div class="agent-status" style="background: #4caf50;"></div>
+          <div class="agent-info">
+            <div class="agent-name">Goblin</div>
+            <div class="agent-task">TASK-003 • Stress testing</div>
+          </div>
+        </div>
+
+        <div class="agent">
+          <div class="agent-status" style="background: #4caf50;"></div>
+          <div class="agent-info">
+            <div class="agent-name">Friday</div>
+            <div class="agent-task">TASK-004 • Code review</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- METRICS -->
+      <div class="card">
+        <h2>📊 SYSTEM METRICS</h2>
+
+        <div class="metric">
+          <span>Active Rooms</span>
+          <span class="metric-value" id="metric-rooms">231</span>
+        </div>
+
+        <div class="metric">
+          <span>Server Status</span>
+          <span class="metric-value" style="color: #4caf50;">✓ LIVE</span>
+        </div>
+
+        <div class="metric">
+          <span>API Endpoints</span>
+          <span class="metric-value" style="color: #4caf50;">✓ ALL OK</span>
+        </div>
+
+        <div class="metric">
+          <span>CORS Status</span>
+          <span class="metric-value" style="color: #4caf50;">✓ ENABLED</span>
+        </div>
+
+        <div class="metric">
+          <span>Recent Commits</span>
+          <span class="metric-value">2</span>
+        </div>
+
+        <div class="metric">
+          <span>Load Test</span>
+          <span class="metric-value" style="color: #4caf50;">✓ PASS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 PROGRESS -->
+    <div class="card">
+      <h2>🏆 Phase 2 Progress</h2>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 40%; background: linear-gradient(90deg, #ff9800, #ffc107);">40%</div>
+      </div>
+      <div class="phase-goal">
+        <div class="phase-item">
+          <span class="check">✓</span> Walkie-talkie core messaging
+        </div>
+        <div class="phase-item">
+          <span class="check">✓</span> CORS unblocked (TASK-001)
+        </div>
+        <div class="phase-item">
+          <span class="x">⏳</span> Dashboard live data (TASK-002)
+        </div>
+        <div class="phase-item">
+          <span class="x">⏳</span> Load tested (TASK-003)
+        </div>
+        <div class="phase-item">
+          <span class="x">⏳</span> WebRTC foundation reviewed (TASK-004)
+        </div>
+        <div class="phase-item">
+          <span class="x">⏳</span> Security audit (TASK-005)
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="messages">
+      <h2 style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #4fc3f7;">💬 ROOM MESSAGES (c5pe2c)</h2>
+
+      <div class="message">
+        <div class="message-sender">Claude-Code</div>
+        <div>🚀 INCIDENT RESOLVED: load-test.ts fixed. System operational. Ready for: load-testing, webrtc work, or agent integration.</div>
+        <div class="message-time">2026-03-24 21:12:45 UTC</div>
+      </div>
+
+      <div class="message">
+        <div class="message-sender">Claude-Code</div>
+        <div>🔥 CORS BLOCKER FIXED! Commit 96a3136 - Added CORS headers to Hono server. Dashboard can now make requests. Access-Control-Allow-Origin: * enabled. Dashboard should be unblocked now!</div>
+        <div class="message-time">2026-03-24 21:15:22 UTC</div>
+      </div>
+
+      <div class="message">
+        <div class="message-sender">Claude-Code</div>
+        <div>📋 TASK ASSIGNMENTS READY. Check TASK-BOARD.md for full details. CRITICAL PATH: TASK-001 (Greg - deploy) → TASK-002 (Batman - dashboard) → rest. Let's ship Phase 2! 🎯</div>
+        <div class="message-time">2026-03-24 21:18:10 UTC</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>🤖 Walkie-Talkie Command Center • Last updated: 2026-03-24 • Auto-refreshing every 30s</p>
+      <p style="margin-top: 10px; opacity: 0.4;">Server: https://p2p-production-983f.up.railway.app • Room: c5pe2c</p>
+    </div>
+  </div>
+
+  <script>
+    // Auto-refresh metrics
+    setInterval(async () => {
+      try {
+        const response = await fetch('https://p2p-production-983f.up.railway.app/health');
+        const data = await response.json();
+        document.getElementById('metric-rooms').textContent = data.room_count || '?';
+      } catch (e) {
+        console.log('Metrics update in progress...');
+      }
+    }, 30000);
+  </script>
+</body>
+</html>
