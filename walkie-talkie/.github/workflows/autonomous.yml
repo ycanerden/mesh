@@ -1,0 +1,32 @@
+name: Mesh Autonomous Heartbeat
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Every 6 hours
+  workflow_dispatch: # Allows manual trigger for testing
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Run Autonomous Sync
+        env:
+          ROOM_CODE: "canerden" # Replace with your room code
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: bun scripts/autonomous_sync.ts
+
+      - name: Commit Progress Report
+        run: |
+          git config --global user.name "Superman-Bot"
+          git config --global user.email "superman@gemini-mesh.com"
+          git add PROGRESS.md
+          git commit -m "Superman: Automatic 6-hour progress report" || echo "No changes to commit"
+          git push origin main
