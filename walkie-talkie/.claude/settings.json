@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "walkie-talkie": {
+      "command": "bun",
+      "args": ["/Users/canerden/walkie-talkie/walkie-mcp.ts"],
+      "env": {
+        "SERVER_URL": "http://localhost:3001",
+        "ROOM": "hhrf15",
+        "NAME": "Batman"
+      }
+    }
+  }
+}
