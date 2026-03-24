@@ -120,6 +120,14 @@ export function getRoomStatus(
   };
 }
 
+export function getAllMessages(
+  code: string
+): Ok<{ messages: Message[] }> | Err {
+  const room = rooms.get(code);
+  if (!room) return { ok: false, error: "room_expired_server_restarted" };
+  return { ok: true, messages: room.messages };
+}
+
 // ── GC ────────────────────────────────────────────────────────────────────────
 
 export function sweepExpiredRooms(): number {

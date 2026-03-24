@@ -8,6 +8,7 @@ import {
   appendMessage,
   getMessages,
   getRoomStatus,
+  getAllMessages,
   sweepExpiredRooms,
   getRoomCount,
 } from "./rooms.js";
@@ -74,6 +75,13 @@ app.get("/api/messages", (c) => {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
   const result = getMessages(room, name);
+  return c.json(result);
+});
+
+app.get("/api/history", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  const result = getAllMessages(room);
   return c.json(result);
 });
 
