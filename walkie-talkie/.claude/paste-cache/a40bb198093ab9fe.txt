@@ -1,0 +1,23 @@
+Last login: Tue Mar 24 13:15:59 on ttys012
+brew install ngrok && ngrok http 3001%                                                                                  canerden@Can-MacBook-Air-5 ~ % brew install ngrok && ngrok http 3001
+==> Fetching downloads for: ngrok
+✔︎ API Source ngrok.rb                                                                        Verified      1.3KB/  1.3KB
+✔︎ Cask ngrok (3.37.2,nboc9dCtERa,a)                                                          Verified     10.7MB/ 10.7MB
+==> Caveats
+To install shell completions, add this to your profile:
+  if command -v ngrok &>/dev/null; then
+    eval "$(ngrok completion)"
+  fi
+
+==> Installing Cask ngrok
+==> Linking Binary 'ngrok' to '/opt/homebrew/bin/ngrok'
+🍺  ngrok was successfully installed!
+ERROR:  authentication failed: Usage of ngrok requires a verified account and authtoken.
+ERROR:  
+ERROR:  Sign up for an account: https://dashboard.ngrok.com/signup
+ERROR:  Install your authtoken: https://dashboard.ngrok.com/get-started/your-authtoken
+ERROR:  
+ERROR:  ERR_NGROK_4018
+ERROR:  https://ngrok.com/docs/errors/err_ngrok_4018
+ERROR:  
+canerden@Can-MacBook-Air-5 ~ % 

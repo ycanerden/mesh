@@ -1,0 +1,187 @@
+# Greg CRM — MVP Implementation Plan
+
+A local-first, agent-native CRM where contacts are markdown files and an AI agent does the relationship work. Built for developer-founders who hate Salesforce.
+
+## Architecture Decisions
+
+### Tech Stack
+| Layer | Choice | Why |
+|-------|--------|-----|
+| **Runtime** | Electron | Desktop app, full filesystem access, proven (Obsidian uses it) |
+| **Frontend** | React + Vite | Fast dev, HMR, you already know it |
+| **Styling** | Vanilla CSS with CSS variables | Dev-tool aesthetic, dark theme, full control |
+| **Markdown** | `gray-matter` (frontmatter) + `react-markdown` (render) | Parse YAML frontmatter + render body |
+| **File watching** | `chokidar` | Watch contact directory for external changes |
+| **Command palette** | Custom `cmdk`-inspired component | Cmd+K is the primary interface |
+| **Icons** | `lucide-react` | Clean, dev-tool-friendly icons |
+
+### Contact File Format
+Each contact is a [.md](file:///Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/task.md) file in `~/greg-contacts/` (configurable):
+
+```markdown
+---
+name: John Doe
+email: john@example.com
+company: Acme Corp
+role: CTO
+tags: [investor, technical]
+phone: "+1-555-0123"
+linkedin: https://linkedin.com/in/johndoe
+last_contacted: 2026-03-01
+created: 2026-02-15
+---
+
+## Notes
+Met at YC Demo Day. Interested in our Series A.
+
+## Log
+- **2026-03-01** — Sent follow-up email about partnership
+- **2026-02-20** — Coffee meeting, discussed roadmap
+- **2026-02-15** — Initial intro via Sarah
+```
+
+> [!IMPORTANT]
+> The file **is** the database. No SQLite, no JSON store. This means contacts are git-trackable, grep-able, and work offline by default.
+
+## Proposed Changes
+
+### Project Initialization
+
+#### [NEW] Project scaffold at `/Users/canerden/.gemini/antigravity/scratch/gregg-crm/`
+
+Initialize with Vite + React template, then add Electron via `electron` + `electron-builder`. Key config files:
+
+- `package.json` — scripts for dev (renderer + electron), build
+- `vite.config.js` — Vite config for the renderer process
+- `electron/main.js` — Electron main process (window, file system, IPC)
+- `electron/preload.js` — Secure bridge between main and renderer
+
+---
+
+### Design System
+
+#### [NEW] `src/index.css`
+
+Dark-mode-first design system with CSS variables. Inspired by Linear/Cursor aesthetics:
+- Color tokens (dark backgrounds, muted text, accent colors)
+- Typography (Inter/JetBrains Mono)
+- Spacing scale, border radius, shadows
+- Glassmorphism panels, smooth transitions
+
+---
+
+### App Shell
+
+#### [NEW] `src/App.jsx`
+
+Main layout: sidebar (contact list) + main content area (contact detail or welcome screen). Hosts the Cmd+K overlay.
+
+#### [NEW] `src/components/Sidebar.jsx`
+
+Contact list with:
+- Search/filter bar at top
+- Grouped contact list (alphabetical or by tag)
+- Active state highlighting
+- "New Contact" button
+
+#### [NEW] `src/components/ContactDetail.jsx`
+
+Selected contact view:
+- Header with name, company, role
+- Tag pills
+- Rendered markdown body (notes + log)
+- Inline edit mode (toggle between view and edit)
+- Quick actions bar (email, log activity)
+
+#### [NEW] `src/components/CommandPalette.jsx`
+
+Cmd+K overlay:
+- Fuzzy search across contacts and commands
+- Commands: "New contact", "Search contacts", "Add tag", "Log activity"
+- Keyboard-navigable (arrow keys + enter)
+- Animated open/close
+
+#### [NEW] `src/components/ContactEditor.jsx`
+
+Markdown editor for creating/editing contacts:
+- Frontmatter fields as a clean form
+- Markdown body as a textarea
+- Live preview toggle
+
+---
+
+### File System Layer
+
+#### [NEW] `src/lib/fileSystem.js`
+
+Core file operations (called via Electron IPC):
+- `listContacts()` — read directory, parse all [.md](file:///Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/task.md) files
+- `readContact(filename)` — parse frontmatter + body
+- `writeContact(filename, data)` — serialize frontmatter + body, write to disk
+- `deleteContact(filename)` — remove file
+- `watchContacts(callback)` — chokidar file watcher
+
+#### [NEW] `src/lib/markdown.js`
+
+Markdown utilities:
+- `parseContact(content)` — gray-matter parse
+- `serializeContact(frontmatter, body)` — gray-matter stringify
+- `generateFilename(name)` — slugify name to filename
+
+#### [NEW] `electron/ipc.js`
+
+IPC handlers for the main process:
+- File read/write/delete/list handlers
+- Directory selection dialog
+- File watcher setup
+
+---
+
+### State Management
+
+#### [NEW] `src/hooks/useContacts.js`
+
+React hook for contact state:
+- Load contacts from disk on mount
+- Real-time updates via file watcher
+- CRUD operations that write to disk + update React state
+
+#### [NEW] `src/hooks/useCommandPalette.js`
+
+Hook for command palette logic:
+- Open/close state
+- Fuzzy search filtering
+- Command registry
+
+---
+
+### Sample Data
+
+#### [NEW] `sample-contacts/`
+
+3-4 sample [.md](file:///Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/task.md) contact files to ship with the app for first-run experience.
+
+## Verification Plan
+
+### Automated Tests
+
+Since this is an Electron app with file system operations, the primary verification is functional:
+
+```bash
+# Build check — ensures the app compiles without errors
+cd /Users/canerden/.gemini/antigravity/scratch/gregg-crm
+npm run build
+```
+
+### Manual Verification (via browser subagent)
+
+1. **App launches** — Run `npm run dev`, open in browser (renderer process)
+2. **Contact list renders** — Sample contacts appear in sidebar  
+3. **Contact detail view** — Click a contact, see rendered markdown
+4. **Create contact** — Use Cmd+K → "New Contact", fill form, verify [.md](file:///Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/task.md) file appears on disk
+5. **Edit contact** — Toggle edit mode, modify, save, verify file changes
+6. **Cmd+K works** — Press Cmd+K, fuzzy search contacts, execute commands
+7. **Files are plain markdown** — Open contact files in any text editor, confirm they're valid markdown with YAML frontmatter
+
+> [!NOTE]
+> For this MVP, we'll run the React app in dev mode via Vite (browser). The Electron shell will be scaffolded but the **priority is getting the UI and file operations working**. Electron packaging can happen in a follow-up phase. The file system operations will be mocked with localStorage for the browser-based MVP, with the real filesystem layer ready for Electron.

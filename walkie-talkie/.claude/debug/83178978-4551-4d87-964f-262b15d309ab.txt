@@ -1,0 +1,1380 @@
+2026-03-06T14:05:40.543Z [DEBUG] MDM settings load completed in 19ms
+2026-03-06T14:05:40.581Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-06T14:05:40.581Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-06T14:05:40.581Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-06T14:05:40.581Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-06T14:05:40.587Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-06T14:05:40.588Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=false, result=false
+2026-03-06T14:05:40.589Z [DEBUG] [STARTUP] Running setup()...
+2026-03-06T14:05:40.592Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-06T14:05:40.602Z [ERROR] Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'
+    at openSync (unknown)
+    at readSync (/$bunfs/root/claude:12:1441)
+    at F2 (/$bunfs/root/claude:6412:113)
+    at AO (/$bunfs/root/claude:6414:226)
+    at GP8 (/$bunfs/root/claude:6398:5806)
+    at s90 (/$bunfs/root/claude:6398:5579)
+    at <anonymous> (/$bunfs/root/claude:6398:4272)
+    at async a90 (/$bunfs/root/claude:6398:4654)
+    at async <anonymous> (/$bunfs/root/claude:11966:400)
+    at processTicksAndRejections (native:7:39)
+2026-03-06T14:05:40.602Z [DEBUG] Error log sink initialized
+2026-03-06T14:05:40.605Z [DEBUG] [STARTUP] setup() completed in 16ms
+2026-03-06T14:05:40.605Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-06T14:05:40.605Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-06T14:05:40.605Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-06T14:05:40.605Z [DEBUG] Total plugin skills loaded: 0
+2026-03-06T14:05:40.605Z [DEBUG] Total plugin commands loaded: 0
+2026-03-06T14:05:40.605Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-06T14:05:40.605Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-06T14:05:40.605Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-03-06T14:05:40.605Z [DEBUG] [claudeai-mcp] Missing user:mcp_servers scope (scopes=user:inference)
+2026-03-06T14:05:40.606Z [DEBUG] Total plugin agents loaded: 0
+2026-03-06T14:05:40.610Z [DEBUG] Loaded 25 unique skills (25 unconditional, 0 conditional, managed: 0, user: 25, project: 0, additional: 0, legacy commands: 0)
+2026-03-06T14:05:40.610Z [DEBUG] getSkills returning: 25 skill dir commands, 0 plugin skills, 3 bundled skills
+2026-03-06T14:05:40.610Z [DEBUG] [STARTUP] Commands and agents loaded in 5ms
+2026-03-06T14:05:40.610Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-06T14:05:40.611Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-06T14:05:40.611Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-06T14:05:40.611Z [DEBUG] Total LSP servers loaded: 0
+2026-03-06T14:05:40.611Z [DEBUG] [STARTUP] MCP configs loaded in 24ms
+2026-03-06T14:05:40.614Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-06T14:05:40.614Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-06T14:05:40.616Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-06T14:05:40.616Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-06T14:05:40.616Z [DEBUG] LSP server manager initialized successfully
+2026-03-06T14:05:40.616Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-06T14:05:40.616Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:40.619Z [DEBUG] Watching for changes in setting files /Users/canerden/.claude/settings.json...
+2026-03-06T14:05:40.643Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-06T14:05:40.643Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-03-06T14:05:40.644Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-03-06T14:05:40.648Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-06T14:05:40.648Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:05:40.648Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-03-06T14:05:40.648Z [DEBUG] [FileIndex] getProjectFiles called, respectGitignore=true
+2026-03-06T14:05:40.648Z [DEBUG] [FileIndex] getFilesUsingGit called
+2026-03-06T14:05:40.666Z [DEBUG] installPluginsForHeadless: starting
+2026-03-06T14:05:40.666Z [DEBUG] Found 0 installed plugins (V2 format)
+2026-03-06T14:05:40.666Z [DEBUG] installPluginsForHeadless: no missing plugins or marketplaces configured
+2026-03-06T14:05:40.668Z [DEBUG] Security messages are fresh (<1h old), skipping fetch
+2026-03-06T14:05:40.671Z [DEBUG] Git remote URL: https://github.com/ycanerden/notetakertest.git
+2026-03-06T14:05:40.671Z [DEBUG] Parsed repository: github.com/ycanerden/notetakertest from URL: https://github.com/ycanerden/notetakertest.git
+2026-03-06T14:05:40.671Z [DEBUG] Watching for changes in skill/command directories: /Users/canerden/.claude/skills...
+2026-03-06T14:05:40.678Z [DEBUG] Total plugin output styles loaded: 0
+2026-03-06T14:05:40.678Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:40.695Z [DEBUG] [FileIndex] git ls-files (tracked) took 47ms
+2026-03-06T14:05:40.696Z [DEBUG] [FileIndex] git ls-files: 0 tracked files in 48ms
+2026-03-06T14:05:40.698Z [DEBUG] [FileIndex] using git ls-files result (0 files)
+2026-03-06T14:05:40.751Z [DEBUG] [FileIndex] background untracked fetch: 0 files
+2026-03-06T14:05:40.756Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-06T14:05:40.777Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:05:40.777Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:05:40.777Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:05:40.777Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:05:40.777Z [DEBUG] Sending 27 skills via attachment (initial, 27 total sent)
+2026-03-06T14:05:40.777Z [WARN] [3P telemetry] Event dropped (no event logger initialized): user_prompt
+2026-03-06T14:05:40.778Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-06T14:05:40.778Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:05:40.778Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-06T14:05:40.780Z [DEBUG] autocompact: tokens=3076 threshold=167000 effectiveWindow=180000
+2026-03-06T14:05:40.782Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:05:40.807Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:05:40.807Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:40.807Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:05:40.807Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:05:40.807Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:40.807Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:05:40.808Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:40.814Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=429,body=Rate limited. Please try again later.] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:05:40.815Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:05:40.815Z [DEBUG] Failed to fetch org fast mode status, defaulting to disabled
+2026-03-06T14:05:40.819Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=429,body=Rate limited. Please try again later.] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-psychology/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/programmatic-seo/references/playbooks.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/programmatic-seo/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/NON-TECHNICAL-WEB-INTERFACE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/PHASES.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/FRIDAY-CHECKLIST.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/GETTING-STARTED.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/README.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/SIMPLE-MODE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/DEMO-SCRIPT.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/WHATS-NEW.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/FIRECRAWL-SETUP.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/CONTRIBUTING.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/social/product-hunt-launch.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/copy/landing-page-hero.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/email/launch-sequence.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/IMPROVEMENT-ROADMAP.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.826Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/launch-plan/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/sprint-coach/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/founder-context/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/sales-outreach/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/mom-test/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/social-content/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/mvp-scope/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/customer-segments/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/pitch-deck/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/competitor-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/prototype-sprint/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/idea-validation/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/first-users/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/landing-page/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/follow-up-tracks/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/gtm-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/vc-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/portfolio-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/onboarding/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/AGENTS.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/CLAUDE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/references/aeo-geo-patterns.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/references/ai-writing-detection.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/references/copy-frameworks.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/references/natural-transitions.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/launch-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/reverse-engineering.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/platforms.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/post-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/references/templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/references/content-architecture.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copy-editing/references/plain-english-alternatives.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copy-editing/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/product-marketing-context/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-ideas/references/ideas-by-category.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-ideas/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/references/tier-structure.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/references/research-methods.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/free-tool-strategy/references/tool-types.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/free-tool-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/content-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/ga4-implementation.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/event-library.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/gtm-implementation.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/platform-setup-checklists.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/audience-targeting.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/ad-copy-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/form-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/page-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/page-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/signup-flow-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/onboarding-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/onboarding-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paywall-upgrade-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paywall-upgrade-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/schema-markup/references/schema-examples.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/schema-markup/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/popup-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/sequence-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/copy-guidelines.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/email-types.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/references/test-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/references/sample-size-guide.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/references/affiliate-programs.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/references/program-examples.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.827Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:05:40.828Z [DEBUG] Deduplicated 92 files in skills (same inode via symlinks or hard links)
+2026-03-06T14:05:41.400Z [DEBUG] [FileIndex] cache refresh completed in 752ms (rust index)
+2026-03-06T14:05:41.415Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/canerden/Library/Application Support/Claude/claude-code/2.1.51/claude)
+2026-03-06T14:05:43.289Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:05:44.786Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:05:44.786Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:05:44.786Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:05:44.786Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:05:44.788Z [DEBUG] "Permission suggestions for Read: [\n  {\n    \"type\": \"addRules\",\n    \"rules\": [\n      {\n        \"toolName\": \"Read\",\n        \"ruleContent\": \"//Users/canerden/Downloads/**\"\n      }\n    ],\n    \"behavior\": \"allow\",\n    \"destination\": \"session\"\n  }\n]"
+2026-03-06T14:05:44.788Z [DEBUG] executePermissionRequestHooks called for tool: Read
+2026-03-06T14:05:44.788Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Read
+2026-03-06T14:05:44.788Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:05:44.788Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:05:46.216Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-06T14:05:46.216Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:05:46.216Z [DEBUG] Matched 2 unique hooks for query "Read" (2 before deduplication)
+2026-03-06T14:05:46.235Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:05:46.235Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:05:46.235Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:05:46.236Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:05:46.236Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:05:46.236Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:05:46.236Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:46.236Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:05:46.236Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:05:46.236Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:46.236Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:05:46.236Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:46.237Z [DEBUG] autocompact: tokens=64612 threshold=167000 effectiveWindow=180000
+2026-03-06T14:05:46.237Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:05:46.239Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:05:46.239Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:46.239Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:05:46.239Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:05:46.239Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:46.239Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:05:46.239Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:05:46.246Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=429,body=Rate limited. Please try again later.] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:05:46.806Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:05:50.705Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:08:01.018Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-06T14:08:01.018Z [DEBUG] Found 2 hook matchers in settings
+2026-03-06T14:08:01.018Z [DEBUG] Matched 2 unique hooks for query "no match query" (2 before deduplication)
+2026-03-06T14:09:21.594Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-06T14:09:21.631Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:09:21.631Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:09:21.631Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:09:21.631Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:09:21.635Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-06T14:09:21.635Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:09:21.635Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-06T14:09:21.638Z [DEBUG] autocompact: tokens=116394 threshold=167000 effectiveWindow=180000
+2026-03-06T14:09:21.639Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:09:21.647Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:09:21.648Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:21.648Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:09:21.648Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:09:21.648Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:21.648Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:09:21.649Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:21.743Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:09:21.778Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:09:27.071Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:09:31.775Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:09:31.775Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:09:31.775Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:09:31.775Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:09:31.781Z [DEBUG] Read tool error (3ms): File does not exist. Note: your current working directory is /Users/canerden/Downloads/sales vlerick/.claude/worktrees/jovial-kilby.
+2026-03-06T14:09:31.781Z [ERROR] "Error: Error: File does not exist. Note: your current working directory is /Users/canerden/Downloads/sales vlerick/.claude/worktrees/jovial-kilby.\n    at call (/$bunfs/root/claude:1906:6346)\n    at async jJ8 (/$bunfs/root/claude:3322:15033)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:09:31.784Z [DEBUG] Getting matching hook commands for PostToolUseFailure with query: Read
+2026-03-06T14:09:31.784Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:09:31.784Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:09:32.300Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:09:32.300Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:09:32.300Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:09:32.300Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:09:32.300Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:09:32.300Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:09:32.300Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:32.300Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:09:32.300Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:09:32.300Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:32.301Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:09:32.301Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:32.301Z [DEBUG] autocompact: tokens=116635 threshold=167000 effectiveWindow=180000
+2026-03-06T14:09:32.301Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:09:32.304Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:09:32.304Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:32.304Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:09:32.304Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:09:32.304Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:32.304Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:09:32.304Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:09:32.311Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=429,body=Rate limited. Please try again later.] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:09:32.971Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:09:34.303Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:09:34.387Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-06T14:09:34.387Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-06T14:09:34.387Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:09:34.387Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T14:09:34.431Z [DEBUG] tree-sitter: loaded from embedded
+2026-03-06T14:09:34.437Z [DEBUG] "Permission suggestions for Bash: [\n  {\n    \"type\": \"addRules\",\n    \"rules\": [\n      {\n        \"toolName\": \"Read\",\n        \"ruleContent\": \"//Users/canerden/Downloads/sales vlerick/**\"\n      }\n    ],\n    \"behavior\": \"allow\",\n    \"destination\": \"session\"\n  }\n]"
+2026-03-06T14:09:34.437Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-03-06T14:09:34.437Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-03-06T14:09:34.437Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:09:34.437Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T14:11:12.025Z [DEBUG] Creating shell snapshot for zsh (/bin/zsh)
+2026-03-06T14:11:12.029Z [DEBUG] Looking for shell config file: /Users/canerden/.zshrc
+2026-03-06T14:11:12.036Z [DEBUG] Snapshots directory: /Users/canerden/.claude/shell-snapshots
+2026-03-06T14:11:12.041Z [DEBUG] Creating snapshot at: /Users/canerden/.claude/shell-snapshots/snapshot-zsh-1772806272036-erur4j.sh
+2026-03-06T14:11:12.041Z [DEBUG] Execution timeout: 10000ms
+2026-03-06T14:11:12.092Z [DEBUG] Shell snapshot created successfully (1098 bytes)
+2026-03-06T14:11:12.095Z [DEBUG] No session environment scripts found
+2026-03-06T14:11:12.096Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-03-06T14:11:12.114Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:12.116Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.eb8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:12.116Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.116Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:12.116Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:12.116Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.116Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:12.116Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.119Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-06T14:11:12.119Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:12.119Z [DEBUG] Matched 1 unique hooks for query "Bash" (1 before deduplication)
+2026-03-06T14:11:12.124Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:12.124Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:11:12.124Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:11:12.124Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:11:12.124Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:11:12.124Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:12.124Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.124Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:12.124Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:12.125Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.125Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:12.125Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.126Z [DEBUG] autocompact: tokens=116984 threshold=167000 effectiveWindow=180000
+2026-03-06T14:11:12.128Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:11:12.137Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:12.137Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.137Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:12.137Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:12.137Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.137Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:12.137Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:12.279Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:11:12.567Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:12.640Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:14.114Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:20.356Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:11:20.366Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:11:20.366Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:20.366Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:11:20.423Z [DEBUG] "Permission suggestions for Read: [\n  {\n    \"type\": \"addRules\",\n    \"rules\": [\n      {\n        \"toolName\": \"Read\",\n        \"ruleContent\": \"//Users/canerden/Downloads/sales vlerick/**\"\n      }\n    ],\n    \"behavior\": \"allow\",\n    \"destination\": \"session\"\n  }\n]"
+2026-03-06T14:11:20.423Z [DEBUG] executePermissionRequestHooks called for tool: Read
+2026-03-06T14:11:20.423Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Read
+2026-03-06T14:11:20.423Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:20.423Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:11:25.081Z [DEBUG] Applying permission update: Adding 1 allow rule(s) to destination 'session': ["Read(//Users/canerden/Downloads/sales vlerick/**)"]
+2026-03-06T14:11:25.084Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:25.084Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:25.084Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:25.275Z [DEBUG] Persisted tool result to /Users/canerden/.claude/projects/-Users-canerden-Downloads-sales-vlerick--claude-worktrees-jovial-kilby/83178978-4551-4d87-964f-262b15d309ab/tool-results/toolu_018ow2d9eaaP6Q7hiCtJddX9.txt (96.9KB)
+2026-03-06T14:11:25.275Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-06T14:11:25.275Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:25.275Z [DEBUG] Matched 2 unique hooks for query "Read" (2 before deduplication)
+2026-03-06T14:11:25.278Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:25.278Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:11:25.278Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:11:25.278Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:11:25.278Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:11:25.278Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:25.278Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:25.278Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:25.278Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:25.278Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:25.279Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:25.279Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:25.279Z [DEBUG] autocompact: tokens=118076 threshold=167000 effectiveWindow=180000
+2026-03-06T14:11:25.279Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:11:25.282Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:25.282Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:25.282Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:25.282Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:25.282Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:25.282Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:25.282Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:25.426Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:11:25.853Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:28.231Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:34.461Z [DEBUG] executePreToolHooks called for tool: Task
+2026-03-06T14:11:34.462Z [DEBUG] Getting matching hook commands for PreToolUse with query: Task
+2026-03-06T14:11:34.462Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:34.462Z [DEBUG] Matched 0 unique hooks for query "Task" (0 before deduplication)
+2026-03-06T14:11:34.473Z [DEBUG] Getting matching hook commands for SubagentStart with query: Explore
+2026-03-06T14:11:34.473Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:34.473Z [DEBUG] Matched 0 unique hooks for query "Explore" (0 before deduplication)
+2026-03-06T14:11:34.475Z [DEBUG] autocompact: tokens=271 threshold=167000 effectiveWindow=180000
+2026-03-06T14:11:34.476Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:34.477Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:34.477Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:34.477Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:34.477Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:34.477Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:34.477Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:34.477Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:37.336Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:37.993Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:11:37.993Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:11:37.993Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:37.994Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:11:37.999Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:37.999Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:37.999Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:38.179Z [DEBUG] Read tool error (183ms): File content (33120 tokens) exceeds maximum allowed tokens (25000). Please use offset and limit parameters to read specific portions of the file, or use the GrepTool to search for specific content.
+2026-03-06T14:11:38.180Z [ERROR] "MaxFileReadTokenExceededError: MaxFileReadTokenExceededError: File content (33120 tokens) exceeds maximum allowed tokens (25000). Please use offset and limit parameters to read specific portions of the file, or use the GrepTool to search for specific content.\n    at _t_ (/$bunfs/root/claude:1897:7740)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:11:38.180Z [DEBUG] Getting matching hook commands for PostToolUseFailure with query: Read
+2026-03-06T14:11:38.180Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:38.180Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:11:38.180Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:38.181Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:38.181Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:38.181Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:38.181Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:38.181Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:38.181Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:38.181Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:38.181Z [DEBUG] autocompact: tokens=52617 threshold=167000 effectiveWindow=180000
+2026-03-06T14:11:38.182Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:38.183Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:38.183Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:38.183Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:38.183Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:38.183Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:38.183Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:38.183Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:38.728Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:38.775Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:40.112Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:40.113Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:40.113Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:40.113Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:40.752Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:40.752Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:40.752Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:40.752Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:40.843Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:40.843Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:40.843Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:41.025Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:41.025Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:41.025Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:41.463Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:41.464Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:41.464Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:41.464Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:41.786Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:41.786Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:41.786Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:41.788Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:41.789Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:41.789Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:41.789Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:41.789Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:41.789Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:41.789Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:41.789Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:41.791Z [DEBUG] autocompact: tokens=57382 threshold=167000 effectiveWindow=180000
+2026-03-06T14:11:41.791Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:41.793Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:41.793Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:41.793Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:41.793Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:41.793Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:41.793Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:41.793Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:42.516Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:42.541Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:45.578Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:45.578Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:45.578Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:45.578Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:45.895Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:45.895Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:45.895Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:46.425Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:46.425Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:46.425Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:46.425Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:46.747Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:46.747Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:46.747Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:46.998Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:46.998Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:46.998Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:46.998Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:47.315Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:47.315Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:47.315Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:47.316Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:47.317Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:47.317Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:47.317Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:47.317Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:47.317Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:47.317Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:47.317Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:47.318Z [DEBUG] autocompact: tokens=62841 threshold=167000 effectiveWindow=180000
+2026-03-06T14:11:47.318Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:47.319Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:47.320Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:47.320Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:47.320Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:47.320Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:47.320Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:47.320Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:47.918Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:48.315Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:50.873Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:50.874Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:50.874Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:50.874Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:51.210Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:51.210Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:51.211Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:51.615Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:51.616Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:51.616Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:51.616Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:51.932Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:51.932Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:51.932Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:51.934Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:51.935Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:51.935Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:51.935Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:51.935Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:51.935Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:51.935Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:51.935Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:51.936Z [DEBUG] autocompact: tokens=67651 threshold=167000 effectiveWindow=180000
+2026-03-06T14:11:51.936Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:51.938Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:51.938Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:51.938Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:51.938Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:51.938Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:51.939Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:51.939Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:53.005Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:53.213Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:55.815Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:55.817Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:55.817Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:55.817Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:56.139Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:56.139Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:56.139Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:56.584Z [DEBUG] executePreToolHooks called for tool: Grep
+2026-03-06T14:11:56.584Z [DEBUG] Getting matching hook commands for PreToolUse with query: Grep
+2026-03-06T14:11:56.584Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:11:56.584Z [DEBUG] Matched 0 unique hooks for query "Grep" (0 before deduplication)
+2026-03-06T14:11:56.931Z [DEBUG] Getting matching hook commands for PostToolUse with query: Grep
+2026-03-06T14:11:56.931Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:11:56.931Z [DEBUG] Matched 2 unique hooks for query "Grep" (2 before deduplication)
+2026-03-06T14:11:56.936Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:56.937Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:56.938Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:56.938Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:56.938Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:56.939Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:56.939Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:56.939Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:56.942Z [DEBUG] autocompact: tokens=70272 threshold=167000 effectiveWindow=180000
+2026-03-06T14:11:56.943Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:11:56.949Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:11:56.949Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:56.949Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:11:56.949Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:11:56.949Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:11:56.949Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:56.950Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:11:57.356Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:11:57.828Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:12:00.417Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:12:00.417Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:12:00.417Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:12:00.417Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:12:00.422Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-06T14:12:00.422Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:12:00.422Z [DEBUG] Matched 2 unique hooks for query "Read" (2 before deduplication)
+2026-03-06T14:12:01.050Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:12:01.050Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:12:01.050Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:12:01.050Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:12:01.055Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-06T14:12:01.055Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:12:01.055Z [DEBUG] Matched 2 unique hooks for query "Read" (2 before deduplication)
+2026-03-06T14:12:01.538Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:12:01.538Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:12:01.538Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:12:01.539Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:12:01.546Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-06T14:12:01.546Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:12:01.546Z [DEBUG] Matched 2 unique hooks for query "Read" (2 before deduplication)
+2026-03-06T14:12:01.549Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:12:01.550Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:12:01.550Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:01.550Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:12:01.550Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:12:01.550Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:01.551Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:12:01.551Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:01.552Z [DEBUG] autocompact: tokens=81593 threshold=167000 effectiveWindow=180000
+2026-03-06T14:12:01.552Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:12:01.554Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:12:01.554Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:01.554Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:12:01.554Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:12:01.554Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:12:01.554Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:01.555Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:02.507Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:12:03.726Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:12:06.170Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:12:06.170Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:12:06.170Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:12:06.170Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:12:06.173Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-06T14:12:06.173Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:12:06.173Z [DEBUG] Matched 2 unique hooks for query "Read" (2 before deduplication)
+2026-03-06T14:12:06.614Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-06T14:12:06.614Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-06T14:12:06.614Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:12:06.614Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-06T14:12:06.615Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-06T14:12:06.615Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:12:06.615Z [DEBUG] Matched 2 unique hooks for query "Read" (2 before deduplication)
+2026-03-06T14:12:06.623Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:12:06.623Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:12:06.623Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:06.623Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:12:06.623Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:12:06.623Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:06.623Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:12:06.623Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:06.624Z [DEBUG] autocompact: tokens=95323 threshold=167000 effectiveWindow=180000
+2026-03-06T14:12:06.624Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:12:06.625Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:12:06.625Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:06.625Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:12:06.625Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:12:06.625Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:12:06.625Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:06.625Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:07.696Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:12:07.973Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:12:58.497Z [DEBUG] Getting matching hook commands for SubagentStop with query: Explore
+2026-03-06T14:12:58.497Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:12:58.497Z [DEBUG] Matched 0 unique hooks for query "Explore" (0 before deduplication)
+2026-03-06T14:12:58.504Z [DEBUG] Getting matching hook commands for PostToolUse with query: Task
+2026-03-06T14:12:58.504Z [DEBUG] Found 6 hook matchers in settings
+2026-03-06T14:12:58.504Z [DEBUG] Matched 1 unique hooks for query "Task" (1 before deduplication)
+2026-03-06T14:12:58.513Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T14:12:58.513Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:12:58.513Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:12:58.513Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:12:58.513Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:12:58.513Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:12:58.513Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:58.513Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:12:58.513Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:12:58.514Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:58.515Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:12:58.515Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:58.517Z [DEBUG] autocompact: tokens=122985 threshold=167000 effectiveWindow=180000
+2026-03-06T14:12:58.521Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:12:58.529Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:12:58.529Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:58.529Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:12:58.529Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:12:58.529Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:58.529Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:12:58.530Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:12:58.755Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:12:59.120Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:13:01.103Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:14:31.873Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-06T14:14:31.873Z [DEBUG] Found 2 hook matchers in settings
+2026-03-06T14:14:31.873Z [DEBUG] Matched 2 unique hooks for query "no match query" (2 before deduplication)
+2026-03-06T14:19:00.014Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-06T14:19:00.029Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:19:00.030Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:19:00.030Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:19:00.030Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:19:00.033Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-06T14:19:00.033Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:19:00.033Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-06T14:19:00.038Z [DEBUG] autocompact: tokens=126623 threshold=167000 effectiveWindow=180000
+2026-03-06T14:19:00.038Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:19:00.050Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:19:00.050Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:19:00.050Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:19:00.050Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:19:00.051Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:19:00.051Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:19:00.052Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:19:00.159Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:19:00.244Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:19:17.474Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:19:49.445Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-06T14:19:49.446Z [DEBUG] Found 2 hook matchers in settings
+2026-03-06T14:19:49.446Z [DEBUG] Matched 2 unique hooks for query "no match query" (2 before deduplication)
+2026-03-06T14:23:34.720Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-06T14:23:34.772Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:23:34.772Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:23:34.772Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:23:34.772Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:23:34.775Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-06T14:23:34.775Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:23:34.775Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-06T14:23:34.782Z [DEBUG] autocompact: tokens=128049 threshold=167000 effectiveWindow=180000
+2026-03-06T14:23:34.782Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:23:34.794Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.ea8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:23:34.794Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:23:34.794Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:23:34.794Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:23:34.794Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:23:34.795Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:23:34.795Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:23:34.905Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:23:34.962Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:23:37.328Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:23:53.182Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-06T14:23:53.182Z [DEBUG] Found 2 hook matchers in settings
+2026-03-06T14:23:53.182Z [DEBUG] Matched 2 unique hooks for query "no match query" (2 before deduplication)
+2026-03-06T14:35:40.694Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:39:04.456Z [DEBUG] MDM settings load completed in 20ms
+2026-03-06T14:39:04.504Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-06T14:39:04.504Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-06T14:39:04.504Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-06T14:39:04.504Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-06T14:39:04.510Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-06T14:39:04.513Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=false, result=false
+2026-03-06T14:39:04.513Z [DEBUG] [STARTUP] Running setup()...
+2026-03-06T14:39:04.516Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-06T14:39:04.525Z [ERROR] Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'
+    at openSync (unknown)
+    at readSync (/$bunfs/root/claude:12:1441)
+    at F2 (/$bunfs/root/claude:6412:113)
+    at AO (/$bunfs/root/claude:6414:226)
+    at GP8 (/$bunfs/root/claude:6398:5806)
+    at s90 (/$bunfs/root/claude:6398:5579)
+    at <anonymous> (/$bunfs/root/claude:6398:4272)
+    at async a90 (/$bunfs/root/claude:6398:4654)
+    at async <anonymous> (/$bunfs/root/claude:11966:400)
+    at processTicksAndRejections (native:7:39)
+2026-03-06T14:39:04.525Z [DEBUG] Error log sink initialized
+2026-03-06T14:39:04.529Z [DEBUG] [STARTUP] setup() completed in 16ms
+2026-03-06T14:39:04.529Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-06T14:39:04.530Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-06T14:39:04.530Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-06T14:39:04.530Z [DEBUG] Total plugin skills loaded: 0
+2026-03-06T14:39:04.530Z [DEBUG] Total plugin commands loaded: 0
+2026-03-06T14:39:04.530Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-06T14:39:04.530Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-06T14:39:04.530Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-03-06T14:39:04.530Z [DEBUG] [claudeai-mcp] Missing user:mcp_servers scope (scopes=user:inference)
+2026-03-06T14:39:04.531Z [DEBUG] Loaded 25 unique skills (25 unconditional, 0 conditional, managed: 0, user: 25, project: 0, additional: 0, legacy commands: 0)
+2026-03-06T14:39:04.531Z [DEBUG] getSkills returning: 25 skill dir commands, 0 plugin skills, 3 bundled skills
+2026-03-06T14:39:04.531Z [DEBUG] Total plugin agents loaded: 0
+2026-03-06T14:39:04.534Z [DEBUG] [STARTUP] Commands and agents loaded in 5ms
+2026-03-06T14:39:04.535Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-06T14:39:04.535Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-06T14:39:04.535Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-06T14:39:04.536Z [DEBUG] Total LSP servers loaded: 0
+2026-03-06T14:39:04.536Z [DEBUG] [STARTUP] MCP configs loaded in 26ms
+2026-03-06T14:39:04.538Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-06T14:39:04.538Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-06T14:39:04.540Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-06T14:39:04.540Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-06T14:39:04.540Z [DEBUG] LSP server manager initialized successfully
+2026-03-06T14:39:04.540Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-06T14:39:04.541Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:39:04.543Z [DEBUG] Watching for changes in setting files /Users/canerden/.claude/settings.json...
+2026-03-06T14:39:04.572Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-06T14:39:04.572Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-03-06T14:39:04.573Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-03-06T14:39:04.597Z [DEBUG] Getting matching hook commands for SessionStart with query: resume
+2026-03-06T14:39:04.597Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:39:04.597Z [DEBUG] Matched 0 unique hooks for query "resume" (0 before deduplication)
+2026-03-06T14:39:04.601Z [DEBUG] [FileIndex] getProjectFiles called, respectGitignore=true
+2026-03-06T14:39:04.601Z [DEBUG] [FileIndex] getFilesUsingGit called
+2026-03-06T14:39:04.616Z [DEBUG] installPluginsForHeadless: starting
+2026-03-06T14:39:04.616Z [DEBUG] Found 0 installed plugins (V2 format)
+2026-03-06T14:39:04.616Z [DEBUG] installPluginsForHeadless: no missing plugins or marketplaces configured
+2026-03-06T14:39:04.617Z [DEBUG] Git remote URL: https://github.com/ycanerden/notetakertest.git
+2026-03-06T14:39:04.618Z [DEBUG] Parsed repository: github.com/ycanerden/notetakertest from URL: https://github.com/ycanerden/notetakertest.git
+2026-03-06T14:39:04.618Z [DEBUG] Watching for changes in skill/command directories: /Users/canerden/.claude/skills...
+2026-03-06T14:39:04.619Z [DEBUG] Security messages are fresh (<1h old), skipping fetch
+2026-03-06T14:39:04.629Z [DEBUG] Total plugin output styles loaded: 0
+2026-03-06T14:39:04.629Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:39:04.635Z [DEBUG] [FileIndex] git ls-files (tracked) took 33ms
+2026-03-06T14:39:04.635Z [DEBUG] [FileIndex] git ls-files: 0 tracked files in 34ms
+2026-03-06T14:39:04.642Z [DEBUG] [FileIndex] using git ls-files result (0 files)
+2026-03-06T14:39:04.674Z [DEBUG] [FileIndex] background untracked fetch: 0 files
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-psychology/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/programmatic-seo/references/playbooks.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/programmatic-seo/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/NON-TECHNICAL-WEB-INTERFACE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/PHASES.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/FRIDAY-CHECKLIST.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/GETTING-STARTED.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/README.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/SIMPLE-MODE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/DEMO-SCRIPT.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/WHATS-NEW.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/FIRECRAWL-SETUP.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/CONTRIBUTING.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/social/product-hunt-launch.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/copy/landing-page-hero.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/email/launch-sequence.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/IMPROVEMENT-ROADMAP.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/launch-plan/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/sprint-coach/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/founder-context/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/sales-outreach/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/mom-test/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/social-content/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/mvp-scope/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/customer-segments/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/pitch-deck/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/competitor-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/prototype-sprint/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/idea-validation/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/first-users/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/landing-page/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/follow-up-tracks/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/gtm-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/vc-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/portfolio-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/onboarding/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/AGENTS.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/CLAUDE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/references/aeo-geo-patterns.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/references/ai-writing-detection.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.693Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/references/copy-frameworks.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/references/natural-transitions.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/launch-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/reverse-engineering.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/platforms.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/post-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/references/templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/references/content-architecture.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copy-editing/references/plain-english-alternatives.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copy-editing/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/product-marketing-context/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-ideas/references/ideas-by-category.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-ideas/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/references/tier-structure.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/references/research-methods.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/free-tool-strategy/references/tool-types.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/free-tool-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/content-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/ga4-implementation.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/event-library.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/gtm-implementation.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/platform-setup-checklists.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/audience-targeting.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/ad-copy-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/form-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/page-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/page-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/signup-flow-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/onboarding-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/onboarding-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paywall-upgrade-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paywall-upgrade-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/schema-markup/references/schema-examples.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/schema-markup/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/popup-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/sequence-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/copy-guidelines.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/email-types.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/references/test-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/references/sample-size-guide.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/references/affiliate-programs.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/references/program-examples.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T14:39:04.696Z [DEBUG] Deduplicated 92 files in skills (same inode via symlinks or hard links)
+2026-03-06T14:39:04.926Z [DEBUG] [FileIndex] cache refresh completed in 325ms (rust index)
+2026-03-06T14:39:04.934Z [DEBUG] Failed to fetch org fast mode status, defaulting to disabled
+2026-03-06T14:39:04.934Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:39:05.104Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/canerden/Library/Application Support/Claude/claude-code/2.1.51/claude)
+2026-03-06T14:53:45.522Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-06T14:53:45.572Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:53:45.573Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:53:45.574Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:53:45.574Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:53:45.580Z [DEBUG] Sending 27 skills via attachment (initial, 27 total sent)
+2026-03-06T14:53:45.584Z [WARN] [3P telemetry] Event dropped (no event logger initialized): user_prompt
+2026-03-06T14:53:45.586Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-06T14:53:45.586Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:53:45.586Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-06T14:53:45.594Z [DEBUG] autocompact: tokens=131858 threshold=167000 effectiveWindow=180000
+2026-03-06T14:53:45.597Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:53:45.626Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:53:45.627Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:53:45.627Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:53:45.627Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:53:45.628Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:53:45.628Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:53:45.630Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:53:45.840Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:53:46.054Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:53:51.538Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:53:58.472Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-06T14:53:58.472Z [DEBUG] Found 1 hook matchers in settings
+2026-03-06T14:53:58.473Z [DEBUG] Matched 1 unique hooks for query "no match query" (1 before deduplication)
+2026-03-06T14:59:08.229Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-06T14:59:08.252Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T14:59:08.252Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T14:59:08.253Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T14:59:08.253Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T14:59:08.256Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-06T14:59:08.256Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T14:59:08.256Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-06T14:59:08.261Z [DEBUG] autocompact: tokens=126368 threshold=167000 effectiveWindow=180000
+2026-03-06T14:59:08.262Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T14:59:08.272Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T14:59:08.272Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:59:08.272Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T14:59:08.272Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T14:59:08.272Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:59:08.272Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T14:59:08.272Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T14:59:08.420Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:59:08.420Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T14:59:14.589Z [DEBUG] Stream started - received first chunk
+2026-03-06T14:59:18.334Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-06T14:59:18.334Z [DEBUG] Found 1 hook matchers in settings
+2026-03-06T14:59:18.334Z [DEBUG] Matched 1 unique hooks for query "no match query" (1 before deduplication)
+2026-03-06T15:01:05.711Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-06T15:01:05.721Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T15:01:05.721Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T15:01:05.721Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T15:01:05.721Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T15:01:05.723Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-06T15:01:05.723Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:01:05.723Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-06T15:01:05.726Z [DEBUG] autocompact: tokens=126654 threshold=167000 effectiveWindow=180000
+2026-03-06T15:01:05.726Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T15:01:05.731Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:01:05.731Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:01:05.731Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:01:05.731Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:01:05.732Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:01:05.732Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:01:05.732Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:01:05.848Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:01:05.875Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:01:07.854Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:01:18.103Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-06T15:01:18.103Z [DEBUG] Found 1 hook matchers in settings
+2026-03-06T15:01:18.103Z [DEBUG] Matched 1 unique hooks for query "no match query" (1 before deduplication)
+2026-03-06T15:03:12.475Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-06T15:03:12.575Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T15:03:12.575Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T15:03:12.575Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T15:03:12.575Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T15:03:12.576Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-06T15:03:12.576Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:03:12.576Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-06T15:03:12.580Z [DEBUG] autocompact: tokens=127050 threshold=167000 effectiveWindow=180000
+2026-03-06T15:03:12.586Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T15:03:12.596Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:03:12.596Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:12.596Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:03:12.596Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:03:12.597Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:12.597Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:03:12.597Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:12.695Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:03:12.744Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:03:15.165Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:03:15.534Z [DEBUG] Read tool validation error: This tool cannot read binary files. The file appears to be a binary .docx file. Please use appropriate tools for binary file analysis.
+2026-03-06T15:03:15.544Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:03:15.546Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T15:03:15.546Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T15:03:15.546Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T15:03:15.546Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T15:03:15.547Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:03:15.547Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:15.547Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:03:15.547Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:03:15.550Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:15.551Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:03:15.551Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:15.552Z [DEBUG] autocompact: tokens=127173 threshold=167000 effectiveWindow=180000
+2026-03-06T15:03:15.552Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T15:03:15.564Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:03:15.565Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:15.565Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:03:15.565Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:03:15.565Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:15.565Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:03:15.565Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:15.581Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=429,body=Rate limited. Please try again later.] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:03:16.338Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:03:18.614Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:03:18.690Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-06T15:03:18.691Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-06T15:03:18.691Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:03:18.691Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:03:18.757Z [DEBUG] tree-sitter: loaded from embedded
+2026-03-06T15:03:18.784Z [DEBUG] "Permission suggestions for Bash: [\n  {\n    \"type\": \"addRules\",\n    \"rules\": [\n      {\n        \"toolName\": \"Read\",\n        \"ruleContent\": \"//Users/canerden/Downloads/sales vlerick/**\"\n      }\n    ],\n    \"behavior\": \"allow\",\n    \"destination\": \"session\"\n  }\n]"
+2026-03-06T15:03:18.785Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-03-06T15:03:18.785Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-03-06T15:03:18.785Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:03:18.785Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:03:25.227Z [DEBUG] Creating shell snapshot for zsh (/bin/zsh)
+2026-03-06T15:03:25.228Z [DEBUG] Looking for shell config file: /Users/canerden/.zshrc
+2026-03-06T15:03:25.228Z [DEBUG] Snapshots directory: /Users/canerden/.claude/shell-snapshots
+2026-03-06T15:03:25.229Z [DEBUG] Creating snapshot at: /Users/canerden/.claude/shell-snapshots/snapshot-zsh-1772809405228-vp9511.sh
+2026-03-06T15:03:25.229Z [DEBUG] Execution timeout: 10000ms
+2026-03-06T15:03:25.286Z [DEBUG] Shell snapshot created successfully (1098 bytes)
+2026-03-06T15:03:25.290Z [DEBUG] No session environment scripts found
+2026-03-06T15:03:25.290Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-03-06T15:03:26.132Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:03:26.135Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.eb8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:03:26.135Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.135Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:03:26.135Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:03:26.135Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.136Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:03:26.136Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.137Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-06T15:03:26.137Z [DEBUG] Found 5 hook matchers in settings
+2026-03-06T15:03:26.138Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:03:26.140Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:03:26.141Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T15:03:26.141Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T15:03:26.141Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T15:03:26.141Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T15:03:26.141Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:03:26.141Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.141Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:03:26.141Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:03:26.141Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.141Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:03:26.141Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.142Z [DEBUG] autocompact: tokens=127526 threshold=167000 effectiveWindow=180000
+2026-03-06T15:03:26.142Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T15:03:26.153Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:03:26.153Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.153Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:03:26.153Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:03:26.153Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.154Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:03:26.154Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:03:26.428Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:03:26.854Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:03:26.919Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:03:29.142Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:03:29.242Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-06T15:03:29.242Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-06T15:03:29.242Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:03:29.242Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:03:29.249Z [DEBUG] "Permission suggestions for Bash: [\n  {\n    \"type\": \"addRules\",\n    \"rules\": [\n      {\n        \"toolName\": \"Read\",\n        \"ruleContent\": \"//Users/canerden/Downloads/sales vlerick/**\"\n      }\n    ],\n    \"behavior\": \"allow\",\n    \"destination\": \"session\"\n  }\n]"
+2026-03-06T15:03:29.249Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-03-06T15:03:29.249Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-03-06T15:03:29.249Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:03:29.249Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:04:01.132Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-03-06T15:04:01.450Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:04:01.451Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.eb8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:01.451Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.451Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:01.451Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:01.451Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.452Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:01.452Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.452Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-06T15:04:01.452Z [DEBUG] Found 5 hook matchers in settings
+2026-03-06T15:04:01.452Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:04:01.454Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:04:01.454Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T15:04:01.454Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T15:04:01.454Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T15:04:01.454Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T15:04:01.455Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:01.455Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.455Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:01.455Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:01.455Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.455Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:01.455Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.456Z [DEBUG] autocompact: tokens=128620 threshold=167000 effectiveWindow=180000
+2026-03-06T15:04:01.456Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T15:04:01.460Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:01.460Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.460Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:01.460Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:01.460Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.460Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:01.460Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:01.666Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:04:01.900Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:04:02.064Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:04:03.977Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:04:10.156Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-06T15:04:10.156Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-06T15:04:10.156Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:04:10.156Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:04:10.166Z [DEBUG] "Permission suggestions for Bash: [\n  {\n    \"type\": \"addRules\",\n    \"rules\": [\n      {\n        \"toolName\": \"Read\",\n        \"ruleContent\": \"//Users/canerden/Downloads/sales vlerick/**\"\n      }\n    ],\n    \"behavior\": \"allow\",\n    \"destination\": \"session\"\n  }\n]"
+2026-03-06T15:04:10.166Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-03-06T15:04:10.167Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-03-06T15:04:10.167Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:04:10.167Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:04:12.017Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-03-06T15:04:12.232Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:04:12.233Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.eb8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:12.233Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.233Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:12.233Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:12.233Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.233Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:12.233Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.234Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-06T15:04:12.234Z [DEBUG] Found 5 hook matchers in settings
+2026-03-06T15:04:12.234Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:04:12.235Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:04:12.235Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T15:04:12.235Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T15:04:12.235Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T15:04:12.235Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T15:04:12.235Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:12.236Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.236Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:12.236Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:12.236Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.236Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:12.236Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.236Z [DEBUG] autocompact: tokens=129657 threshold=167000 effectiveWindow=180000
+2026-03-06T15:04:12.237Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T15:04:12.240Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:12.240Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.240Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:12.240Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:12.240Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.240Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:12.240Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:12.374Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:04:12.810Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:04:12.887Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:04:16.299Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:04:16.434Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-06T15:04:16.434Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-06T15:04:16.434Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:04:16.434Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:04:16.438Z [DEBUG] "Permission suggestions for Bash: [\n  {\n    \"type\": \"addRules\",\n    \"rules\": [\n      {\n        \"toolName\": \"Read\",\n        \"ruleContent\": \"//Users/canerden/Downloads/sales vlerick/**\"\n      }\n    ],\n    \"behavior\": \"allow\",\n    \"destination\": \"session\"\n  }\n]"
+2026-03-06T15:04:16.438Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-03-06T15:04:16.438Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-03-06T15:04:16.438Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:04:16.438Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:04:17.996Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-03-06T15:04:18.427Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:04:18.428Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.eb8; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:18.428Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.428Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:18.428Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:18.428Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.428Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:18.428Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.429Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-06T15:04:18.429Z [DEBUG] Found 5 hook matchers in settings
+2026-03-06T15:04:18.429Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-06T15:04:18.431Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-06T15:04:18.431Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-06T15:04:18.431Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-06T15:04:18.431Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-06T15:04:18.431Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-06T15:04:18.432Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.3ae; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:18.432Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.432Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:18.432Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:18.432Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.432Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:18.432Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.432Z [DEBUG] autocompact: tokens=130415 threshold=167000 effectiveWindow=180000
+2026-03-06T15:04:18.433Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-03-06T15:04:18.436Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.51.97b; cc_entrypoint=claude-desktop; cch=00000;
+2026-03-06T15:04:18.436Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.436Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-06T15:04:18.436Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-06T15:04:18.436Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.436Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-06T15:04:18.436Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:04:18.564Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:04:19.194Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:04:19.336Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:04:20.977Z [DEBUG] Stream started - received first chunk
+2026-03-06T15:05:05.481Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-06T15:05:05.481Z [DEBUG] Found 1 hook matchers in settings
+2026-03-06T15:05:05.481Z [DEBUG] Matched 1 unique hooks for query "no match query" (1 before deduplication)
+2026-03-06T15:09:04.625Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:20:08.961Z [DEBUG] MDM settings load completed in 18ms
+2026-03-06T15:20:09.017Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-06T15:20:09.017Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-06T15:20:09.017Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-06T15:20:09.017Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-06T15:20:09.023Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-06T15:20:09.026Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=false, result=false
+2026-03-06T15:20:09.027Z [DEBUG] [STARTUP] Running setup()...
+2026-03-06T15:20:09.029Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-06T15:20:09.040Z [ERROR] Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'
+    at openSync (unknown)
+    at readSync (/$bunfs/root/claude:12:1441)
+    at F2 (/$bunfs/root/claude:6412:113)
+    at AO (/$bunfs/root/claude:6414:226)
+    at GP8 (/$bunfs/root/claude:6398:5806)
+    at s90 (/$bunfs/root/claude:6398:5579)
+    at <anonymous> (/$bunfs/root/claude:6398:4272)
+    at async a90 (/$bunfs/root/claude:6398:4654)
+    at async <anonymous> (/$bunfs/root/claude:11966:400)
+    at processTicksAndRejections (native:7:39)
+2026-03-06T15:20:09.040Z [DEBUG] Error log sink initialized
+2026-03-06T15:20:09.044Z [DEBUG] [STARTUP] setup() completed in 17ms
+2026-03-06T15:20:09.044Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-06T15:20:09.044Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-06T15:20:09.044Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-06T15:20:09.044Z [DEBUG] Total plugin skills loaded: 0
+2026-03-06T15:20:09.044Z [DEBUG] Total plugin commands loaded: 0
+2026-03-06T15:20:09.044Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-06T15:20:09.045Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-06T15:20:09.045Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-03-06T15:20:09.045Z [DEBUG] [claudeai-mcp] Missing user:mcp_servers scope (scopes=user:inference)
+2026-03-06T15:20:09.047Z [DEBUG] Total plugin agents loaded: 0
+2026-03-06T15:20:09.050Z [DEBUG] Loaded 25 unique skills (25 unconditional, 0 conditional, managed: 0, user: 25, project: 0, additional: 0, legacy commands: 0)
+2026-03-06T15:20:09.050Z [DEBUG] getSkills returning: 25 skill dir commands, 0 plugin skills, 3 bundled skills
+2026-03-06T15:20:09.050Z [DEBUG] [STARTUP] Commands and agents loaded in 6ms
+2026-03-06T15:20:09.051Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-06T15:20:09.051Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-06T15:20:09.051Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-06T15:20:09.051Z [DEBUG] Total LSP servers loaded: 0
+2026-03-06T15:20:09.051Z [DEBUG] [STARTUP] MCP configs loaded in 28ms
+2026-03-06T15:20:09.056Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-06T15:20:09.056Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-06T15:20:09.058Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-06T15:20:09.058Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-06T15:20:09.058Z [DEBUG] LSP server manager initialized successfully
+2026-03-06T15:20:09.058Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-06T15:20:09.058Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:20:09.060Z [DEBUG] Watching for changes in setting files /Users/canerden/.claude/settings.json...
+2026-03-06T15:20:09.084Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-06T15:20:09.084Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-03-06T15:20:09.085Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-03-06T15:20:09.104Z [DEBUG] Getting matching hook commands for SessionStart with query: resume
+2026-03-06T15:20:09.104Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T15:20:09.104Z [DEBUG] Matched 0 unique hooks for query "resume" (0 before deduplication)
+2026-03-06T15:20:09.106Z [DEBUG] [FileIndex] getProjectFiles called, respectGitignore=true
+2026-03-06T15:20:09.106Z [DEBUG] [FileIndex] getFilesUsingGit called
+2026-03-06T15:20:09.117Z [DEBUG] installPluginsForHeadless: starting
+2026-03-06T15:20:09.117Z [DEBUG] Found 0 installed plugins (V2 format)
+2026-03-06T15:20:09.117Z [DEBUG] installPluginsForHeadless: no missing plugins or marketplaces configured
+2026-03-06T15:20:09.118Z [DEBUG] Watching for changes in skill/command directories: /Users/canerden/.claude/skills...
+2026-03-06T15:20:09.119Z [DEBUG] Git remote URL: https://github.com/ycanerden/notetakertest.git
+2026-03-06T15:20:09.119Z [DEBUG] Parsed repository: github.com/ycanerden/notetakertest from URL: https://github.com/ycanerden/notetakertest.git
+2026-03-06T15:20:09.125Z [DEBUG] Fetching plugin security messages from https://raw.githubusercontent.com/anthropics/claude-plugins-official/refs/heads/security/security.json
+2026-03-06T15:20:09.129Z [DEBUG] Total plugin output styles loaded: 0
+2026-03-06T15:20:09.129Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T15:20:09.142Z [DEBUG] [FileIndex] git ls-files (tracked) took 36ms
+2026-03-06T15:20:09.143Z [DEBUG] [FileIndex] git ls-files: 0 tracked files in 37ms
+2026-03-06T15:20:09.145Z [DEBUG] [FileIndex] using git ls-files result (0 files)
+2026-03-06T15:20:09.180Z [DEBUG] [FileIndex] background untracked fetch: 0 files
+2026-03-06T15:20:09.183Z [DEBUG] Security messages saved successfully
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-psychology/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/programmatic-seo/references/playbooks.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/programmatic-seo/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/NON-TECHNICAL-WEB-INTERFACE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/PHASES.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/FRIDAY-CHECKLIST.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/GETTING-STARTED.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/README.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/SIMPLE-MODE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/DEMO-SCRIPT.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/WHATS-NEW.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/FIRECRAWL-SETUP.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/CONTRIBUTING.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/social/product-hunt-launch.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/copy/landing-page-hero.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/templates/email/launch-sequence.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/IMPROVEMENT-ROADMAP.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/launch-plan/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/sprint-coach/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/founder-context/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/sales-outreach/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/mom-test/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/social-content/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/mvp-scope/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/customer-segments/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/pitch-deck/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/competitor-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/prototype-sprint/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/idea-validation/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/first-users/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/landing-page/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/follow-up-tracks/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/gtm-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/vc-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/portfolio-research/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/skills/onboarding/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/AGENTS.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/habitat/CLAUDE.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/references/aeo-geo-patterns.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.190Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/references/ai-writing-detection.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/seo-audit/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/references/copy-frameworks.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/references/natural-transitions.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copywriting/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/launch-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/reverse-engineering.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/platforms.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/references/post-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/social-content/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/references/templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/references/content-architecture.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/competitor-alternatives/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copy-editing/references/plain-english-alternatives.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/copy-editing/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/product-marketing-context/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-ideas/references/ideas-by-category.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/marketing-ideas/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/references/tier-structure.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/references/research-methods.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/pricing-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/free-tool-strategy/references/tool-types.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/free-tool-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/content-strategy/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/ga4-implementation.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/event-library.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/references/gtm-implementation.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/analytics-tracking/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/platform-setup-checklists.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/audience-targeting.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/references/ad-copy-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paid-ads/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/form-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/page-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/page-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/signup-flow-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/onboarding-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/onboarding-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paywall-upgrade-cro/references/experiments.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/paywall-upgrade-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/schema-markup/references/schema-examples.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/schema-markup/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/popup-cro/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/sequence-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/copy-guidelines.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/references/email-types.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/email-sequence/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/references/test-templates.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/references/sample-size-guide.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/ab-test-setup/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/references/affiliate-programs.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/references/program-examples.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Skipping duplicate file '/Users/canerden/.claude/skills/referral-program/SKILL.md' from projectSettings (same inode already loaded from userSettings)
+2026-03-06T15:20:09.193Z [DEBUG] Deduplicated 92 files in skills (same inode via symlinks or hard links)
+2026-03-06T15:20:09.468Z [DEBUG] [FileIndex] cache refresh completed in 362ms (rust index)
+2026-03-06T15:20:09.472Z [DEBUG] Failed to fetch org fast mode status, defaulting to disabled
+2026-03-06T15:20:09.472Z [ERROR] "AxiosError: [url=https://api.anthropic.com/api/oauth/claude_cli/client_data,status=403,body=OAuth token does not meet scope requirement user:profile] Error\n    at pj (/$bunfs/root/claude:92:1144)\n    at <anonymous> (/$bunfs/root/claude:93:10067)\n    at emit (node:events:92:22)\n    at endReadableNT (internal:streams/readable:861:50)\n    at processTicksAndRejections (native:7:39)\n    at request (/$bunfs/root/claude:95:2149)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T15:20:09.810Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/Users/canerden/Library/Application Support/Claude/claude-code/2.1.51/claude)
+2026-03-06T15:50:09.302Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T16:20:09.124Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T16:50:09.095Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T17:20:09.095Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T17:51:47.737Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T18:27:32.813Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T19:10:06.791Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T19:44:49.792Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T20:18:02.101Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T21:04:01.092Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T21:45:57.530Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T22:24:21.756Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"
+2026-03-06T23:04:36.460Z [ERROR] "Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'\n    at openSync (unknown)\n    at readSync (/$bunfs/root/claude:12:1441)\n    at F2 (/$bunfs/root/claude:6412:113)\n    at AO (/$bunfs/root/claude:6414:226)\n    at GP8 (/$bunfs/root/claude:6398:5806)\n    at s90 (/$bunfs/root/claude:6398:5579)\n    at o90 (/$bunfs/root/claude:6398:4794)\n    at async <anonymous> (/$bunfs/root/claude:6398:8150)\n    at processTicksAndRejections (native:7:39)"

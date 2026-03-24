@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Plan to build GameHunt: a Product Hunt for games. Includes fixing configuration, backend models (Game, Vote, Comment), and frontend pages (Home, Submit, Detail).",
+  "updatedAt": "2025-11-19T09:35:46.086083Z"
+}

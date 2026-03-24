@@ -1,0 +1,411 @@
+import Link from "next/link";
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 z-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Link href="/" className="text-xl font-bold text-gray-900">
+                Habitat
+              </Link>
+            </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="#program" className="text-gray-600 hover:text-gray-900 transition-colors">
+                Program
+              </Link>
+              <Link href="#community" className="text-gray-600 hover:text-gray-900 transition-colors">
+                Community
+              </Link>
+              <Link href="#faq" className="text-gray-600 hover:text-gray-900 transition-colors">
+                FAQ
+              </Link>
+              <Link
+                href="#apply"
+                className="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition-colors"
+              >
+                Apply Now
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
+            Build your startup in
+            <br />
+            <span className="text-gray-500">3 months. Together.</span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+            An intensive in-person residency for solo founders to ship, launch, and find their first 100 users.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="#apply"
+              className="px-8 py-4 bg-gray-900 text-white rounded-lg text-lg font-medium hover:bg-gray-800 transition-colors"
+            >
+              Apply for Cohort 1
+            </Link>
+            <Link
+              href="#program"
+              className="px-8 py-4 border border-gray-300 rounded-lg text-lg font-medium hover:border-gray-400 transition-colors"
+            >
+              Learn More
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 border-y border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div>
+              <div className="text-4xl font-bold mb-2">101+</div>
+              <div className="text-gray-600">Prototypes Shipped at Habitat Evenings</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">5 Hours</div>
+              <div className="text-gray-600">Sprint Methodology, Not 5 Months</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">33%</div>
+              <div className="text-gray-600">Of New Companies Are Solo-Founded</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Philosophy Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+            Solo founding is considered odd.
+            <br />
+            <span className="text-gray-500">We think it&apos;s the future.</span>
+          </h2>
+          <p className="text-xl text-gray-600">
+            With the right frameworks, peer support, and AI tools, solo founders move faster than most teams.
+          </p>
+        </div>
+      </section>
+
+      {/* Program Section */}
+      <section id="program" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">The Program</h2>
+            <p className="text-xl text-gray-600">What you get in 3 months</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <h3 className="text-2xl font-bold mb-4">Proven Frameworks</h3>
+              <p className="text-gray-600 mb-4">
+                The 5-hour sprint methodology that helped 101+ founders ship prototypes in one evening.
+                Validation, building, and marketing playbooks based on real results.
+              </p>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Idea validation frameworks</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>MVP scoping & rapid prototyping</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Launch strategy & first 100 users</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <h3 className="text-2xl font-bold mb-4">AI-Native Toolkit</h3>
+              <p className="text-gray-600 mb-4">
+                Habitat Skills: your AI co-founder in Claude Code. Expert advice on fundraising, marketing,
+                and growth — like having a co-founder who&apos;s done it before.
+              </p>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Open-source agent frameworks</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Autonomous research tools</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Marketing & growth playbooks</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <h3 className="text-2xl font-bold mb-4">In-Person Intensity</h3>
+              <p className="text-gray-600 mb-4">
+                3 months together in Europe. No Zoom calls. Real momentum, serendipity, and energy
+                that only happens in person.
+              </p>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Daily co-working & sprint sessions</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Weekly founder talks & workshops</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Demo days & peer feedback</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-white p-8 rounded-lg border border-gray-200">
+              <h3 className="text-2xl font-bold mb-4">Community Support</h3>
+              <p className="text-gray-600 mb-4">
+                Solo, together. Build with peers who understand the journey. Peer accountability,
+                shared struggles, and lifelong founder friendships.
+              </p>
+              <ul className="space-y-2 text-gray-600">
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>12-20 carefully selected founders</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Peer accountability groups</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="mr-2">•</span>
+                  <span>Alumni network access</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Community Section */}
+      <section id="community" className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Solo, Together</h2>
+            <p className="text-xl text-gray-600">
+              Building a startup alone is hard. But you don&apos;t have to do it isolated.
+            </p>
+          </div>
+
+          <div className="space-y-12">
+            <div>
+              <h3 className="text-2xl font-bold mb-4">Why Solo Founders?</h3>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Traditional accelerators are built for teams. Solo founders often feel like second-class citizens.
+                At Habitat, we celebrate solo founding — we believe it&apos;s the future.
+              </p>
+              <p className="text-gray-600 leading-relaxed">
+                With AI tools like Claude Code and the right frameworks, solo founders move faster than most teams.
+                You don&apos;t need a co-founder to build something great.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 p-8 rounded-lg">
+              <blockquote className="text-xl italic text-gray-700 mb-4">
+                &ldquo;Solo founders start over one-third of new companies — a 53% increase from 2019.&rdquo;
+              </blockquote>
+              <p className="text-gray-600">— Carta Research</p>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-bold mb-4">Who This Is For</h3>
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="border-l-4 border-gray-900 pl-4">
+                  <h4 className="font-bold mb-2">You&apos;re Building Solo</h4>
+                  <p className="text-gray-600">
+                    You&apos;re the solo founder or a tiny 2-person team building something ambitious.
+                  </p>
+                </div>
+                <div className="border-l-4 border-gray-900 pl-4">
+                  <h4 className="font-bold mb-2">You&apos;re Ready to Ship</h4>
+                  <p className="text-gray-600">
+                    You have an idea (or several) and you&apos;re ready to go all-in for 3 months.
+                  </p>
+                </div>
+                <div className="border-l-4 border-gray-900 pl-4">
+                  <h4 className="font-bold mb-2">You&apos;re AI-Native</h4>
+                  <p className="text-gray-600">
+                    You use (or want to use) Claude Code, Cursor, or similar AI tools to build.
+                  </p>
+                </div>
+                <div className="border-l-4 border-gray-900 pl-4">
+                  <h4 className="font-bold mb-2">You Can Relocate</h4>
+                  <p className="text-gray-600">
+                    You&apos;re willing to spend 3 months in Europe building alongside other founders.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold mb-12 text-center">Frequently Asked Questions</h2>
+
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-bold mb-2">When does the first cohort start?</h3>
+              <p className="text-gray-600">
+                Applications are opening soon. The first cohort will start in Q2/Q3 2026.
+                Join our newsletter to be notified when applications open.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-2">Where is the residency located?</h3>
+              <p className="text-gray-600">
+                The residency will be in a major European city (TBD). We&apos;ll provide co-working space
+                and help with accommodation recommendations.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-2">How many founders will be in each cohort?</h3>
+              <p className="text-gray-600">
+                We&apos;re keeping it intimate: 12-20 carefully selected founders per cohort.
+                Quality over quantity.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-2">What does it cost?</h3>
+              <p className="text-gray-600">
+                We&apos;re finalizing the model. It may be equity-based (2-5%), a program fee, or a combination.
+                Details will be shared when applications open.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-2">I&apos;m not technical. Can I still apply?</h3>
+              <p className="text-gray-600">
+                Yes! If you&apos;re using AI tools (Claude Code, Cursor) to build, you&apos;re technical enough.
+                We teach the Habitat Skills framework which works for non-traditional builders.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-2">What if I don&apos;t have an idea yet?</h3>
+              <p className="text-gray-600">
+                That&apos;s okay. We prefer founders who have validated ideas, but if you&apos;re committed
+                to finding one during the program, we&apos;ll consider you. The first weeks include validation frameworks.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-2">How is this different from YC or other accelerators?</h3>
+              <p className="text-gray-600">
+                Traditional accelerators are built for teams and optimized for VC fundraising. We&apos;re built for
+                solo founders and optimized for shipping + traction. You leave with a launched product and real users.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Apply Section */}
+      <section id="apply" className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">Ready to Build?</h2>
+          <p className="text-xl text-gray-600 mb-12">
+            Applications for Cohort 1 are opening soon. Join the waitlist to be notified.
+          </p>
+
+          <form className="max-w-md mx-auto space-y-4">
+            <input
+              type="email"
+              placeholder="Your email"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+            />
+            <button
+              type="submit"
+              className="w-full px-8 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            >
+              Join Waitlist
+            </button>
+          </form>
+
+          <p className="text-sm text-gray-500 mt-8">
+            Or{" "}
+            <Link href="https://github.com/ycanerden/habitat-skills" className="underline hover:text-gray-900">
+              try Habitat Skills
+            </Link>
+            {" "}for free while you wait.
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h3 className="font-bold mb-4">Habitat</h3>
+              <p className="text-gray-600 text-sm">
+                Building the future of solo founding.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Program</h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>
+                  <Link href="#program" className="hover:text-gray-900">
+                    How It Works
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#faq" className="hover:text-gray-900">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#apply" className="hover:text-gray-900">
+                    Apply
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-bold mb-4">Resources</h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>
+                  <Link href="https://github.com/ycanerden/habitat-skills" className="hover:text-gray-900">
+                    Habitat Skills (GitHub)
+                  </Link>
+                </li>
+                <li>
+                  <Link href="https://www.joinhabitat.eu" className="hover:text-gray-900">
+                    Habitat Evenings
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-100 pt-8 text-center text-sm text-gray-600">
+            <p>&copy; 2026 Habitat. Built for solo founders.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

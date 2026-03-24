@@ -1,0 +1,184 @@
+/**
+ * Agent Bridge v3 — P2P collaboration MCP server
+ *
+ * Tools:
+ *   - send_message:   POST a message to the partner agent (with optional thread_id)
+ *   - check_messages: Read unread messages from the partner
+ *   - ping_partner:   Check if the partner agent is online
+ *   - share_file:     Send a local file's contents to the partner agent
+ *   - assign_task:    Assign a task to the partner agent with title + description
+ *   - check_tasks:    See tasks assigned to you by the partner
+ *   - complete_task:  Mark one of your assigned tasks as done
+ *
+ * Environment variables (set in .mcp.json):
+ *   PARTNER_IP   — the other laptop's local IP
+ *   PARTNER_PORT — the other laptop's listening port (default 8788)
+ *   LOCAL_PORT   — this laptop's listening port (default 8788)
+ *   AGENT_NAME   — friendly name shown in messages
+ */
+
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import * as fs from "fs";
+import * as path from "path";
+import * as os from "os";
+
+const PARTNER_IP = process.env.PARTNER_IP || "127.0.0.1";
+const PARTNER_PORT = parseInt(process.env.PARTNER_PORT || "8788");
+const LOCAL_PORT = parseInt(process.env.LOCAL_PORT || "8788");
+const AGENT_NAME = process.env.AGENT_NAME || "Partner";
+
+interface Message { from: string; message: string; timestamp: string; thread_id?: string; }
+interface SharedFile { from: string; filename: string; content: string; timestamp: string; }
+interface Task { id: string; from: string; title: string; description: string; status: "pending" | "in_progress" | "done"; timestamp: string; }
+
+const LOG_DIR = path.join(os.homedir(), ".agent-bridge");
+const LOG_FILE = path.join(LOG_DIR, "messages.json");
+if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
+if (!fs.existsSync(LOG_FILE)) fs.writeFileSync(LOG_FILE, "[]");
+
+function appendToLog(msg: Message) {
+  try {
+    const existing = JSON.parse(fs.readFileSync(LOG_FILE, "utf-8")) as Message[];
+    existing.push(msg);
+    fs.writeFileSync(LOG_FILE, JSON.stringify(existing, null, 2));
+  } catch { }
+}
+
+const inbox: Message[] = [];
+const sharedFiles: SharedFile[] = [];
+const assignedTasks: Task[] = [];
+
+function makeId(): string { return Math.random().toString(36).slice(2, 9); }
+
+async function postToPartner(payload: object): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const response = await fetch(`http://${PARTNER_IP}:${PARTNER_PORT}`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    return response.ok ? { ok: true } : { ok: false, error: `HTTP ${response.status}` };
+  } catch (error: unknown) {
+    return { ok: false, error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+const mcp = new Server({ name: "agent-bridge", version: "3.0.0" }, { capabilities: { tools: {} } });
+
+mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools: [
+    { name: "send_message", description: `Send a message to ${AGENT_NAME}'s Claude Code agent. Optionally tag with thread_id.`, inputSchema: { type: "object" as const, properties: { message: { type: "string" }, thread_id: { type: "string" } }, required: ["message"] } },
+    { name: "check_messages", description: `Check for new messages from ${AGENT_NAME}'s agent. Clears inbox on read.`, inputSchema: { type: "object" as const, properties: {} } },
+    { name: "ping_partner", description: `Check if ${AGENT_NAME}'s agent is online.`, inputSchema: { type: "object" as const, properties: {} } },
+    { name: "share_file", description: `Share a local file with ${AGENT_NAME}'s agent. Auto-saved to ~/agent-bridge-files/ on their machine.`, inputSchema: { type: "object" as const, properties: { file_path: { type: "string" }, note: { type: "string" } }, required: ["file_path"] } },
+    { name: "assign_task", description: `Assign a task to ${AGENT_NAME}'s agent.`, inputSchema: { type: "object" as const, properties: { title: { type: "string" }, description: { type: "string" } }, required: ["title", "description"] } },
+    { name: "check_tasks", description: "See tasks assigned to you by the partner.", inputSchema: { type: "object" as const, properties: {} } },
+    { name: "complete_task", description: "Mark an assigned task done and notify partner.", inputSchema: { type: "object" as const, properties: { task_id: { type: "string" }, result: { type: "string" } }, required: ["task_id", "result"] } },
+  ],
+}));
+
+mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+
+  if (name === "send_message") {
+    const { message, thread_id } = args as { message: string; thread_id?: string };
+    const r = await postToPartner({ type: "message", from: AGENT_NAME, message, thread_id, timestamp: new Date().toISOString() });
+    if (!r.ok) return { content: [{ type: "text" as const, text: `Connection failed: ${r.error}` }] };
+    return { content: [{ type: "text" as const, text: `Message sent to ${AGENT_NAME}${thread_id ? ` [thread: ${thread_id}]` : ""}` }] };
+  }
+
+  if (name === "ping_partner") {
+    try {
+      const response = await fetch(`http://${PARTNER_IP}:${PARTNER_PORT}`, { method: "GET", signal: AbortSignal.timeout(3000) });
+      if (!response.ok) return { content: [{ type: "text" as const, text: `${AGENT_NAME} unreachable (HTTP ${response.status})` }] };
+      const data = await response.json() as { agent: string; inbox: number; tasks: number };
+      return { content: [{ type: "text" as const, text: `${AGENT_NAME} is ONLINE\nAgent: ${data.agent}\nUnread messages: ${data.inbox}\nPending tasks: ${data.tasks}` }] };
+    } catch (e: unknown) {
+      return { content: [{ type: "text" as const, text: `${AGENT_NAME} appears OFFLINE: ${e instanceof Error ? e.message : String(e)}` }] };
+    }
+  }
+
+  if (name === "check_messages") {
+    if (inbox.length === 0) return { content: [{ type: "text" as const, text: `No new messages from ${AGENT_NAME}.` }] };
+    const messages = inbox.map((m) => `[${m.from} @ ${m.timestamp}]${m.thread_id ? ` [thread: ${m.thread_id}]` : ""}\n${m.message}`).join("\n\n---\n\n");
+    const count = inbox.length; inbox.length = 0;
+    return { content: [{ type: "text" as const, text: `${count} new message${count > 1 ? "s" : ""}:\n\n${messages}` }] };
+  }
+
+  if (name === "share_file") {
+    const { file_path, note } = args as { file_path: string; note?: string };
+    let content: string;
+    try { content = fs.readFileSync(file_path, "utf-8"); } catch (e: unknown) { return { content: [{ type: "text" as const, text: `Could not read file: ${e instanceof Error ? e.message : String(e)}` }] }; }
+    const filename = path.basename(file_path);
+    const r = await postToPartner({ type: "shared_file", from: AGENT_NAME, filename, content, note: note || "", timestamp: new Date().toISOString() });
+    if (!r.ok) return { content: [{ type: "text" as const, text: `Failed to share file: ${r.error}` }] };
+    return { content: [{ type: "text" as const, text: `Shared "${filename}" (${content.length} chars) with ${AGENT_NAME}` }] };
+  }
+
+  if (name === "assign_task") {
+    const { title, description } = args as { title: string; description: string };
+    const task: Task = { id: makeId(), from: AGENT_NAME, title, description, status: "pending", timestamp: new Date().toISOString() };
+    const r = await postToPartner({ type: "task_assigned", ...task });
+    if (!r.ok) return { content: [{ type: "text" as const, text: `Failed to assign task: ${r.error}` }] };
+    return { content: [{ type: "text" as const, text: `Task assigned to ${AGENT_NAME}: [${task.id}] ${title}` }] };
+  }
+
+  if (name === "check_tasks") {
+    const active = assignedTasks.filter((t) => t.status !== "done");
+    if (active.length === 0) return { content: [{ type: "text" as const, text: "No pending tasks assigned to you." }] };
+    return { content: [{ type: "text" as const, text: `${active.length} active task(s):\n\n${active.map(t => `[${t.id}] (${t.status}) from ${t.from}\nTitle: ${t.title}\n${t.description}`).join("\n\n---\n\n")}` }] };
+  }
+
+  if (name === "complete_task") {
+    const { task_id, result: resultNote } = args as { task_id: string; result: string };
+    const task = assignedTasks.find((t) => t.id === task_id);
+    if (!task) return { content: [{ type: "text" as const, text: `Task ${task_id} not found.` }] };
+    task.status = "done";
+    const r = await postToPartner({ type: "task_completed", from: AGENT_NAME, task_id, title: task.title, result: resultNote, timestamp: new Date().toISOString() });
+    if (!r.ok) return { content: [{ type: "text" as const, text: `Done locally, but couldn't notify partner: ${r.error}` }] };
+    return { content: [{ type: "text" as const, text: `Task [${task_id}] "${task.title}" complete. Partner notified.` }] };
+  }
+
+  return { content: [{ type: "text" as const, text: `Unknown tool: ${name}` }] };
+});
+
+const transport = new StdioServerTransport();
+await mcp.connect(transport);
+
+Bun.serve({
+  port: LOCAL_PORT, hostname: "0.0.0.0",
+  async fetch(req) {
+    if (req.method !== "POST") {
+      return new Response(JSON.stringify({ status: "running", agent: AGENT_NAME, inbox: inbox.length, tasks: assignedTasks.filter(t => t.status !== "done").length }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    try {
+      const body = await req.json();
+      const type = body.type || "message";
+      if (type === "message") {
+        const msg: Message = { from: body.from || "Unknown", message: body.message || body.text || JSON.stringify(body), timestamp: body.timestamp || new Date().toISOString(), thread_id: body.thread_id };
+        inbox.push(msg); appendToLog(msg);
+        console.error(`\n>> Message from ${msg.from}${msg.thread_id ? ` [thread: ${msg.thread_id}]` : ""}: "${msg.message.slice(0, 80)}"`);
+      } else if (type === "shared_file") {
+        const sf: SharedFile = { from: body.from || "Unknown", filename: body.filename, content: body.content, timestamp: body.timestamp || new Date().toISOString() };
+        sharedFiles.push(sf);
+        const saveDir = path.join(os.homedir(), "agent-bridge-files");
+        fs.mkdirSync(saveDir, { recursive: true });
+        const savePath = path.join(saveDir, sf.filename);
+        fs.writeFileSync(savePath, sf.content, "utf-8");
+        console.error(`\n>> File from ${sf.from}: "${sf.filename}" saved to ${savePath}`);
+        inbox.push({ from: sf.from, message: `File received: "${sf.filename}" → ${savePath}${body.note ? `\nNote: ${body.note}` : ""}`, timestamp: sf.timestamp });
+      } else if (type === "task_assigned") {
+        const task: Task = { id: body.id || makeId(), from: body.from || "Unknown", title: body.title, description: body.description, status: "pending", timestamp: body.timestamp || new Date().toISOString() };
+        assignedTasks.push(task);
+        console.error(`\n>> Task assigned by ${task.from}: [${task.id}] ${task.title}`);
+        inbox.push({ from: task.from, message: `New task: [${task.id}] "${task.title}"\n${task.description}\nRun check_tasks to view all.`, timestamp: task.timestamp });
+      } else if (type === "task_completed") {
+        console.error(`\n>> Task [${body.task_id}] done by ${body.from}`);
+        inbox.push({ from: body.from || "Unknown", message: `Task done: [${body.task_id}] "${body.title}"\nResult: ${body.result}`, timestamp: body.timestamp || new Date().toISOString() });
+      }
+      return new Response(JSON.stringify({ status: "delivered" }), { status: 200, headers: { "Content-Type": "application/json" } });
+    } catch { return new Response("Bad request", { status: 400 }); }
+  },
+});
+
+console.error(`Agent Bridge v3 on 0.0.0.0:${LOCAL_PORT} | Partner: ${AGENT_NAME} @ ${PARTNER_IP}:${PARTNER_PORT}`);

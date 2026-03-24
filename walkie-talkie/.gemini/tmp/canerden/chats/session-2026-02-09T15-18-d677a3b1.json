@@ -1,0 +1,546 @@
+{
+  "sessionId": "d677a3b1-509f-400d-b924-f29cf4ab72a6",
+  "projectHash": "5bd757d708468e3cc9887899bfa3a1e5de1a112072b66872433241e2321ec4f9",
+  "startTime": "2026-02-09T15:18:40.389Z",
+  "lastUpdated": "2026-02-09T22:21:06.841Z",
+  "messages": [
+    {
+      "id": "643120ff-277f-42b8-865c-f8cd41fd1316",
+      "timestamp": "2026-02-09T15:18:40.389Z",
+      "type": "user",
+      "content": "what kind of linkedin post can i prepare to share what i built - vibecoded for habitat skills"
+    },
+    {
+      "id": "97dc77d3-4eea-434d-a60c-9fc0d25f9112",
+      "timestamp": "2026-02-09T15:18:44.280Z",
+      "type": "gemini",
+      "content": "I'll start by exploring the current directory to locate any relevant project files for \"habitat skills\" or \"vibecoded\".",
+      "thoughts": [
+        {
+          "subject": "Considering Project Context",
+          "description": "I'm currently focused on defining \"habitat skills\" and \"vibecoded\" within the project's scope. I'm exploring the implications of the project's name and its connection to the user's LinkedIn post. It seems the user is referencing something they built, and the directory path provided could offer further clues.",
+          "timestamp": "2026-02-09T15:18:42.583Z"
+        },
+        {
+          "subject": "Identifying Key Terminology",
+          "description": "Okay, so \"habitat skills\" and \"vibecoded\" remain the key terms to unpack. My initial directory search proved unproductive. The \"home\" directory is likely not where the project lives. I now need to re-evaluate the directory structure. I'm going to list the directories in my current location to see if I can pinpoint the actual project folder. This should help to understand the user's project, and the context of their post.",
+          "timestamp": "2026-02-09T15:18:44.040Z"
+        }
+      ],
+      "tokens": {
+        "input": 5755,
+        "output": 41,
+        "cached": 0,
+        "thoughts": 174,
+        "tool": 0,
+        "total": 5970
+      },
+      "model": "gemini-3-flash-preview",
+      "toolCalls": [
+        {
+          "id": "list_directory-1770650324275-fcbdabcdb3391",
+          "name": "list_directory",
+          "args": {
+            "dir_path": "/Users/canerden"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "list_directory-1770650324275-fcbdabcdb3391",
+                "name": "list_directory",
+                "response": {
+                  "output": "Directory listing for /Users/canerden:\n[DIR] .agent\n[DIR] .agents\n[DIR] .antigravity\n[DIR] .bun\n[DIR] .cache\n[DIR] .claude\n[DIR] .codex\n[DIR] .config\n[DIR] .cursor\n[DIR] .docker\n[DIR] .gemini\n[DIR] .goose\n[DIR] .idlerc\n[DIR] .lmstudio\n[DIR] .local\n[DIR] .npm\n[DIR] .rustup\n[DIR] .ssh\n[DIR] .swiftpm\n[DIR] .Trash\n[DIR] .vscode\n[DIR] .zsh_sessions\n[DIR] aesthetic-ehr\n[DIR] Applications\n[DIR] Desktop\n[DIR] Documents\n[DIR] Downloads\n[DIR] granola-mvp\n[DIR] granola-web-mvp\n[DIR] habitat-enterprise-web\n[DIR] habitat-skills\n[DIR] habitat-skills-web\n[DIR] Library\n[DIR] loyalty-pwa\n[DIR] Movies\n[DIR] Music\n[DIR] my-test-startup\n[DIR] personal-website\n[DIR] personal-website-old\n[DIR] Pictures\n[DIR] Public\n.bash_history\n.CFUserTextEncoding\n.claude.json\n.claude.json.backup\n.claude.json.backup.1770585741265\n.claude.json.backup.1770624161364\n.claude.json.backup.1770636061827\n.claude.json.backup.1770642381402\n.claude.json.backup.1770649713644\n.DS_Store\n.gitconfig\n.gitmodules\n.lmstudio-home-pointer\n.zprofile\n.zprofile.pysave\n.zsh_history\n.zshrc\n9FEBLATEST2PMHABITATFINANCIAL.pdf\n9FEBLATEST2PMHABITATFINANCIAL.pptx\nlatest Habitat_Financial_Strategy.pdf\nlatest Habitat_Financial_Strategy.pptx\n\n(1 ignored)"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:18:44.340Z",
+          "resultDisplay": "Listed 62 item(s). (1 ignored)",
+          "displayName": "ReadFolder",
+          "description": "Lists the names of files and subdirectories directly within a specified directory path. Can optionally ignore entries matching provided glob patterns.",
+          "renderOutputAsMarkdown": true
+        }
+      ]
+    },
+    {
+      "id": "d7a503e4-0bc5-4feb-a737-50fb3fb9d50c",
+      "timestamp": "2026-02-09T15:18:47.274Z",
+      "type": "gemini",
+      "content": "I'll explore the `habitat-skills` directory to understand the project's purpose and features.",
+      "thoughts": [
+        {
+          "subject": "Examining Relevant Skills",
+          "description": "I'm currently focused on the `habitat-skills` directory, figuring it's the core of the matter. I'm also keeping an eye out for \"vibecoded,\" suspecting it might hold valuable, user-specific information, or be a clue to the architecture.",
+          "timestamp": "2026-02-09T15:18:46.944Z"
+        },
+        {
+          "subject": "Delineating Habitat Structure",
+          "description": "I've begun dissecting the `habitat-skills` directory, confirming its centrality. The \"vibecoded\" reference strongly suggests AI integration, possibly user-specific adaptation. I am now focused on the contents of the `habitat-skills` directory.",
+          "timestamp": "2026-02-09T15:18:47.002Z"
+        }
+      ],
+      "tokens": {
+        "input": 6310,
+        "output": 40,
+        "cached": 0,
+        "thoughts": 101,
+        "tool": 0,
+        "total": 6451
+      },
+      "model": "gemini-3-flash-preview",
+      "toolCalls": [
+        {
+          "id": "list_directory-1770650327270-cb3e63ac17ed3",
+          "name": "list_directory",
+          "args": {
+            "dir_path": "/Users/canerden/habitat-skills"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "list_directory-1770650327270-cb3e63ac17ed3",
+                "name": "list_directory",
+                "response": {
+                  "output": "Directory listing for /Users/canerden/habitat-skills:\n[DIR] .github\n[DIR] skills\n[DIR] tools\n.gitignore\nAGENTS.md\nCLAUDE.md\nCONTRIBUTING.md\nGETTING-STARTED.md\nLICENSE\nPHASES.md\nREADME.md\n\n(4 ignored)"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:18:47.305Z",
+          "resultDisplay": "Listed 11 item(s). (4 ignored)",
+          "displayName": "ReadFolder",
+          "description": "Lists the names of files and subdirectories directly within a specified directory path. Can optionally ignore entries matching provided glob patterns.",
+          "renderOutputAsMarkdown": true
+        }
+      ]
+    },
+    {
+      "id": "f9273da0-553d-4251-9d55-e2d15bb68665",
+      "timestamp": "2026-02-09T15:18:50.914Z",
+      "type": "gemini",
+      "content": "I'll read the `README.md` and `AGENTS.md` files to understand the project's core functionality and its AI agent system.",
+      "thoughts": [
+        {
+          "subject": "Gaining Project Insight",
+          "description": "I'm currently immersed in the project's documentation. I'm poring over `README.md` and `AGENTS.md` right now. My goal is to grasp the core objectives and general structure. Next up, I will focus on the `skills` to ascertain the agent's capabilities.",
+          "timestamp": "2026-02-09T15:18:50.305Z"
+        }
+      ],
+      "tokens": {
+        "input": 6422,
+        "output": 100,
+        "cached": 0,
+        "thoughts": 45,
+        "tool": 0,
+        "total": 6567
+      },
+      "model": "gemini-3-flash-preview",
+      "toolCalls": [
+        {
+          "id": "read_file-1770650330515-57f307bbaeb78",
+          "name": "read_file",
+          "args": {
+            "file_path": "/Users/canerden/habitat-skills/README.md"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "read_file-1770650330515-57f307bbaeb78",
+                "name": "read_file",
+                "response": {
+                  "output": "# Habitat Skills — The Operating System for Founders\n\nA collection of AI agent skills that turn your AI coder into a Co-Founder and Marketing Director. Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and compatible AI agents.\n\nFrom the team behind [Habitat](https://joinhabitat.eu) — where 101+ founders have launched prototypes in a single evening.\n\n## The \"Founder as Director\" Philosophy\n\nInspired by the methodologies of Corey Haines and the Habitat 5-hour sprint, these skills are designed to empower you to act as a **Director**. Instead of getting lost in the weeds, you use these specialized agents to validate, build, and market your startup with expert-grade frameworks.\n\n## Available Skills\n\n### Meta & Operations\n\n| Skill | Description |\n|-------|-------------|\n| [`sprint-coach`](skills/sprint-coach/SKILL.md) | **NEW.** Your timed facilitator for a 5-hour launch sprint. Momentum over perfection. |\n| [`onboarding`](skills/onboarding/SKILL.md) | Start here. Introduces Habitat Skills and sets up your environment. |\n\n### Phase 1: Ideation & Validation\n*Skills for deep research and strategic positioning.*\n\n| Skill | Description |\n|-------|-------------|\n| [`founder-context`](skills/founder-context/SKILL.md) | Your persistent memory — business model, audience, and validation state. |\n| [`idea-validation`](skills/idea-validation/SKILL.md) | Structured frameworks (TAM, Problem-Solution, Mom Test). |\n| [`competitor-research`](skills/competitor-research/SKILL.md) | Find gaps and identify \"unfair\" positioning angles. |\n| [`customer-segments`](skills/customer-segments/SKILL.md) | Personas, pain points, and specific outreach playbooks. |\n\n### Phase 2: Prototyping & Building\n*Skills for shipping functional cores, not just code.*\n\n| Skill | Description |\n|-------|-------------|\n| [`landing-page`](skills/landing-page/SKILL.md) | Conversion-focused copy and code using psychological triggers. |\n| [`prototype-sprint`](skills/prototype-sprint/SKILL.md) | Execution plan for a focused build session. |\n| [`mvp-scope`](skills/mvp-scope/SKILL.md) | Ruthlessly cut features down to a true, shippable MVP. |\n\n### Phase 3: Launch & Traction\n*Expert-grade marketing skills for the first 100 users.*\n\n| Skill | Description |\n|-------|-------------|\n| [`social-content`](skills/social-content/SKILL.md) | **ENHANCED.** Content using PAS, AIDA, and BAB copywriting frameworks. |\n| [`first-users`](skills/first-users/SKILL.md) | Find your first 10-100 users with targeted outreach playbooks. |\n| [`launch-plan`](skills/launch-plan/SKILL.md) | Phased launch strategy: Pre-launch -> Launch Day -> Post-launch. |\n| [`pitch-deck`](skills/pitch-deck/SKILL.md) | Elevator pitches, demo scripts, and objection prep. |\n\n## Installation\n\n### Quick Install (Recommended)\n\n```bash\n# Clone into your project\ngit clone https://github.com/ycanerden/habitat-skills.git .claude/skills/habitat\n```\n\n### Manual Install\n\n1. Download the `skills/` folder\n2. Copy it to `.claude/skills/habitat/` in your project\n3. Skills will be available automatically\n\n### Git Submodule\n\n```bash\ngit submodule add https://github.com/ycanerden/habitat-skills.git .claude/skills/habitat\n```\n\n## Usage\n\nSkills activate automatically when you ask relevant questions:\n\n```\n\"Help me validate my startup idea\"          → idea-validation\n\"Research my competitors\"                    → competitor-research\n\"Build me a landing page\"                   → landing-page\n\"What should my MVP include?\"               → mvp-scope\n\"How do I find my first users?\"             → first-users\n```\n\nOr invoke directly:\n\n```\n/idea-validation\n/competitor-research\n/landing-page\n```\n\n## Quick Start\n\n1. Install the skills\n2. Say **\"Get started\"** — the onboarding skill walks you through everything in under 2 minutes\n3. Follow the recommended next step based on your stage\n\n## Built by Habitat\n\nThese skills were born from 23+ prototypes launched at [Habitat](https://joinhabitat.eu) evenings — where founders go from idea to shipped product in 5 hours.\n\nWant to build alongside 50+ others? [Join the next evening →](https://joinhabitat.eu)\n\n## Contributing\n\nWe welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.\n\n### Contributors\n- **Can Erden** ([@ycanerden](https://github.com/ycanerden)) — Founder\n- **Gemini** — AI Resident Architect & Strategy Specialist\n\n### Adding a new skill\n1. Create a folder in `skills/` with a `SKILL.md` file\n2. Follow the format of existing skills (YAML frontmatter + markdown)\n3. Keep files under 500 lines\n4. Submit a PR\n\n## License\n\nMIT — use these however you want.\n"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:18:50.986Z",
+          "resultDisplay": "",
+          "displayName": "ReadFile",
+          "description": "Reads and returns the content of a specified file. If the file is large, the content will be truncated. The tool's response will clearly indicate if truncation has occurred and will provide details on how to read more of the file using the 'offset' and 'limit' parameters. Handles text, images (PNG, JPG, GIF, WEBP, SVG, BMP), audio files (MP3, WAV, AIFF, AAC, OGG, FLAC), and PDF files. For text files, it can read specific line ranges.",
+          "renderOutputAsMarkdown": true
+        },
+        {
+          "id": "read_file-1770650330713-1a28721982082",
+          "name": "read_file",
+          "args": {
+            "file_path": "/Users/canerden/habitat-skills/AGENTS.md"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "read_file-1770650330713-1a28721982082",
+                "name": "read_file",
+                "response": {
+                  "output": "# Habitat Skills — Agent Configuration\n\nThis repository contains AI agent skills for founders building startups from scratch. Skills provide structured frameworks for ideation, validation, prototyping, and launch.\n\n## Skill Registry\n\nEach skill is a markdown file at `skills/<skill-name>/SKILL.md` with YAML frontmatter.\n\n### Available Skills\n\n- `onboarding` — First-time user experience. Introduces skills, shows immediate value, sets up context progressively\n- `founder-context` — Deep-dive context enrichment (business model, team, validation) that all other skills reference\n- `idea-validation` — Validate startup ideas using structured frameworks\n- `competitor-research` — Research competitors, map gaps, find positioning angles\n- `customer-segments` — Generate customer segments with personas, pain points, and outreach per segment\n- `landing-page` — Build conversion-focused landing pages\n- `prototype-sprint` — Plan and execute focused prototype sprints\n- `mvp-scope` — Scope a true MVP from a feature wishlist\n- `pitch-deck` — Create pitches — 30-second elevator pitch, demo scripts, objection prep\n- `first-users` — Find first 10-100 users with targeted playbooks\n- `launch-plan` — Create phased launch strategies\n- `social-content` — Create launch posts, build-in-public updates, and social media content\n\n## Skill Format\n\n### Required\n\n- `name`: 1-64 chars, lowercase a-z, numbers, hyphens. Must match directory name.\n- `description`: 1-1024 chars. Describe what it does and when to use it.\n\n### Optional\n\n- `version`: Semantic version (default: 1.0.0)\n- `license`: License identifier (default: MIT)\n\n### Structure\n\n```\nskills/\n  skill-name/\n    SKILL.md          # Main skill file (required)\n    references/       # Supporting reference files (optional)\n```\n\n## Conventions\n\n- Keep SKILL.md under 500 lines\n- Use H2/H3 headings and bullet points for scannability\n- Include trigger phrases in descriptions so agents can match intent\n- Reference related skills to help agents pick the right one\n- Check for `founder-context` before gathering info — avoid re-asking what's already known\n\n## Context File\n\nThe `founder-context` skill creates `.claude/founder-context.md` in the user's project. All other skills should check for this file before asking questions.\n"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:18:50.986Z",
+          "resultDisplay": "",
+          "displayName": "ReadFile",
+          "description": "Reads and returns the content of a specified file. If the file is large, the content will be truncated. The tool's response will clearly indicate if truncation has occurred and will provide details on how to read more of the file using the 'offset' and 'limit' parameters. Handles text, images (PNG, JPG, GIF, WEBP, SVG, BMP), audio files (MP3, WAV, AIFF, AAC, OGG, FLAC), and PDF files. For text files, it can read specific line ranges.",
+          "renderOutputAsMarkdown": true
+        },
+        {
+          "id": "list_directory-1770650330912-0279509f4407a",
+          "name": "list_directory",
+          "args": {
+            "dir_path": "/Users/canerden/habitat-skills/skills"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "list_directory-1770650330912-0279509f4407a",
+                "name": "list_directory",
+                "response": {
+                  "output": "Directory listing for /Users/canerden/habitat-skills/skills:\n[DIR] competitor-research\n[DIR] customer-segments\n[DIR] first-users\n[DIR] founder-context\n[DIR] idea-validation\n[DIR] landing-page\n[DIR] launch-plan\n[DIR] mvp-scope\n[DIR] onboarding\n[DIR] pitch-deck\n[DIR] prototype-sprint\n[DIR] social-content\n[DIR] sprint-coach\n\n(1 ignored)"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:18:50.986Z",
+          "resultDisplay": "Listed 13 item(s). (1 ignored)",
+          "displayName": "ReadFolder",
+          "description": "Lists the names of files and subdirectories directly within a specified directory path. Can optionally ignore entries matching provided glob patterns.",
+          "renderOutputAsMarkdown": true
+        }
+      ]
+    },
+    {
+      "id": "3df471cb-7d12-4795-925a-54a0f8790c35",
+      "timestamp": "2026-02-09T15:18:54.572Z",
+      "type": "gemini",
+      "content": "I'll examine the `social-content` and `sprint-coach` skills, and search for \"vibecoded\" in the codebase to understand how to best frame the LinkedIn post.",
+      "thoughts": [
+        {
+          "subject": "Developing Habitat Skills",
+          "description": "I'm focusing on the \"Habitat Skills\" project, an OS for Founders. I've pinpointed AI agent skills, initially for Claude Code and compatible agents, to aid founders. The goal is to facilitate rapid validation, building, and marketing within a 5-hour sprint, essentially creating an effective AI-driven startup incubator. Can Erden is the intended user; Gemini is the AI Resident Architect.",
+          "timestamp": "2026-02-09T15:18:53.200Z"
+        },
+        {
+          "subject": "Investigating Content Generation",
+          "description": "I'm now investigating the social-content skill for LinkedIn post generation frameworks. I'm also exploring sprint-coach, recently added to the project, for potentially useful insights. My focus is on integrating \"vibecoded\" references, reflecting the AI-driven nature of the project, throughout.",
+          "timestamp": "2026-02-09T15:18:54.031Z"
+        }
+      ],
+      "tokens": {
+        "input": 8388,
+        "output": 115,
+        "cached": 3106,
+        "thoughts": 190,
+        "tool": 0,
+        "total": 8693
+      },
+      "model": "gemini-3-flash-preview",
+      "toolCalls": [
+        {
+          "id": "read_file-1770650334258-83a88d2d61fc9",
+          "name": "read_file",
+          "args": {
+            "file_path": "/Users/canerden/habitat-skills/skills/social-content/SKILL.md"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "read_file-1770650334258-83a88d2d61fc9",
+                "name": "read_file",
+                "response": {
+                  "output": "---\nname: social-content\nversion: 1.0.0\ndescription: \"Create social media content for startup launches, build-in-public updates, and community engagement. Use when the user mentions 'social media post,' 'LinkedIn post,' 'Twitter post,' 'tweet,' 'launch post,' 'build in public,' 'social content,' 'announcement post,' 'content calendar,' or 'what should I post.' For email sequences, see related email skills. For landing page copy, see landing-page.\"\n---\n\n# Social Content\n\nYou are helping a founder create social media content that drives awareness, engagement, and signups for their startup. Focus on authenticity over polish — early-stage founders win by being real, not by being professional content creators.\n\n## Before Starting\n\n**Check for context first:**\nIf `.claude/founder-context.md` exists, read it. Use the idea, audience, stage, and proof points to inform the content.\n\nIf no context exists, gather:\n- What are you building? (one sentence)\n- What stage are you at? (idea, building, launched, growing)\n- What platform(s) are you most active on? (LinkedIn, Twitter/X, both)\n- What's the goal of this content? (announce launch, build audience, find users, share progress)\n\n## Platform Guidelines\n\n### LinkedIn\n\n**Best for:** B2B products, professional tools, founder audiences, local startup communities.\n\n**What works:**\n- Personal stories with a lesson\n- Transformation posts (\"3 months ago I had X. Today I have Y.\")\n- Behind-the-scenes of building\n- Carousel posts with frameworks/data\n- Tagging people for distribution\n\n**What doesn't work:**\n- Generic startup advice without personal experience\n- Links in the main body (kills reach — put links in comments)\n- Corporate tone\n- Too many hashtags (max 3-5)\n\n**Posting cadence:** 2-4x per week. Consistency matters more than frequency.\n\n**Best times:** Tuesday-Thursday, 8-10am local time.\n\n### Twitter/X\n\n**Best for:** Tech products, developer tools, indie hackers, broader startup community.\n\n**What works:**\n- Threads (long-form storytelling)\n- Screenshots of product/metrics\n- Hot takes and opinions\n- Short punchy observations\n- Replying to bigger accounts in your niche\n\n**What doesn't work:**\n- Overly polished corporate content\n- Thread-bait without substance\n- Posting only about yourself (engage with others 3x more than you self-promote)\n\n**Posting cadence:** 1-2x daily if possible. Engagement (replies, quotes) counts more than original posts.\n\n## Content Types\n\n### 1. Launch Announcement\n\n**LinkedIn version:**\n\n```\n[Hook — surprising statement or result]\n\n[2-3 sentences: What you built and why]\n\n[What happened / early results]\n\n[What you learned / what surprised you]\n\n[CTA — try it, link in comments]\n```\n\n**Example structure:**\n```\nLast night I launched [product] at a Habitat evening.\n\nBy midnight, [specific result — signups, feedback, conversations].\n\nHere's what I built and why:\n\n[2-3 sentences about the problem and solution]\n\nThe part that surprised me most: [honest observation]\n\nIf you're a [target audience], try it: [link in comments]\n```\n\n**Twitter/X version (thread):**\n\n```\nTweet 1: [Hook — bold claim or result] 🧵\n\nTweet 2: The problem: [1-2 sentences]\n\nTweet 3: What I built: [screenshot + 1 sentence]\n\nTweet 4: How it works: [3 bullet points]\n\nTweet 5: Early results: [specific numbers or feedback]\n\nTweet 6: Try it → [link]\n         Follow for updates as I build this in public.\n```\n\n### 2. Build in Public Update\n\n**Weekly progress format:**\n\n```\nWeek [X] of building [product]:\n\nWhat I shipped:\n→ [Feature/improvement 1]\n→ [Feature/improvement 2]\n→ [Feature/improvement 3]\n\nWhat I learned:\n→ [Insight from users or data]\n\nNumbers:\n→ [Key metric] (up/down from last week)\n\nWhat's next:\n→ [1-2 priorities for next week]\n\n[Optional: screenshot or photo]\n```\n\n**Daily micro-update:**\n\n```\nDay [X] building [product].\n\nToday: [What you did in 1 sentence]\nResult: [What happened]\nTomorrow: [Next priority]\n\n[Screenshot if relevant]\n```\n\n### 3. Customer Story / Testimonial\n\n```\n[Name] came to Habitat [X weeks ago] with [situation].\n\n[What happened — what they built, what they did differently]\n\nToday: [Their current result]\n\n[Quote from them — 1-2 sentences]\n\nThis is why we [do what we do / run Habitat / built this].\n\n[Tag the person if they're okay with it]\n```\n\n### 4. Contrarian Take / Opinion\n\n```\n[Unpopular opinion or contrarian statement]\n\n[Why most people think the opposite]\n\n[Why you think differently — based on personal experience]\n\n[What you do instead / what you recommend]\n\n[Optional: question to drive engagement]\n```\n\n### 5. Data / Numbers Post\n\n```\n[Product] in numbers:\n\n[Stat 1] — [brief context]\n[Stat 2] — [brief context]\n[Stat 3] — [brief context]\n\nThe one number I care about most: [pick one and explain why]\n\n[What this means for what you're building next]\n```\n\n### 6. Lesson Learned\n\n```\n[Mistake or surprising discovery — specific]\n\nWhat happened:\n[2-3 sentences about the situation]\n\nWhat I learned:\n[The takeaway — actionable, not vague]\n\nWhat I'd do differently:\n[Specific change]\n\n[Ask: Has anyone else experienced this?]\n```\n\n### 7. Event Recap (Habitat Specific)\n\n```\n[X] people showed up to Habitat last night.\n\n[Y] prototypes shipped.\n\nHere's what happened:\n\n→ [Highlight 1 — a specific team/story]\n→ [Highlight 2 — a surprising moment]\n→ [Highlight 3 — a result or number]\n\n[Photo from the event]\n\nNext one is [date]. [Link to sign up]\n```\n\n## Content Calendar Template\n\nFor a founder posting 3x/week on LinkedIn:\n\n| Day | Content Type | Topic |\n|-----|-------------|-------|\n| **Monday** | Build in Public update | What you shipped last week + what you learned |\n| **Wednesday** | Story / Opinion | Customer story, lesson learned, or contrarian take |\n| **Friday** | Numbers / Progress | Metrics update, milestone, or data insight |\n\n**Monthly specials:**\n- 1x/month: Longer origin story or reflection post\n- After each Habitat evening: Event recap with photos\n- When you hit a milestone: Numbers celebration post\n\n## Copywriting Frameworks\n\nUse these frameworks to structure your posts for maximum impact. Don't just follow templates; understand the psychology behind them.\n\n### 1. PAS: Problem, Agitation, Solution\nThe most effective framework for early-stage startups solving a specific pain point.\n- **Problem:** Clearly state a problem your audience faces.\n- **Agitation:** Twist the knife. Describe the emotional or financial cost of the problem.\n- **Solution:** Introduce your product as the bridge to a better reality.\n\n### 2. AIDA: Attention, Interest, Desire, Action\nClassic marketing framework for launches and \"big idea\" posts.\n- **Attention:** A scroll-stopping hook (bold claim, surprising stat).\n- **Interest:** Interesting details or data that keep them reading.\n- **Desire:** Show the \"after\" state. What does life look like with your solution?\n- **Action:** A clear, single call to action.\n\n### 3. BAB: Before, After, Bridge\nPerfect for \"Build in Public\" and customer transformation stories.\n- **Before:** The status quo (how it used to be).\n- **After:** The new reality (how it is now).\n- **Bridge:** How your product/process made that transformation possible.\n\n## Psychological Triggers\n\nIncorporate these triggers to increase engagement and conversion:\n\n- **Curiosity Gap:** Start with a question or a partial story that can only be completed by reading the post.\n- **Social Proof (Types):**\n    - *Expert:* Mention influencers or experts using your tool.\n    - *User:* Share testimonials or user numbers.\n    - *Wisdom of the Crowd:* \"100+ founders joined last night.\"\n- **Loss Aversion:** Highlight what they are losing by *not* using your solution (e.g., wasted time, missed opportunities).\n- **Specifics vs. Generalities:** \"Save 4.5 hours\" is more believable and compelling than \"Save time.\"\n\n## Writing Principles\n\n### Be Specific\n- Bad: \"We're growing fast\"\n- Good: \"12 signups this week, up from 4 last week\"\n\n### Be Honest\n- Bad: \"Our groundbreaking AI-powered platform\"\n- Good: \"I built a simple tool that does one thing well\"\n\n### Lead with the Hook\nThe first line determines if anyone reads the rest.\n- Bad: \"I've been thinking a lot about startups lately...\"\n- Good: \"I launched my startup in 5 hours last night.\"\n- **Hook formulas:**\n    - The Transformation: \"I went from [X] to [Y] in [Z] days.\"\n    - The Contrarian: \"Most founders think [X]. They're wrong. Here's why.\"\n    - The Open Loop: \"I almost quit building [Product] yesterday. Here's what changed my mind.\"\n    - The Lesson: \"I spent $500 on ads and got 0 signups. Here are 3 things I learned.\"\n\n### One Idea Per Post\nDon't combine your launch announcement with your life philosophy. One post, one idea.\n\n### End with Engagement\n- Ask a question\n- Invite people to try it\n- Tag relevant people\n- Ask for feedback\n- **CTA types:**\n    - *Direct:* \"Click the link in the comments.\"\n    - *Low-friction:* \"Reply 'YES' if you want the checklist.\"\n    - *Engagement:* \"What's the one thing you're building this week?\"\n\n### Avoid\n- Humble bragging (\"I'm so grateful for this incredible milestone of 10 users\")\n- Fake vulnerability (\"I'll be honest, I almost gave up\")\n- Buzzwords (\"disruptive,\" \"game-changing,\" \"revolutionary\")\n- Exclamation points (they weaken your writing)\n\n## Output Format\n\n### Social Content Package\n\n```\nSOCIAL CONTENT\n─────────────────────────────────────────\n\nProduct: [name]\nPlatform: [LinkedIn / Twitter/X / Both]\nGoal: [launch / awareness / users / engagement]\n\nPOST 1: [Content type]\n────────────────────\nPlatform: [LinkedIn/Twitter]\n[Full post text, ready to copy-paste]\n\nPOST 2: [Content type]\n────────────────────\nPlatform: [LinkedIn/Twitter]\n[Full post text, ready to copy-paste]\n\nPOST 3: [Content type]\n────────────────────\nPlatform: [LinkedIn/Twitter]\n[Full post text, ready to copy-paste]\n\nPOSTING SCHEDULE\n────────────────────\n[Day]: Post [X]\n[Day]: Post [Y]\n[Day]: Post [Z]\n```\n\n## Principles\n\n- **Authenticity over polish.** Real stories from a real founder beat polished marketing content every time.\n- **Consistency over virality.** Posting 3x/week for 3 months beats one viral post that leads nowhere.\n- **Give more than you take.** For every promotional post, share 3 posts that are genuinely useful or interesting.\n- **Engage, don't broadcast.** Reply to comments. Comment on others' posts. Social media is social.\n- **Screenshots are content.** A screenshot of your product, a DM from a happy user, or a graph going up — these are easy, high-engagement posts.\n- **The algorithm rewards speed.** Reply to comments in the first hour. That's when reach is determined.\n\n## Related Skills\n\n- `founder-context` — Set up context before creating content\n- `launch-plan` — Coordinate social content with broader launch strategy\n- `first-users` — Social content as a user acquisition channel\n- `landing-page` — Where social content drives traffic to\n- `pitch-deck` — Align messaging between pitch and social content\n"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:19:24.676Z",
+          "resultDisplay": "",
+          "displayName": "ReadFile",
+          "description": "Reads and returns the content of a specified file. If the file is large, the content will be truncated. The tool's response will clearly indicate if truncation has occurred and will provide details on how to read more of the file using the 'offset' and 'limit' parameters. Handles text, images (PNG, JPG, GIF, WEBP, SVG, BMP), audio files (MP3, WAV, AIFF, AAC, OGG, FLAC), and PDF files. For text files, it can read specific line ranges.",
+          "renderOutputAsMarkdown": true
+        },
+        {
+          "id": "read_file-1770650334417-b32cffb6389ce",
+          "name": "read_file",
+          "args": {
+            "file_path": "/Users/canerden/habitat-skills/skills/sprint-coach/SKILL.md"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "read_file-1770650334417-b32cffb6389ce",
+                "name": "read_file",
+                "response": {
+                  "output": "---\nname: sprint-coach\nversion: 1.0.0\ndescription: \"Your personal coach for a 5-hour Habitat Prototype Sprint. Use when the user says 'I want to start a sprint,' 'Let's build a prototype tonight,' 'Guide me through a Habitat evening,' or 'How do I go from idea to launch in 5 hours?' This skill manages the timer, sets milestones, and ensures you ship by the deadline.\"\n---\n\n# Sprint Coach\n\nYou are the facilitator for a Habitat Prototype Sprint. Your goal is to move the founder from \"vague idea\" to \"shipped prototype\" in 5 hours (300 minutes). You are encouraging, focused on momentum over perfection, and ruthless about cutting scope.\n\n## The Habitat Methodology\n\nThe sprint is divided into 4 intense phases:\n\n1. **Phase 1: Define & Scope (45 min)** — What exactly are we building?\n2. **Phase 2: The Core Build (150 min)** — The heavy lifting.\n3. **Phase 3: The Polish & Launch (75 min)** — Landing page, copy, and deployment.\n4. **Phase 4: The Pitch & Share (30 min)** — Recording the demo and sharing it.\n\n## Getting Started\n\nBefore the timer starts, check for context:\n- If `.claude/founder-context.md` exists, read it.\n- If not, ask: \"What's the one-sentence idea you're building tonight?\"\n\n**To start the sprint, say:** \"Ready to start the 5-hour Habitat sprint? We'll begin with Phase 1: Define & Scope. Let's go!\"\n\n---\n\n## Phase 1: Define & Scope (45 min)\n**Goal:** Define the smallest possible version of the product that still provides value.\n\n### Your Role:\n- **Challenge the scope.** If they want to build a platform, tell them to build a feature.\n- **The \"Atomic Value\" Test:** Ask, \"What is the single most important action a user takes to get value?\"\n- **Deliverables:** \n    1. A one-sentence value proposition.\n    2. A list of exactly 3 core features.\n    3. A tech stack choice (keep it simple).\n\n---\n\n## Phase 2: The Core Build (150 min)\n**Goal:** Build the functional core. No styling yet.\n\n### Your Role:\n- **Set a check-in every 45 minutes.** Ask: \"What's working? What's blocking you? What can we cut if you're behind?\"\n- **The \"Good Enough\" Principle:** If a feature is 80% working, move to the next one.\n- **Deliverables:** A functional (even if ugly) prototype that performs the \"Atomic Value\" action.\n\n---\n\n## Phase 3: The Polish & Launch (75 min)\n**Goal:** Make it look real and put it online.\n\n### Your Role:\n- **Pivot to Copy:** Switch the founder's brain from \"logic/code\" to \"marketing/feelings.\"\n- **Landing Page Sprint:** Use the `landing-page` skill to generate copy and a simple site.\n- **Deploy:** Help them push to Vercel, Netlify, or similar.\n- **Deliverables:** A live URL and a clear headline.\n\n---\n\n## Phase 4: The Pitch & Share (30 min)\n**Goal:** Close the loop and get eyes on the product.\n\n### Your Role:\n- **Demo Script:** Use the `pitch-deck` skill to draft a 60-second demo script.\n- **Social Launch:** Use the `social-content` skill to draft the launch post.\n- **Deliverables:** A demo video (or GIF) and a live social post.\n\n---\n\n## Sprint Management Principles\n\n### 1. The Clock is Boss\nAlways keep track of time. Remind the founder: \"We have [X] minutes left in this phase. What can we simplify to finish on time?\"\n\n### 2. Cut to the Bone\nIf the founder is stuck on a technical detail for more than 15 minutes, suggest a workaround or tell them to skip it. \"We can't let [Feature X] kill the whole launch. Let's mock it for now.\"\n\n### 3. Energy Management\nBuilding for 5 hours is exhausting. Use high-energy language. \"You're 2 hours in! The core logic is done. Now let's bring it to life!\"\n\n### 4. Done > Perfect\nThe goal of Habitat is to *ship*. A broken link is better than a non-existent page. A manual process is better than an unbuilt automation.\n\n---\n\n## Related Skills\n\n- `mvp-scope` — Use during Phase 1 to cut features.\n- `landing-page` — Use during Phase 3 for the site.\n- `social-content` — Use during Phase 4 for the launch.\n- `founder-context` — Always the foundation.\n"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:19:24.676Z",
+          "resultDisplay": "",
+          "displayName": "ReadFile",
+          "description": "Reads and returns the content of a specified file. If the file is large, the content will be truncated. The tool's response will clearly indicate if truncation has occurred and will provide details on how to read more of the file using the 'offset' and 'limit' parameters. Handles text, images (PNG, JPG, GIF, WEBP, SVG, BMP), audio files (MP3, WAV, AIFF, AAC, OGG, FLAC), and PDF files. For text files, it can read specific line ranges.",
+          "renderOutputAsMarkdown": true
+        },
+        {
+          "id": "search_file_content-1770650334571-1b1c785730254",
+          "name": "search_file_content",
+          "args": {
+            "pattern": "vibecoded"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "search_file_content-1770650334571-1b1c785730254",
+                "name": "search_file_content",
+                "response": {
+                  "output": "Error during grep search operation: The operation was aborted"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:19:24.676Z",
+          "resultDisplay": "Error: The operation was aborted",
+          "displayName": "SearchText",
+          "description": "FAST, optimized search powered by `ripgrep`. PREFERRED over standard `run_shell_command(\"grep ...\")` due to better performance and automatic output limiting (max 20k matches).",
+          "renderOutputAsMarkdown": true
+        }
+      ]
+    },
+    {
+      "id": "feb332ef-fb03-4c57-aad3-5bf906af67d6",
+      "timestamp": "2026-02-09T15:19:30.447Z",
+      "type": "gemini",
+      "content": "I'll check for a `.claude/founder-context.md` file to see if there's more specific information about the project's goals and \"vibecoded\" process.",
+      "thoughts": [
+        {
+          "subject": "Examining Gemini's Role",
+          "description": "I've shifted my focus to Gemini, seeing as it's mentioned in the `README.md`. It seems Gemini is an AI resident. I'm now curious about Gemini's responsibilities, and how its role intersects with the overall architecture and strategy.",
+          "timestamp": "2026-02-09T15:19:27.347Z"
+        },
+        {
+          "subject": "Defining \"Vibecoded\"",
+          "description": "I'm now investigating the term \"vibecoded,\" suspecting it relates to building \"Habitat Skills\" with Gemini. The `README.md` identifies Can Erden, the creator, and the project as `habitat-skills`. I need to search the project again, including commit messages, to find out the definition of \"vibecoded\". I will also check the `.claude/founder-context.md` file.",
+          "timestamp": "2026-02-09T15:19:29.864Z"
+        }
+      ],
+      "tokens": {
+        "input": 12434,
+        "output": 116,
+        "cached": 0,
+        "thoughts": 210,
+        "tool": 0,
+        "total": 12760
+      },
+      "model": "gemini-3-flash-preview",
+      "toolCalls": [
+        {
+          "id": "list_directory-1770650370088-057e7d810aec2",
+          "name": "list_directory",
+          "args": {
+            "dir_path": "/Users/canerden/habitat-skills/.github"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "list_directory-1770650370088-057e7d810aec2",
+                "name": "list_directory",
+                "response": {
+                  "output": "Directory listing for /Users/canerden/habitat-skills/.github:\n[DIR] ISSUE_TEMPLATE\n[DIR] PULL_REQUEST_TEMPLATE\n[DIR] workflows"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:20:10.511Z",
+          "resultDisplay": "Listed 3 item(s).",
+          "displayName": "ReadFolder",
+          "description": "Lists the names of files and subdirectories directly within a specified directory path. Can optionally ignore entries matching provided glob patterns.",
+          "renderOutputAsMarkdown": true
+        },
+        {
+          "id": "run_shell_command-1770650370244-6bbacaa2420c4",
+          "name": "run_shell_command",
+          "args": {
+            "command": "git log -n 5",
+            "dir_path": "/Users/canerden/habitat-skills"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "run_shell_command-1770650370244-6bbacaa2420c4",
+                "name": "run_shell_command",
+                "response": {
+                  "output": "Output: commit e749373a4fdc49fff8b2e6d4a7ff41c7b4afae32 (HEAD -> main, origin/main)\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sun Feb 8 23:11:42 2026 +0100\n\n    feat: add sprint-coach and enhance social-content skills\n\ncommit 06748876f7bbfe8ba1f307800bb69afa4ba8539e\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sun Feb 8 22:39:49 2026 +0100\n\n    Remove LOVABLE-PROMPT.md from public repo\n    \n    Internal file, kept locally only.\n\ncommit 57b8d496f757cffd43396706c90e113fc73f54e2\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sun Feb 8 22:35:38 2026 +0100\n\n    Add multi-tool setup guide and combined Lovable prompt\n    \n    Update GETTING-STARTED.md with 6 tool options organized by type\n    (Terminal: Claude Code, Gemini CLI; IDE: Cursor, Antigravity;\n    Browser: AI Studio, Claude.ai, ChatGPT). Add LOVABLE-PROMPT.md\n    with all 12 skills condensed into a single prompt for building\n    a web app in Lovable or pasting into any AI chat.\n\ncommit 78687f06ae3586462d722cbd27f39fd09d8c44da\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sun Feb 8 22:13:33 2026 +0100\n\n    Add onboarding skill for smoother first-time experience\n    \n    New:\n    - onboarding skill: Welcome → Quick Win from 1 sentence → progressive\n      context gathering → path recommendation. Supports 4 modes: standard,\n      event, explorer, brainstorm.\n    \n    Updated:\n    - founder-context: Now detects minimal context from onboarding and offers\n      enrichment instead of starting over\n    - CLAUDE.md: Suggests onboarding for first-time users\n    - AGENTS.md: Registered onboarding as first skill\n    - README.md: Updated Quick Start to use onboarding, added to skills table\n    - GETTING-STARTED.md: Changed entry point from \"set up context\" to\n      \"get started\"\n    - PHASES.md: Added \"First Time? Start Here\" section before Phase 1\n\ncommit 8dc9eeafdd6158194a3caf9d8ff9dffa7d5a1598\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sat Feb 7 22:50:15 2026 +0100\n\n    Add 3 new skills + phase mapping guide\n    \n    New skills:\n    - pitch-deck: 30-sec pitch, 2-min pitch, demo scripts, objection prep\n    - customer-segments: Generate segments with personas, LinkedIn queries, outreach per segment\n    - social-content: LinkedIn/Twitter launch posts, build-in-public templates, content calendar\n    \n    New docs:\n    - PHASES.md: Maps all 11 skills to the 4-phase Habitat Sprint app workflow\n    \n    Updated:\n    - README.md: Added new skills to available skills table, reorganized into 4 phases\n    - AGENTS.md: Registered 3 new skills in the skill registry\nProcess Group PGID: 45755"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:20:10.511Z",
+          "resultDisplay": "commit e749373a4fdc49fff8b2e6d4a7ff41c7b4afae32 (HEAD -> main, origin/main)\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sun Feb 8 23:11:42 2026 +0100\n\n    feat: add sprint-coach and enhance social-content skills\n\ncommit 06748876f7bbfe8ba1f307800bb69afa4ba8539e\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sun Feb 8 22:39:49 2026 +0100\n\n    Remove LOVABLE-PROMPT.md from public repo\n    \n    Internal file, kept locally only.\n\ncommit 57b8d496f757cffd43396706c90e113fc73f54e2\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sun Feb 8 22:35:38 2026 +0100\n\n    Add multi-tool setup guide and combined Lovable prompt\n    \n    Update GETTING-STARTED.md with 6 tool options organized by type\n    (Terminal: Claude Code, Gemini CLI; IDE: Cursor, Antigravity;\n    Browser: AI Studio, Claude.ai, ChatGPT). Add LOVABLE-PROMPT.md\n    with all 12 skills condensed into a single prompt for building\n    a web app in Lovable or pasting into any AI chat.\n\ncommit 78687f06ae3586462d722cbd27f39fd09d8c44da\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sun Feb 8 22:13:33 2026 +0100\n\n    Add onboarding skill for smoother first-time experience\n    \n    New:\n    - onboarding skill: Welcome → Quick Win from 1 sentence → progressive\n      context gathering → path recommendation. Supports 4 modes: standard,\n      event, explorer, brainstorm.\n    \n    Updated:\n    - founder-context: Now detects minimal context from onboarding and offers\n      enrichment instead of starting over\n    - CLAUDE.md: Suggests onboarding for first-time users\n    - AGENTS.md: Registered onboarding as first skill\n    - README.md: Updated Quick Start to use onboarding, added to skills table\n    - GETTING-STARTED.md: Changed entry point from \"set up context\" to\n      \"get started\"\n    - PHASES.md: Added \"First Time? Start Here\" section before Phase 1\n\ncommit 8dc9eeafdd6158194a3caf9d8ff9dffa7d5a1598\nAuthor: ycanerden <ycanerden@gmail.com>\nDate:   Sat Feb 7 22:50:15 2026 +0100\n\n    Add 3 new skills + phase mapping guide\n    \n    New skills:\n    - pitch-deck: 30-sec pitch, 2-min pitch, demo scripts, objection prep\n    - customer-segments: Generate segments with personas, LinkedIn queries, outreach per segment\n    - social-content: LinkedIn/Twitter launch posts, build-in-public templates, content calendar\n    \n    New docs:\n    - PHASES.md: Maps all 11 skills to the 4-phase Habitat Sprint app workflow\n    \n    Updated:\n    - README.md: Added new skills to available skills table, reorganized into 4 phases\n    - AGENTS.md: Registered 3 new skills in the skill registry",
+          "displayName": "Shell",
+          "description": "This tool executes a given shell command as `bash -c <command>`. Command can start background processes using `&`. Command is executed as a subprocess that leads its own process group. Command process group can be terminated as `kill -- -PGID` or signaled as `kill -s SIGNAL -- -PGID`.\n\n      The following information is returned:\n\n      Output: Combined stdout/stderr. Can be `(empty)` or partial on error and for any unwaited background processes.\n      Exit Code: Only included if non-zero (command failed).\n      Error: Only included if a process-level error occurred (e.g., spawn failure).\n      Signal: Only included if process was terminated by a signal.\n      Background PIDs: Only included if background processes were started.\n      Process Group PGID: Only included if available.",
+          "renderOutputAsMarkdown": false
+        },
+        {
+          "id": "list_directory-1770650370433-8c6cbfc5507f3",
+          "name": "list_directory",
+          "args": {
+            "dir_path": "/Users/canerden/habitat-skills/skills/social-content/references"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "list_directory-1770650370433-8c6cbfc5507f3",
+                "name": "list_directory",
+                "response": {
+                  "output": "Directory /Users/canerden/habitat-skills/skills/social-content/references is empty."
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:20:10.511Z",
+          "resultDisplay": "Directory is empty.",
+          "displayName": "ReadFolder",
+          "description": "Lists the names of files and subdirectories directly within a specified directory path. Can optionally ignore entries matching provided glob patterns.",
+          "renderOutputAsMarkdown": true
+        }
+      ]
+    },
+    {
+      "id": "bd1163b1-af80-492b-ad47-6086d45ab56f",
+      "timestamp": "2026-02-09T15:20:14.641Z",
+      "type": "gemini",
+      "content": "I'll read `PHASES.md` and `GETTING-STARTED.md` to gather more details about the project's structure and the specific value it offers to founders, which will help me craft more compelling LinkedIn post options.",
+      "thoughts": [
+        {
+          "subject": "Analyzing Project Velocity",
+          "description": "I've been examining the recent commits. The project's development tempo appears to have picked up considerably. Specifically, I've noted the addition of pitch-deck, customer-segments, and social-content skills on February 7th. Followed by onboarding and sprint-coach skills the very next day, along with a multi-tool setup guide. The team's productivity is quite impressive!",
+          "timestamp": "2026-02-09T15:20:12.671Z"
+        },
+        {
+          "subject": "Composing Social Media Content",
+          "description": "I'm now generating LinkedIn post drafts to promote \"Habitat Skills,\" and I'm quite proud of the project. I'm leveraging the `social-content` skill to craft messaging that highlights the pain points of founders, then presents the AI-powered solution, and also adds the \"Vibecoded\" flair. I'm focusing on the rapid iteration, too – shipping over a dozen skills in a few days is notable!",
+          "timestamp": "2026-02-09T15:20:14.178Z"
+        }
+      ],
+      "tokens": {
+        "input": 13505,
+        "output": 99,
+        "cached": 6606,
+        "thoughts": 255,
+        "tool": 0,
+        "total": 13859
+      },
+      "model": "gemini-3-flash-preview",
+      "toolCalls": [
+        {
+          "id": "read_file-1770650414438-d274c457858ff",
+          "name": "read_file",
+          "args": {
+            "file_path": "/Users/canerden/habitat-skills/PHASES.md"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "read_file-1770650414438-d274c457858ff",
+                "name": "read_file",
+                "response": {
+                  "output": "# Habitat Skills × Sprint Phases\n\nHow to use Habitat Skills alongside the Habitat Sprint app during an evening session.\n\nThe app tracks your progress. The skills do the thinking.\n\n---\n\n## First Time? Start Here\n\nBefore Phase 1, run the onboarding skill. Just say **\"Get started\"** — it takes under 2 minutes, shows you what Habitat Skills can do, and sets up your context automatically.\n\n---\n\n## Phase 1: Idea & Business Model (60 min)\n\n**App tasks:** Problem statement, solution, target customer, unfair advantage, problem validation, success metrics\n\n**Skills to use:**\n\n| Order | Skill | Time | What it does |\n|-------|-------|------|-------------|\n| 1 | `/founder-context` | 5 min | Set up your project context — all other skills will use this |\n| 2 | `/idea-validation` | 20 min | Get a validation scorecard: problem severity, market size, riskiest assumptions |\n| 3 | `/competitor-research` | 15 min | Map competitors, find gaps, identify your positioning angle |\n| 4 | `/customer-segments` | 15 min | Generate 3-5 customer segments with pain points and where to find them |\n\n**Tip:** Run `/founder-context` first. It saves your idea, audience, and goals so you don't have to repeat yourself for every other skill.\n\n**What to paste into the app:** Use the outputs from idea-validation (problem, solution, metrics) and customer-segments (target customer) to fill in your Phase 1 tasks in the sprint app.\n\n---\n\n## Phase 2: Build Prototype & Customer Discovery (90 min)\n\n**App tasks:** MVP prompt, build & deploy, outreach message, contact list\n\n**Skills to use:**\n\n| Order | Skill | Time | What it does |\n|-------|-------|------|-------------|\n| 1 | `/mvp-scope` | 10 min | Cut your feature list to the absolute minimum. Get a build checklist. |\n| 2 | `/prototype-sprint` | 60 min | Follow the 5-hour sprint framework — scope, setup, build, polish, ship |\n| 3 | `/first-users` | 10 min | Generate outreach templates and a contact list for your target segments |\n| 4 | `/customer-segments` | 10 min | Get personalized outreach messages per segment + LinkedIn search queries |\n\n**Tip:** Ask `/mvp-scope` before you start building. The #1 mistake is building too much. Let it tell you what to cut.\n\n**Tip:** Use the outreach templates from `/first-users` to fill in your outreach message task in the sprint app.\n\n---\n\n## Phase 3: Demo & Pitch (20 min)\n\n**App tasks:** 30-second pitch, demo test, demo to group\n\n**Skills to use:**\n\n| Order | Skill | Time | What it does |\n|-------|-------|------|-------------|\n| 1 | `/pitch-deck` | 10 min | Generate a 30-second pitch, demo script, and objection prep |\n\n**Tip:** The pitch skill auto-fills from your founder-context. If you set up context in Phase 1, your pitch will reference your actual problem, solution, and traction.\n\n**Before you demo:**\n- Test the core flow works (click through it twice)\n- Make sure your URL is live\n- Know your first line by heart\n- Have backup screenshots in case of wifi issues\n\n---\n\n## Phase 4: Extra Mile (After the Evening)\n\n**App tasks:** Landing page, social launch post, domain, analytics, outreach, community\n\n**Skills to use:**\n\n| Task | Skill | What it does |\n|------|-------|-------------|\n| Landing page | `/landing-page` | Write copy + build a deployable landing page |\n| Social launch | `/social-content` | Create LinkedIn/Twitter launch posts, build-in-public templates |\n| Outreach | `/first-users` | Execute the outreach playbook — first 10, then 100 users |\n| Launch strategy | `/launch-plan` | Plan a phased launch: pre-launch, launch day, post-launch |\n\n**Tip:** Phase 4 is where the real work begins. The evening gives you momentum — these skills help you keep it going for 30 days.\n\n---\n\n## Quick Reference\n\n| Phase | Time | Key Skills | Main Output |\n|-------|------|-----------|-------------|\n| **1. Idea** | 60 min | founder-context, idea-validation, competitor-research, customer-segments | Validated idea + positioning |\n| **2. Build** | 90 min | mvp-scope, prototype-sprint, first-users | Live prototype + outreach plan |\n| **3. Pitch** | 20 min | pitch-deck | 30-sec pitch + demo script |\n| **4. Extra Mile** | After event | landing-page, social-content, launch-plan, first-users | Landing page + launch + first users |\n"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:20:14.696Z",
+          "resultDisplay": "",
+          "displayName": "ReadFile",
+          "description": "Reads and returns the content of a specified file. If the file is large, the content will be truncated. The tool's response will clearly indicate if truncation has occurred and will provide details on how to read more of the file using the 'offset' and 'limit' parameters. Handles text, images (PNG, JPG, GIF, WEBP, SVG, BMP), audio files (MP3, WAV, AIFF, AAC, OGG, FLAC), and PDF files. For text files, it can read specific line ranges.",
+          "renderOutputAsMarkdown": true
+        },
+        {
+          "id": "read_file-1770650414636-9f692afd043ef",
+          "name": "read_file",
+          "args": {
+            "file_path": "/Users/canerden/habitat-skills/GETTING-STARTED.md"
+          },
+          "result": [
+            {
+              "functionResponse": {
+                "id": "read_file-1770650414636-9f692afd043ef",
+                "name": "read_file",
+                "response": {
+                  "output": "# Getting Started with Habitat Skills\n\nA step-by-step guide for non-technical founders. No coding experience needed.\n\n---\n\n## What are Habitat Skills?\n\nHabitat Skills are like cheat sheets for AI. When you install them, your AI assistant learns how to help you with startup-specific tasks — validating ideas, researching competitors, building landing pages, and more.\n\nThink of it like hiring a startup advisor that lives inside your computer.\n\n---\n\n## What You Need\n\n1. **A computer** (Mac, Windows, or Linux)\n2. **An AI tool** (see options below)\n3. **10 minutes** to set up\n\nThat's it. No coding required.\n\n---\n\n## Choose Your Tool\n\nHabitat Skills work with multiple AI tools. Pick the one that fits you best:\n\n| Tool | Cost | Best For | Setup |\n|------|------|----------|-------|\n| **Claude Code** | Pro $20/month | Best skills experience | Terminal |\n| **Gemini CLI** | Free | Free terminal option | Terminal |\n| **Cursor** | Free tier available | People who prefer an IDE | IDE |\n| **Google Antigravity** | Free | Free IDE, no API key needed | IDE |\n| **Google AI Studio** | Free | No install needed | Browser |\n| **Claude.ai / ChatGPT** | Free tiers available | No install needed | Browser |\n\n**Not sure?** Here's the simple guide:\n- **Have a terminal and want the best experience?** → Claude Code\n- **Have a terminal and want free?** → Gemini CLI\n- **Prefer a code editor (IDE)?** → Cursor or Antigravity\n- **Don't want to install anything?** → Google AI Studio, Claude.ai, or ChatGPT\n\n### At a Habitat Evening?\n\nYour organizer will share an API key at the start. You just need to:\n\n1. Open Terminal (Cmd + Space → type \"Terminal\")\n2. Paste the setup command you'll receive at the event\n3. Start building\n\nSkip to [Step 2](#step-2-create-your-project-folder) if your setup is provided at the event.\n\n---\n\n## Terminal Options\n\n### Option A: Claude Code (Recommended)\n\nThe best experience. Skills activate automatically when you ask questions.\n\n**Install:**\n\nOpen **Terminal** (Cmd + Space → type \"Terminal\" → press Enter).\n\n```\nnpm install -g @anthropic-ai/claude-code\n```\n\n**Don't have npm?** Go to [nodejs.org](https://nodejs.org), download the installer, run it, then try again.\n\n**First time?** Run `claude` and follow the login prompts. Once you see the Claude prompt, you're in.\n\nThen continue to [Step 2](#step-2-create-your-project-folder).\n\n---\n\n### Option B: Gemini CLI (Free)\n\nGoogle's free terminal AI. Uses the same skills format as Claude Code — no changes needed.\n\n**Install:**\n\n```\nnpm install -g @google/gemini-cli\n```\n\n**Don't have npm?** Go to [nodejs.org](https://nodejs.org), download the installer, run it, then try again.\n\n**First time?** Run `gemini` and sign in with your Google account. Free tier gives you 60 requests/minute and 1,000/day — more than enough for an evening.\n\n**Install skills:**\n\nAfter creating your project folder ([Step 2](#step-2-create-your-project-folder)), clone the skills:\n\n```\ngit clone https://github.com/ycanerden/habitat-skills.git .gemini/skills/habitat\n```\n\nThen run `gemini` in your project folder and type \"Get started.\"\n\n---\n\n## IDE Options\n\n### Option C: Cursor (Free Tier Available)\n\nCursor is a code editor with built-in AI. It has a generous free tier.\n\n**Install:**\n\n1. Download from [cursor.com](https://cursor.com)\n2. Install and open it\n3. Create your project folder and open it in Cursor\n\n**Add the skills:**\n\nIn Cursor's terminal (View → Terminal), paste:\n\n```\ngit clone https://github.com/ycanerden/habitat-skills.git .cursor/skills/habitat\n```\n\n**Use the skills:**\n\nOpen Cursor's AI chat (Cmd + L) and type naturally:\n\n```\nGet started\n```\n\nCursor reads the skill files and follows the frameworks automatically.\n\n---\n\n### Option D: Google Antigravity (Free)\n\nGoogle's free code editor (VS Code fork) with built-in Gemini AI. No API key needed — just sign in with Google.\n\n**Install:**\n\n1. Download from [developers.google.com/gemini/antigravity](https://developers.google.com/gemini/antigravity)\n2. Install and open it\n3. Create your project folder and open it in Antigravity\n\n**Add the skills:**\n\nOpen the terminal in Antigravity (View → Terminal), paste:\n\n```\ngit clone https://github.com/ycanerden/habitat-skills.git .gemini/skills/habitat\n```\n\n**Use the skills:**\n\nOpen the AI chat panel and type:\n\n```\nGet started\n```\n\nIt works just like Cursor but uses Gemini (free) instead of Claude/GPT.\n\n---\n\n## Browser Options (No Install Needed)\n\n### Option E: Google AI Studio (Easiest + Free)\n\n1. Go to [aistudio.google.com](https://aistudio.google.com)\n2. Sign in with your Google account\n3. Start a new chat\n4. Copy a skill file from the [quick links below](#quick-links-to-skill-files)\n5. Paste it into the chat and say:\n\n```\nUse this framework to help me. Here's my idea: [describe your idea]\n\n[paste the skill content here]\n```\n\nFree. No install. Works right now.\n\n---\n\n### Option F: Claude.ai or ChatGPT (No Install Needed)\n\nUse the skills manually in any AI chat — no terminal required.\n\n1. Go to [claude.ai](https://claude.ai) or [chatgpt.com](https://chatgpt.com)\n2. Open a skill from the quick links below\n3. Copy the full content of the skill file\n4. Paste it into your chat with your idea:\n\n```\nUse the following framework to help me. Here's my idea: [describe your idea]\n\n[paste the skill content here]\n```\n\n### Quick Links to Skill Files\n\n- [Onboarding](https://github.com/ycanerden/habitat-skills/blob/main/skills/onboarding/SKILL.md) — Start here\n- [Founder Context](https://github.com/ycanerden/habitat-skills/blob/main/skills/founder-context/SKILL.md)\n- [Idea Validation](https://github.com/ycanerden/habitat-skills/blob/main/skills/idea-validation/SKILL.md)\n- [Competitor Research](https://github.com/ycanerden/habitat-skills/blob/main/skills/competitor-research/SKILL.md)\n- [Customer Segments](https://github.com/ycanerden/habitat-skills/blob/main/skills/customer-segments/SKILL.md)\n- [Landing Page](https://github.com/ycanerden/habitat-skills/blob/main/skills/landing-page/SKILL.md)\n- [MVP Scope](https://github.com/ycanerden/habitat-skills/blob/main/skills/mvp-scope/SKILL.md)\n- [Prototype Sprint](https://github.com/ycanerden/habitat-skills/blob/main/skills/prototype-sprint/SKILL.md)\n- [Pitch Deck](https://github.com/ycanerden/habitat-skills/blob/main/skills/pitch-deck/SKILL.md)\n- [First Users](https://github.com/ycanerden/habitat-skills/blob/main/skills/first-users/SKILL.md)\n- [Launch Plan](https://github.com/ycanerden/habitat-skills/blob/main/skills/launch-plan/SKILL.md)\n- [Social Content](https://github.com/ycanerden/habitat-skills/blob/main/skills/social-content/SKILL.md)\n\n**Tip:** Bookmark these links for quick access during the evening.\n\n---\n\n## Step 2: Create Your Project Folder\n\nIn Terminal, type:\n\n```\nmkdir my-startup && cd my-startup\n```\n\nThis creates a folder called \"my-startup\" and moves you into it. Name it whatever you want.\n\n---\n\n## Step 3: Install Habitat Skills\n\nStill in Terminal, paste the command for your tool:\n\n**Claude Code:**\n```\ngit clone https://github.com/ycanerden/habitat-skills.git .claude/skills/habitat\n```\n\n**Gemini CLI or Antigravity:**\n```\ngit clone https://github.com/ycanerden/habitat-skills.git .gemini/skills/habitat\n```\n\n**Cursor:**\n```\ngit clone https://github.com/ycanerden/habitat-skills.git .cursor/skills/habitat\n```\n\nThis downloads all the Habitat Skills into your project. Done.\n\n---\n\n## Step 4: Start Using the Skills\n\nLaunch your AI tool inside your project:\n\n| Tool | Command |\n|------|---------|\n| Claude Code | `claude` |\n| Gemini CLI | `gemini` |\n| Cursor | Open folder in Cursor → Cmd + L |\n| Antigravity | Open folder in Antigravity → open AI chat |\n\nNow you can talk to it and it knows all the Habitat frameworks. Here's what to try:\n\n### Get Started (Do This First)\n\n```\nGet started\n```\n\nThe onboarding skill will welcome you, ask for your idea in one sentence, and immediately show you what it can do. It takes under 2 minutes and sets up everything for the other skills.\n\n### Validate Your Idea\n\n```\nValidate my startup idea\n```\n\nRuns your idea through a structured framework — problem severity, market size, riskiest assumptions — and gives you a scorecard with next steps.\n\n### Research Competitors\n\n```\nResearch my competitors\n```\n\nSearches for competitors, analyzes their strengths and weaknesses, and helps you find your positioning angle.\n\n### Build a Landing Page\n\n```\nBuild me a landing page\n```\n\nWrites the copy AND the code for a landing page you can deploy tonight.\n\n### Scope Your MVP\n\n```\nWhat should my MVP include?\n```\n\nCuts your feature list down to the absolute minimum that tests your core idea.\n\n### Find Your First Users\n\n```\nHow do I find my first users?\n```\n\nCreates a playbook with specific outreach templates, channels, and a daily routine.\n\n### Plan Your Launch\n\n```\nHelp me plan my launch\n```\n\nBuilds a phased launch strategy — what to do before, during, and after launch day.\n\n---\n\n## The Habitat Evening Workflow\n\nIf you're at a Habitat evening, here's the recommended order:\n\n| Time | What to Do | Say This |\n|------|-----------|----------|\n| **6:00 PM** | Get started | \"Get started\" |\n| **6:15 PM** | Quick validation | \"Validate my startup idea\" |\n| **6:30 PM** | Scope what to build tonight | \"Scope my MVP for tonight\" |\n| **6:45 PM** | Start building | \"Build me a landing page\" or \"Help me prototype this\" |\n| **9:30 PM** | Polish and ship | \"Help me deploy this\" |\n| **10:00 PM** | Plan next steps | \"How do I find my first users?\" |\n\n---\n\n## Common Questions\n\n### \"I don't know how to use the terminal\"\n\nThat's okay. Three options:\n\n1. **The basics:** Open Terminal (Cmd + Space → \"Terminal\"), type a command, press Enter. Copy-paste works (Cmd + V). That's all you need.\n2. **Use an IDE instead:** Try [Cursor](#option-c-cursor-free-tier-available) or [Antigravity](#option-d-google-antigravity-free) — they're visual code editors with AI built in.\n3. **Skip everything:** Use [Google AI Studio](#option-e-google-ai-studio-easiest--free), [Claude.ai or ChatGPT](#option-f-claudeai-or-chatgpt-no-install-needed) — just copy skill content into an AI chat in your browser.\n\n### \"I don't have an idea yet\"\n\nStart with:\n\n```\nI don't have a specific idea yet. Help me brainstorm based on problems I've experienced.\n```\n\nThe AI will walk you through it.\n\n### \"I tried a command and got an error\"\n\nPaste the error message to your AI tool:\n\n```\nI got this error: [paste the error here]. What do I do?\n```\n\nIt can usually fix it for you.\n\n### \"Do I need to pay for anything?\"\n\n- **Habitat Skills:** Free and open source, forever.\n- **At a Habitat evening:** Access is provided — you don't need to pay for anything.\n- **On your own:** Gemini CLI, Google AI Studio, and Antigravity are free. Claude.ai and ChatGPT have free tiers. Claude Code is $20/month. Cursor has a free tier.\n\n---\n\n## Quick Reference Card\n\nSave this for the evening:\n\n| I want to... | Say this |\n|--------------|---------|\n| Set up my project | \"Get started\" |\n| Test my idea | \"Validate my startup idea\" |\n| Research competitors | \"Research my competitors\" |\n| Decide what to build | \"Scope my MVP\" |\n| Build a landing page | \"Build me a landing page\" |\n| Build a prototype | \"Help me prototype this in 5 hours\" |\n| Find users | \"How do I find my first users?\" |\n| Plan a launch | \"Help me plan my launch\" |\n| Get unstuck | \"I'm stuck on [describe the problem]\" |\n\n---\n\n## Need Help?\n\n- **At a Habitat evening?** Raise your hand — mentors are here to help.\n- **Building on your own?** Ask in the Habitat community or open an issue on GitHub.\n- **Found a bug or have a suggestion?** [Open an issue](https://github.com/ycanerden/habitat-skills/issues) on GitHub.\n\nHappy building.\n"
+                }
+              }
+            }
+          ],
+          "status": "success",
+          "timestamp": "2026-02-09T15:20:14.696Z",
+          "resultDisplay": "",
+          "displayName": "ReadFile",
+          "description": "Reads and returns the content of a specified file. If the file is large, the content will be truncated. The tool's response will clearly indicate if truncation has occurred and will provide details on how to read more of the file using the 'offset' and 'limit' parameters. Handles text, images (PNG, JPG, GIF, WEBP, SVG, BMP), audio files (MP3, WAV, AIFF, AAC, OGG, FLAC), and PDF files. For text files, it can read specific line ranges.",
+          "renderOutputAsMarkdown": true
+        }
+      ]
+    },
+    {
+      "id": "d4f276e2-1e92-4ec6-8080-b2cc3f806041",
+      "timestamp": "2026-02-09T15:20:27.114Z",
+      "type": "gemini",
+      "content": "Based on your project files and the \"vibecoded\" approach you've taken with Gemini, I've prepared three distinct LinkedIn post options. \n\nEach one follows the frameworks found in your `social-content` skill (PAS, AIDA, and BAB) to maximize engagement with founders and the tech community.\n\n### Option 1: The \"Vibecoded\" Breakthrough (Authentic & Meta)\n*Best for: Showing off the speed of AI-assisted development and the \"Vibe\" philosophy.*\n\n**Hook:** I just vibecoded an entire Operating System for Founders in a single weekend. 🚀\n\n12+ AI agent skills. Built with Gemini. Zero friction. \n\nI call it **Habitat Skills**.\n\nThe problem with most AI tools? They give you generic advice. \nHabitat Skills are different. They are specialized agents that turn your AI coder into a Co-Founder and Marketing Director. \n\nWe’ve spent 23+ evenings at Habitat watching founders struggle with the same things:\n❌ Over-scoping their MVP\n❌ Getting stuck on competitor research\n❌ Writing landing page copy that doesn't convert\n\nSo, I built the solution *with* the solution. \n\nBy \"vibing\" with Gemini, I shipped:\n• `/idea-validation` – Structured frameworks (TAM, Mom Test)\n• `/mvp-scope` – Ruthlessly cutting features to the core\n• `/sprint-coach` – A timed facilitator for 5-hour launches\n• `/social-content` – High-conversion templates for traction\n\nThe \"Founder as Director\" era is here. You don't need to be a prompt engineer; you just need to know how to direct your agents.\n\nCheck out the open-source repo here: [link]\nOr join our next 5-hour sprint to see them in action: [link]\n\n#buildinpublic #vibecoding #startup #AI #HabitatSkills\n\n***\n\n### Option 2: The \"Founder as Director\" Philosophy (Thought Leadership)\n*Best for: Positioning yourself as a leader in the AI/Founder space.*\n\n**Hook:** Most founders are using AI as a better \"Google.\" They’re missing the point.\n\nThe real shift isn't \"AI as a tool.\" It's **AI as a Teammate.**\n\nI’ve just released **Habitat Skills**—a collection of AI agent skills designed to move you from \"Worker\" to \"Director.\"\n\nWhen you're building a startup in a 5-hour Habitat sprint, you don't have time to be a researcher, a copywriter, AND a developer. \n\nHabitat Skills gives you a specialized department for each:\n✅ **Research Dept:** Maps competitors and finds your unfair advantage.\n✅ **Product Dept:** Scopes your MVP down to the \"Atomic Value.\"\n✅ **Marketing Dept:** Writes your pitch, your landing page, and your launch posts.\n\nEverything was vibecoded to ensure it's not just code—it's a framework for momentum. \n\nStop prompting. Start directing. \n\nTry the onboarding skill today: `gemini install habitat-skills` (or check the link in comments).\n\n#Founders #Productivity #AI #Entrepreneurship #Habitat\n\n***\n\n### Option 3: The \"12 Skills in 48 Hours\" (Result-Oriented)\n*Best for: Highlighting the sheer volume and utility of what you've built.*\n\n**Hook:** 48 hours. 12 AI Skills. 1 Goal: Launching your startup tonight. ⚡️\n\nI’m excited to share **Habitat Skills**—the OS for Founders.\n\nWe took everything we learned from helping 101+ founders launch prototypes at Habitat and baked it into a set of AI agents for Claude Code, Gemini CLI, and Cursor.\n\nWhether you're non-technical or a seasoned dev, these skills help you:\n1️⃣ **Validate:** Stop building things nobody wants.\n2️⃣ **Scope:** Ship in 5 hours, not 5 weeks.\n3️⃣ **Market:** Find your first 100 users with actual playbooks.\n\nIt's open-source, it's free, and it's built to keep you in \"flow state.\" \n\nThe best part? It's \"vibecoded\"—meaning it was built iteratively with AI, for AI, to help humans build faster.\n\nGrab the skills here: [Link to GitHub]\n\nWhat would you build if you knew you could ship the MVP by midnight? Let me know in the comments. 👇\n\n#OpenSource #AI #StartupLife #Vibecoding #HabitatSkills\n\n***\n\n### Pro-Tips for Posting:\n1. **The Link:** LinkedIn hates external links in the main post. Post the GitHub link in the **first comment** and mention \"Link in comments\" in the post.\n2. **The Visual:** A screenshot of your terminal running `/sprint-coach` or a video of the `/onboarding` skill in action will perform 3x better than text alone.\n3. **The Tag:** Tag \"Gemini\" or \"Google for Developers\" since you used their CLI and they are listed as a \"Resident Architect\" in your README.",
+      "thoughts": [
+        {
+          "subject": "Conceptualizing Core Values",
+          "description": "I'm zeroing in on the core value proposition. The idea is to build AI agents that function as co-founders or marketing directors. The emphasis is on facilitating five-hour sprints, to maximize impact. I'm focusing on \"Vibecoded,\" a term suggesting dynamic AI interaction. This should appeal to non-technical founders.",
+          "timestamp": "2026-02-09T15:20:19.952Z"
+        },
+        {
+          "subject": "Outlining LinkedIn Posts",
+          "description": "I'm finalizing the LinkedIn post drafts. I'm structuring them around three key angles: the \"Vibecoded\" approach, the \"Founder as Director\" concept, and the \"5-Hour Sprint\" benefits. I'll weave in phrases like \"Momentum over perfection\" and \"Atomic Value\" to align with the repo's ethos. The goal is a cohesive, engaging narrative.",
+          "timestamp": "2026-02-09T15:20:21.550Z"
+        }
+      ],
+      "tokens": {
+        "input": 18019,
+        "output": 1114,
+        "cached": 3421,
+        "thoughts": 307,
+        "tool": 0,
+        "total": 19440
+      },
+      "model": "gemini-3-flash-preview"
+    },
+    {
+      "id": "36a71918-7721-4aaf-8780-2c37abb74e62",
+      "timestamp": "2026-02-09T15:21:24.275Z",
+      "type": "user",
+      "content": "and for twitter?"
+    },
+    {
+      "id": "96e3265a-762f-4e7b-a078-d0f419e4909d",
+      "timestamp": "2026-02-09T15:21:31.455Z",
+      "type": "gemini",
+      "content": "For Twitter (X), you want to lean into the **#buildinpublic** and **#vibecoding** communities. Twitter favors threads, screenshots of terminal outputs, and punchy, \"developer-to-developer\" or \"founder-to-founder\" value.\n\nHere are three options for Twitter:\n\n### Option 1: The \"Vibe-Coded\" Thread (Best for Engagement)\n*Use this with a screenshot or screen recording of the CLI in action.*\n\n**Tweet 1:**\nI just vibecoded an entire Startup OS for Founders in 48 hours. 🚀\n\n12+ AI agent skills. Built with Gemini. Zero friction. \n\nI call it Habitat Skills — and it’s officially open source today. 🧵\n\n**Tweet 2:**\nThe goal: Turn your AI coder (Claude Code, Gemini CLI, Cursor) into a Co-Founder + Marketing Director.\n\nBuilt from the data of 101+ founders launching at @joinhabitat. \n\nInstead of generic AI advice, you get specialized frameworks.\n\n**Tweet 3:**\nWhat can it actually do?\n\n/idea-validation → TAM, Mom Test, & Scorecards.\n/mvp-scope → Ruthlessly cuts your features.\n/sprint-coach → A 5-hour timed facilitator for your launch.\n/social-content → High-conv copywriting (PAS/AIDA).\n\n**Tweet 4:**\nThe \"Founder as Director\" era is here. \n\nYou don't need to be a prompt engineer. You just need a framework for momentum. \n\nVibecoded by me + Gemini. \n\nGrab the repo here: [Link] ⚡️\n\n---\n\n### Option 2: The \"Short & Punchy\" (Best for Retweets)\n*Ideal if you have a cool GIF of the CLI.*\n\n**Tweet:**\n48 hours ago, I started vibecoding with Gemini. \n\nToday, I’m shipping Habitat Skills: The OS for Founders. 🛠️\n\n12 agents to help you:\n• Validate ideas\n• Scope MVPs\n• Build landing pages\n• Find first users\n\nStop prompting. Start directing.\n\n[GitHub Link] #buildinpublic #vibecoding\n\n---\n\n### Option 3: The \"Comparison\" (Before vs. After)\n*Best for highlighting the specific value of the \"Skills\" approach.*\n\n**Tweet:**\nTraditional AI: \"Give me some startup ideas.\" (Generic & boring)\n\nHabitat Skills: \"/idea-validation\" → Runs the Mom Test, identifies your 3 riskiest assumptions, and gives you a validation scorecard. \n\nI built 12 of these specialized skills this weekend using Gemini. \n\nThe future of building is \"Vibecoding.\" \n\nTry it: [Link]\n\n---\n\n### Twitter Strategy Tips:\n1.  **The \"Vibe\" Tag:** Tag **@GoogleDevs** or developers in the AI space (like **@karpathy** or **@cursor_ai** context) if you want to highlight the \"Vibecoding\" methodology.\n2.  **Visuals are Mandatory:** Twitter's algorithm loves media. Attach a screenshot of your `README.md` or a terminal window showing the `/onboarding` flow.\n3.  **The \"Link\" Hack:** If you have low followers, put the link in the *second* tweet of the thread to prevent the first tweet from being suppressed for having an external link.\n4.  **Use the Hashtags:** #buildinpublic #vibecoding #AI are the most active for this niche right now.",
+      "thoughts": [],
+      "tokens": {
+        "input": 19137,
+        "output": 774,
+        "cached": 0,
+        "thoughts": 0,
+        "tool": 0,
+        "total": 19911
+      },
+      "model": "gemini-3-flash-preview"
+    }
+  ],
+  "summary": "Get LinkedIn/Twitter post ideas for \"vibecoded\" project."
+}

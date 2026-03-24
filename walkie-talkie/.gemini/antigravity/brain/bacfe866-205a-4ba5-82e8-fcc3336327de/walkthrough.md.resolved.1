@@ -1,0 +1,48 @@
+# Greg CRM - Development Walkthrough
+
+This document outlines the progress of building Greg CRM, focusing on the latest design and UX overhaul inspired by Folk CRM.
+
+## Phase 2: Folk CRM UI Redesign & Enhanced UX
+
+Based on user feedback, we completely overhauled the visual design from a dark developer aesthetic to a clean, light, and airy interface heavily inspired by **Folk CRM**. We also implemented critical workflow features like Kanban drag-and-drop and info-dense slide-in panels.
+
+### Key Features Implemented
+
+1. **Light & Airy Design System**
+   - Replaced the dark theme with a clean white/gray palette.
+   - Updated typography using Inter for the main UI to feel more professional and approachable.
+   - Rebuilt the sidebar with "Groups" indicators (colored dots for Sales, Investors, Partners, etc.).
+
+2. **Pipeline (Kanban) View**
+   - Built a new [PipelineView](file:///Users/canerden/.gemini/antigravity/scratch/gregg-crm/src/components/PipelineView.jsx#25-190) component representing the core CRM workflow (New → Warm → Hot → Inactive).
+   - **Contact Cards**: Redesigned to be highly info-dense, surfacing the Company, Email, Role, Tags, and relative "last contacted" time directly on the board.
+   - **Drag and Drop**: Implemented native HTML5 drag-and-drop. You can grab any contact card by its grip handle and drag it across columns. Dropping a card instantly updates its `status` field.
+
+3. **Slide-in Detail Panel**
+   - Replaced the static center-pane detail view with a sleek slide-in panel from the right.
+   - Features structured metadata rows for quick scanning.
+   - **Inline Editing**: Status and Tags can now be edited directly from the detail panel without opening a separate form. Click a status badge to open a dropdown, or click the `+` icon on tags to quickly add new ones.
+   - **Activity Timeline**: Redesigned the markdown activity parser to render a beautiful vertical timeline with source-specific icons (e.g., mail icon for emails, calendar for meetings, LinkedIn logo).
+   - Preserved the ability to edit raw markdown notes inline with a single click.
+
+4. **Table View**
+   - Added a secondary spreadsheet-like [TableView](file:///Users/canerden/.gemini/antigravity/scratch/gregg-crm/src/components/TableView.jsx#15-70) for power users who want to see all data at a glance, toggleable via tabs in the top header.
+
+### Visual Proof
+
+#### 1. The New Pipeline Board
+The core workspace, featuring info-dense cards and drag-and-drop column management.
+![Pipeline View](/Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/pipeline_view_main_1772725367435.png)
+
+#### 2. Slide-In Detail Panel & Activity Timeline
+Clicking any card slides this panel in to reveal deep context, inline editing, and the parsed activity history.
+![Detail Panel](/Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/contact_detail_panel_1772725428090.png)
+
+#### 3. Table / List View
+For high-density scanning of the entire database.
+![Table View](/Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/table_view_1772725575028.png)
+
+### Next Steps (Phase 3: Integration)
+The absolute next step is to build the **Agentic Data Ingestion Layer** mentioned by the user:
+- Connect the AI Agent (via MCP) to read from Notion databases and Google Sheets.
+- Enable the agent to automatically pull in contacts from these sources and generate the corresponding [.md](file:///Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/task.md) files in Greg CRM.

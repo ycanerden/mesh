@@ -1,0 +1,37 @@
+# Greg CRM — MVP Build
+
+## Planning
+- [/] Define architecture and tech stack
+- [/] Create implementation plan
+- [ ] Get user approval on plan
+
+## Core Infrastructure
+- [ ] Initialize project (Vite + React + Electron)
+- [ ] Set up file-based contact storage (markdown)
+- [ ] Define contact markdown schema/frontmatter
+- [ ] Build file watcher for live sync
+
+## UI Shell
+- [ ] App shell with sidebar + main content area
+- [ ] Dark theme design system (dev-tool aesthetic)
+- [ ] Cmd+K command palette
+- [ ] Contact list sidebar with search
+- [ ] Contact detail view (markdown render + edit)
+
+## Contact Management
+- [ ] Create new contact
+- [ ] Edit contact (inline markdown editing)
+- [ ] Delete contact
+- [ ] Tags/labels system
+- [ ] Activity timeline per contact
+
+## Agent Features (Phase 2)
+- [ ] MCP client integration
+- [ ] Agent command processing
+- [ ] Activity logging back to markdown
+
+## Verification
+- [ ] App launches and renders correctly
+- [ ] Can create, view, edit contacts as .md files
+- [ ] Cmd+K palette works
+- [ ] Files are readable on disk as plain markdown

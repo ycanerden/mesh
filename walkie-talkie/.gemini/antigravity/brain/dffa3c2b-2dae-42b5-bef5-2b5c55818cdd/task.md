@@ -1,0 +1,21 @@
+# GymBuddyGemini Development Tracker
+
+## [x] Initial setup
+- [x] Copy `tracker.jsx` to `gymbuddygemini.jsx`
+- [x] Rename app title to GYM BUDDY GEMINI
+
+## [x] Planning Phase
+- [x] Requirements gathering and tech stack proposal
+- [x] User approval on architecture and stack
+
+## [x] Project Initialization
+- [x] Create Next.js app in `gymbuddygemini/`
+- [x] Setup dependencies (Tailwind, Supabase, AI SDK)
+- [x] Initialize Database schema (Supabase)
+
+## [/] Core Features
+- [x] Authentication (Signup/Login)
+- [/] Onboarding Flow (weight, height, goals, frequency)
+- [ ] Workout Plan Generation Module
+- [ ] Manual Workout Logging UI
+- [ ] AI Parsing (Apple Notes -> Workout Log)

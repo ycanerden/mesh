@@ -1,0 +1,83 @@
+# VibeMarketer — Build Walkthrough
+
+## What Was Built
+
+A native-ready macOS desktop app that wraps your **15 HABITAT marketing skills** in a premium, marketer-friendly UI. No terminal required.
+
+**Tech stack:** Electron + React + Vite · Vanilla CSS design system · Claude API (BYOK)
+
+---
+
+## App Screens
+
+````carousel
+![Welcome Screen — dark glassmorphism UI with 15 skills in phase-grouped sidebar](/Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/welcome.png)
+<!-- slide -->
+![Skill Runner — Competitor Research with dynamic input form and phase badge](/Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/skill_runner.png)
+<!-- slide -->
+![Social Content skill with platform, stage, and goal inputs](/Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/social_content.png)
+<!-- slide -->
+![Settings — API key storage + Founder Context shared across all skills](/Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/settings.png)
+````
+
+---
+
+## Demo Recording
+
+![Full app walkthrough — navigating skills, viewing forms, opening settings](/Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/vibemarketer_app_test_1770917361326.webp)
+
+---
+
+## Key Features
+
+| Feature | Details |
+|---|---|
+| **15 HABITAT Skills** | All bundled — Ideation, Building, Launch, Meta phases |
+| **Dynamic Forms** | Each skill gets custom inputs auto-mapped from SKILL.md |
+| **Founder Context** | Fill once in Settings → auto-shared to every skill |
+| **Claude API** | BYOK model — key stored locally, never leaves machine |
+| **Output Panel** | Markdown rendering, copy-to-clipboard, export to .md |
+| **Design System** | Dark theme, glassmorphism, phase color-coding, Inter font |
+
+## Project Structure
+
+```
+vibemarketer/
+├── electron/          # Electron main process + preload
+│   ├── main.cjs       # IPC handlers, Claude API calls, window mgmt
+│   └── preload.cjs    # Secure bridge to renderer
+├── src/
+│   ├── components/    # React components
+│   │   ├── Sidebar.jsx
+│   │   ├── SkillRunner.jsx
+│   │   ├── OutputPanel.jsx
+│   │   ├── Settings.jsx
+│   │   └── Welcome.jsx
+│   ├── lib/
+│   │   ├── skillParser.js     # SKILL.md parser + form mapper
+│   │   └── fallbackSkills.js  # Browser dev mode data
+│   ├── skills/        # All 15 HABITAT SKILL.md files
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── index.css      # Full design system
+├── index.html
+├── vite.config.js
+└── package.json
+```
+
+## What Was Tested
+
+- ✅ Dev server starts at `http://localhost:5173/`
+- ✅ Welcome screen renders with sidebar showing all 15 skills
+- ✅ Skills grouped correctly by phase (4 categories)
+- ✅ Clicking a skill shows correct dynamic form inputs
+- ✅ Settings page renders API key + Founder Context forms
+- ✅ Phase badges and color-coding work per skill
+- ✅ API key warning banner shows when no key configured
+
+## Next Steps
+
+- [ ] Enter a Claude API key and test a real skill execution
+- [ ] Package the app as a `.dmg` via `npm run build`
+- [ ] Add app icon and branding
+- [ ] Add onboarding flow for first-time users

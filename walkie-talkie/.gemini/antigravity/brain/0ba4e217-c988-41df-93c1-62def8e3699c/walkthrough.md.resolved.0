@@ -1,0 +1,54 @@
+# Open Source Dashboard — Walkthrough
+
+## What Was Built
+
+A local web dashboard that helps you discover, learn, and contribute to open source projects in **AI / LLMs / Automation**.
+
+![Dashboard Screenshot](/Users/canerden/.gemini/antigravity/brain/0ba4e217-c988-41df-93c1-62def8e3699c/dashboard_top_view_1770847293683.png)
+
+![Dashboard Demo](/Users/canerden/.gemini/antigravity/brain/0ba4e217-c988-41df-93c1-62def8e3699c/dashboard_preview_1770847176837.webp)
+
+## Dashboard Sections
+
+| Section | What It Shows |
+|---------|--------------|
+| 📊 **Profile** | Your GitHub stats — repos, followers, join date |
+| 📦 **Your Repos** | All 7 of your public repositories |
+| 🔥 **Trending AI Repos** | Hot repos in AI/LLM space (AutoGen, n8n, LangChain, etc.) |
+| 🏷️ **Good First Issues** | Beginner-friendly issues from 6 major projects |
+| 🗺️ **Learning Roadmap** | Step-by-step path from beginner → advanced |
+
+### Issue Sources
+Good first issues are pulled from: **LangChain**, **Ollama**, **n8n**, **Hugging Face**, **Open WebUI**, **AutoGPT**
+
+## How to Use
+
+### Run the dashboard
+```bash
+cd /Users/canerden/.gemini/antigravity/scratch/opensource-dashboard
+./run.sh
+```
+Then open **http://localhost:8787** in your browser.
+
+### Refresh data only
+```bash
+./fetch-data.sh
+```
+
+## Files Created
+
+| File | Purpose |
+|------|---------|
+| [index.html](file:///Users/canerden/.gemini/antigravity/scratch/opensource-dashboard/index.html) | Dashboard page |
+| [style.css](file:///Users/canerden/.gemini/antigravity/scratch/opensource-dashboard/style.css) | Dark theme styling |
+| [app.js](file:///Users/canerden/.gemini/antigravity/scratch/opensource-dashboard/app.js) | Loads data and renders the UI |
+| [fetch-data.sh](file:///Users/canerden/.gemini/antigravity/scratch/opensource-dashboard/fetch-data.sh) | Fetches live data from GitHub |
+| [run.sh](file:///Users/canerden/.gemini/antigravity/scratch/opensource-dashboard/run.sh) | One-command launcher |
+
+## Verification
+
+- ✅ Data fetched successfully from GitHub API (profile, repos, trending, issues)
+- ✅ Dashboard renders all 5 sections correctly
+- ✅ Links to repos and issues open correctly
+- ✅ Issue filter tabs work (All, LangChain, n8n, etc.)
+- ✅ Responsive design works on different screen sizes

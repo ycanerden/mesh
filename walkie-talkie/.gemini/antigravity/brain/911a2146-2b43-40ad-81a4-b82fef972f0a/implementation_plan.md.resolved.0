@@ -1,0 +1,61 @@
+# Implementation Plan - Granola Web (Copycat)
+
+This plan outlines the steps to build a web-based "Granola" clone—a beautiful, local-first meeting notepad that records audio and uses AI to enhance notes.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **API Keys**: This application will require an OpenAI API key (or compatible) to perform Transcription (Whisper) and Summarization (GPT-4o/mini). I will build a "Settings" modal for you to input this key, which will be stored only in your browser's LocalStorage.
+
+> [!NOTE]
+> **Tech Stack**:
+> - **Framework**: Next.js 14+ (App Router)
+> - **Styling**: Vanilla CSS (CSS Modules & Variables) for a bespoke, premium "Granola" look.
+> - **Storage**: IndexedDB (via `idb`) for local-first data storage (Privacy focused).
+> - **Icons**: Lucide React.
+
+## Proposed Changes
+
+### Project Setup
+- Initialize a new Next.js project at `/Users/canerden/.gemini/antigravity/scratch/granola-web`.
+- Clean up default styles and implement a custom Design System in `globals.css` focusing on:
+    - **Typography**: Inter (sans-serif) or similar clean font.
+    - **Colors**: Warm off-whites, sharp blacks, and "grainy" textures if possible.
+    - **Layout**: Flexbox/Grid based dashboard layout.
+
+### Core Components ([NEW])
+#### `components/Layout/Shell.js`
+- Main application shell with a Sidebar (History) and Main Area (Editor).
+
+#### `components/Editor/NoteEditor.js`
+- A clean, distraction-free text area for typing notes during the meeting.
+
+#### `components/Recorder/AudioRecorder.js`
+- Uses `MediaRecorder` API to capture audio.
+- Visual feedback (red dot, timer, potentially a waveform).
+
+#### `lib/db.js`
+- Utility to interact with IndexedDB to save:
+    - Audio blobs (if size permits, or just metadata).
+    - Note content.
+    - Transcripts and AI summaries.
+
+### AI Integration
+#### `lib/ai.js`
+- Functions to call OpenAI API.
+- `transcribeAudio(blob)`: Sends audio to Whisper.
+- `generateSummary(transcript, userNotes)`: Sends text to LLM to merge and format.
+
+## Verification Plan
+
+### Automated Tests
+- None planned for this MVP phase.
+
+### Manual Verification
+1. **Recording Test**: Click Record, talk, Stop. Verify audio plays back.
+2. **Note Taking**: Type notes while "recording".
+3. **Enhancement Flow**:
+    - Input a dummy API key (or real one).
+    - Trigger "Enhance".
+    - Verify that "Simulated" or Real response updates the note view.
+4. **Persistence**: Reload page, ensure past meeting is still in the sidebar.

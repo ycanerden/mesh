@@ -1,0 +1,25 @@
+// Single source of truth for all model metadata.
+// Add new models here — UI, judge prompt, and API calls all derive from this.
+export type ModelConfig = {
+  id: string
+  displayName: string
+  abbreviation: string
+  envKey: string
+  optional?: boolean // if true, silently skip when env key is missing
+}
+
+export const MODELS: ModelConfig[] = [
+  { id: 'claude-haiku-4-5-20251001',    displayName: 'Claude Haiku',    abbreviation: 'H',  envKey: 'ANTHROPIC_API_KEY' },
+  { id: 'llama-3.3-70b-versatile',      displayName: 'Llama 3.3 (Groq)', abbreviation: 'L', envKey: 'GROQ_API_KEY' },
+  { id: 'mixtral-8x7b-32768',           displayName: 'Mixtral (Groq)',  abbreviation: 'M',  envKey: 'GROQ_API_KEY' },
+  { id: 'gemma2-9b-it',                 displayName: 'Gemma 2 (Groq)',  abbreviation: 'Gm', envKey: 'GROQ_API_KEY' },
+  // Add when you have credits/personal Google account:
+  // { id: 'gemini-2.0-flash',          displayName: 'Gemini Flash',    abbreviation: 'G',  envKey: 'GOOGLE_AI_API_KEY' },
+  // { id: 'deepseek-chat',             displayName: 'DeepSeek',        abbreviation: 'D',  envKey: 'DEEPSEEK_API_KEY' },
+  // Uncomment for full power:
+  // { id: 'gpt-4o',                    displayName: 'GPT-4o',          abbreviation: 'G',  envKey: 'OPENAI_API_KEY' },
+  // { id: 'claude-sonnet-4-5-20251001',displayName: 'Claude Sonnet',   abbreviation: 'C',  envKey: 'ANTHROPIC_API_KEY' },
+]
+
+// Haiku as judge for budget (~$0.02/query). Swap to 'claude-opus-4-6' for production.
+export const JUDGE_MODEL = 'claude-haiku-4-5-20251001'

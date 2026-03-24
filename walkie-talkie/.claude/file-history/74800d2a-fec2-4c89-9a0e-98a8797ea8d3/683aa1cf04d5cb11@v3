@@ -1,0 +1,26 @@
+// Single source of truth for all model metadata.
+// Add new models here — UI, judge prompt, and API calls all derive from this.
+export type ModelConfig = {
+  id: string
+  displayName: string
+  abbreviation: string
+  envKey: string
+  optional?: boolean // if true, silently skip when env key is missing
+}
+
+export const MODELS: ModelConfig[] = [
+  // Budget tier — ~$0.001-0.005/query each
+  { id: 'claude-haiku-4-5-20251001',       displayName: 'Claude Haiku',  abbreviation: 'H',  envKey: 'ANTHROPIC_API_KEY' },
+  { id: 'gemini-2.0-flash',                displayName: 'Gemini Flash',  abbreviation: 'Gm', envKey: 'GOOGLE_AI_API_KEY' },
+  { id: 'deepseek-chat',                   displayName: 'DeepSeek',      abbreviation: 'D',  envKey: 'DEEPSEEK_API_KEY' },
+  // Free — local Ollama (optional, needs `ollama run llama3.2` running)
+  { id: 'llama3.2',                        displayName: 'Ollama (local)', abbreviation: 'O',  envKey: 'OLLAMA_ENABLED', optional: true },
+  // Paid — uncomment when you want full power
+  // { id: 'gpt-4o',                       displayName: 'GPT-4o',        abbreviation: 'G',  envKey: 'OPENAI_API_KEY' },
+  // { id: 'claude-sonnet-4-5-20251001',   displayName: 'Claude Sonnet', abbreviation: 'C',  envKey: 'ANTHROPIC_API_KEY' },
+  // { id: 'claude-opus-4-6',              displayName: 'Claude Opus',   abbreviation: 'Co', envKey: 'ANTHROPIC_API_KEY' },
+]
+
+// Use Haiku as judge for budget testing (~$0.02/query vs $0.30 for Opus)
+// Swap to 'claude-opus-4-6' for production quality
+export const JUDGE_MODEL = 'claude-haiku-4-5-20251001'

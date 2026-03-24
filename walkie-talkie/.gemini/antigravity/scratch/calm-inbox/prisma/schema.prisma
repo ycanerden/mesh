@@ -1,0 +1,58 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  settings  Settings?
+  digests   Digest[]
+}
+
+model Settings {
+  id              String @id @default(uuid())
+  userId          String @unique
+  user            User   @relation(fields: [userId], references: [id])
+  topics          String // JSON: ["AI", "Tech"]
+  senderBlocklist String // JSON: ["spam@bad.com"]
+  schedule        String // "09:00"
+}
+
+model EmailItem {
+  id          String   @id @default(uuid())
+  rawSubject  String
+  sender      String
+  receivedAt  DateTime @default(now())
+  rawBody     String
+  cleanedBody String?
+  isProcessed Boolean  @default(false)
+
+  // AI Extracted
+  summary     String? // The 3-5 bullets
+  category    String? // "News", "Update", etc.
+  relevance   Int? // 0-100 score
+  readingTime Int? // Minutes
+  actionItems String? // JSON list
+
+  digestId String?
+  digest   Digest? @relation(fields: [digestId], references: [id])
+}
+
+model Digest {
+  id     String   @id @default(uuid())
+  date   DateTime @default(now())
+  userId String
+  user   User     @relation(fields: [userId], references: [id])
+  items  EmailItem[]
+
+  // The final composed summary for the whole day
+  intro    String?
+  topReads String? // JSON or HTML of top 5
+  deepDive String?
+}

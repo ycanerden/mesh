@@ -1,0 +1,524 @@
+2026-03-12T21:20:43.535Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-12T21:20:43.535Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-12T21:20:43.535Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-12T21:20:43.535Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-12T21:20:43.543Z [DEBUG] Applying permission update: Adding 14 allow rule(s) to destination 'localSettings': ["Bash(du:*)","Bash(top:*)","Bash(sort:*)","Bash(killall:*)","Bash(system_profiler:*)","Bash(npx skills add:*)","Bash(while read d)","Bash(do du -sh $d)","Bash(done)","Bash(brew list:*)","Bash(brew cleanup:*)","Bash(tmutil listlocalsnapshots:*)","Bash(for dir in $HOME/Library/Application Support/Claude/*/)","Bash(do du -sh $dir)"]
+2026-03-12T21:20:43.543Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-12T21:20:43.564Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-03-12T21:20:43.564Z [DEBUG] [STARTUP] Running setup()...
+2026-03-12T21:20:43.564Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-12T21:20:43.565Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-12T21:20:43.581Z [DEBUG] Error log sink initialized
+2026-03-12T21:20:43.586Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-12T21:20:43.586Z [DEBUG] Total plugin skills loaded: 0
+2026-03-12T21:20:43.586Z [DEBUG] Total plugin commands loaded: 0
+2026-03-12T21:20:43.586Z [DEBUG] [STARTUP] setup() completed in 22ms
+2026-03-12T21:20:43.586Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-12T21:20:43.587Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-12T21:20:43.587Z [DEBUG] Total plugin agents loaded: 0
+2026-03-12T21:20:43.588Z [DEBUG] Loaded 25 unique skills (managed: 0, user: 25, project: 0, additional: 0, legacy commands: 0)
+2026-03-12T21:20:43.588Z [DEBUG] getSkills returning: 25 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-03-12T21:20:43.588Z [DEBUG] [STARTUP] Commands and agents loaded in 2ms
+2026-03-12T21:20:43.588Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-03-12T21:20:43.589Z [DEBUG] [render] initLayout starting
+2026-03-12T21:20:43.589Z [DEBUG] Layout engine: yoga
+2026-03-12T21:20:43.593Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default
+2026-03-12T21:20:43.596Z [DEBUG] [render] initLayout complete
+2026-03-12T21:20:43.599Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-12T21:20:43.606Z [DEBUG] [render] first ink render: 636ms since process start
+2026-03-12T21:20:43.617Z [DEBUG] Grove: Cache stale, returning cached data and refreshing in background
+2026-03-12T21:20:43.630Z [DEBUG] [render] initLayout starting
+2026-03-12T21:20:43.630Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-12T21:20:43.631Z [DEBUG] [render] initLayout complete
+2026-03-12T21:20:43.631Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-12T21:20:43.633Z [DEBUG] [render] first ink render: 662ms since process start
+2026-03-12T21:20:43.635Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-03-12T21:20:43.636Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350443636
+2026-03-12T21:20:43.636Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:20:43.637Z [DEBUG] Temp file written successfully, size: 18166 bytes
+2026-03-12T21:20:43.637Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:20:43.637Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350443636 to /Users/canerden/.claude.json
+2026-03-12T21:20:43.637Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:20:43.637Z [DEBUG] [keybindings] Watching for changes to /Users/canerden/.claude/keybindings.json
+2026-03-12T21:20:43.638Z [DEBUG] [keybindings] Watching for changes to /Users/canerden/.claude/keybindings.json
+2026-03-12T21:20:43.642Z [DEBUG] Git remote URL: https://github.com/ycanerden/notetakertest.git
+2026-03-12T21:20:43.642Z [DEBUG] Parsed repository: ycanerden/notetakertest from https://github.com/ycanerden/notetakertest.git
+2026-03-12T21:20:43.642Z [DEBUG] Parsed repository: ycanerden/notetakertest from URL: https://github.com/ycanerden/notetakertest.git
+2026-03-12T21:20:43.642Z [DEBUG] Path /Users/canerden already tracked for repo ycanerden/notetakertest
+2026-03-12T21:20:43.775Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350443775
+2026-03-12T21:20:43.775Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:20:43.775Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:20:43.776Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:20:43.776Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350443775 to /Users/canerden/.claude.json
+2026-03-12T21:20:43.776Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:20:44.103Z [ERROR] AxiosError: AxiosError: Request failed with status code 400
+    at Jx (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:25:1138)
+    at Unzip.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9813)
+    at Unzip.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Aw8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:109:4706)
+    at async Ye6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:218:2821)
+    at async JJ6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1938:1905)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1938:3528
+2026-03-12T21:20:44.456Z [DEBUG] Failed to fetch Grove notice config: AxiosError: Request failed with status code 401
+2026-03-12T21:20:45.862Z [ERROR] AxiosError: AxiosError: Request failed with status code 400
+    at Jx (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:25:1138)
+    at Unzip.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9813)
+    at Unzip.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Aw8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:109:4706)
+    at async Ye6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:218:2821)
+    at async JJ6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1938:1905)
+    at async ZM1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1938:1986)
+    at async Promise.all (index 0)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:4222:13376
+2026-03-12T21:20:46.064Z [ERROR] AxiosError: AxiosError: Request failed with status code 401
+    at Jx (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:25:1138)
+    at Unzip.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9813)
+    at Unzip.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async JJ6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1938:1918)
+    at async ZM1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1938:1986)
+    at async Promise.all (index 0)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:4222:13376
+2026-03-12T21:20:46.067Z [DEBUG] [STARTUP] showSetupScreens() completed in 2479ms
+2026-03-12T21:20:46.067Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-12T21:20:46.067Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-12T21:20:46.068Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-12T21:20:46.069Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-12T21:20:46.069Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-12T21:20:46.102Z [DEBUG] Total LSP servers loaded: 0
+2026-03-12T21:20:46.103Z [DEBUG] [STARTUP] MCP configs loaded in 2560ms
+2026-03-12T21:20:46.105Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-03-12T21:20:46.106Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350446106
+2026-03-12T21:20:46.106Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:20:46.106Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:20:46.106Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:20:46.106Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350446106 to /Users/canerden/.claude.json
+2026-03-12T21:20:46.107Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:20:46.107Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-12T21:20:46.107Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-12T21:20:46.108Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-12T21:20:46.108Z [DEBUG] Found 0 hook matchers in settings
+2026-03-12T21:20:46.108Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-03-12T21:20:46.108Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-12T21:20:46.108Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-12T21:20:46.108Z [DEBUG] LSP server manager initialized successfully
+2026-03-12T21:20:46.108Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-12T21:20:46.110Z [DEBUG] [render] initLayout starting
+2026-03-12T21:20:46.119Z [DEBUG] [render] initLayout complete
+2026-03-12T21:20:46.125Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-12T21:20:46.162Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-03-12T21:20:46.163Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-03-12T21:20:46.163Z [DEBUG] performStartupChecks called
+2026-03-12T21:20:46.163Z [DEBUG] Starting background plugin installations
+2026-03-12T21:20:46.163Z [DEBUG] performBackgroundPluginInstallations called
+2026-03-12T21:20:46.164Z [DEBUG] [render] first ink render: 3194ms since process start
+2026-03-12T21:20:46.164Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-12T21:20:46.166Z [DEBUG] Watching for changes in setting files /Users/canerden/.claude/settings.json, /Users/canerden/.claude/settings.local.json...
+2026-03-12T21:20:46.167Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-12T21:20:46.167Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-03-12T21:20:46.167Z [DEBUG] [claudeai-mcp] Fetching from https://api.anthropic.com/v1/mcp_servers?limit=1000
+2026-03-12T21:20:46.168Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-03-12T21:20:46.168Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-12T21:20:46.168Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-12T21:20:46.168Z [DEBUG] Loaded plugins - Enabled: 0, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-03-12T21:20:46.184Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350446184
+2026-03-12T21:20:46.184Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:20:46.184Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:20:46.184Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:20:46.184Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350446184 to /Users/canerden/.claude.json
+2026-03-12T21:20:46.184Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:20:46.184Z [DEBUG] Watching for changes in skill/command directories: /Users/canerden/.claude/skills, /Users/canerden/.claude/skills...
+2026-03-12T21:20:46.226Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-12T21:20:46.227Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.95b; cc_entrypoint=cli;
+2026-03-12T21:20:46.227Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-12T21:20:46.227Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-12T21:20:46.390Z [DEBUG] [claudeai-mcp] Fetch failed
+2026-03-12T21:20:46.391Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350446391
+2026-03-12T21:20:46.391Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:20:46.391Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:20:46.391Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:20:46.391Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350446391 to /Users/canerden/.claude.json
+2026-03-12T21:20:46.391Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:20:46.392Z [ERROR] AxiosError: AxiosError: Request failed with status code 400
+    at Jx (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:25:1138)
+    at Unzip.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9813)
+    at Unzip.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Aw8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:109:4706)
+    at async Ye6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:218:2821)
+2026-03-12T21:20:46.413Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-12T21:20:46.413Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-12T21:20:46.413Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-12T21:20:46.589Z [ERROR] Error: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytLvuUhYNBH36LmtREc"}
+    at Z4.generate (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:359:8823)
+    at LC.makeStatusError (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:2195)
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:3349
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:2232
+    at async Xq9 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:935:3953)
+    at async Mv7 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:2165)
+    at async _U1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10194)
+    at async Ed (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10890)
+2026-03-12T21:20:46.589Z [DEBUG] countTokensWithFallback: API returned null, trying haiku fallback (21 tools)
+2026-03-12T21:20:46.589Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-12T21:20:46.589Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-12T21:20:46.640Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-12T21:20:46.640Z [DEBUG] AutoUpdater: Using global update method
+2026-03-12T21:20:46.672Z [ERROR] API error (attempt 1/11): 401 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytLwBrAiYEK84XdhGx9"}
+2026-03-12T21:20:46.672Z [ERROR] Error in API request: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytLwBrAiYEK84XdhGx9"}
+2026-03-12T21:20:46.672Z [ERROR] Error: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytLwBrAiYEK84XdhGx9"}
+    at Z4.generate (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:359:8823)
+    at LC.makeStatusError (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:2195)
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-03-12T21:20:46.749Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-12T21:20:46.797Z [ERROR] AxiosError: AxiosError: Request failed with status code 400
+    at Jx (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:25:1138)
+    at Unzip.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9813)
+    at Unzip.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Aw8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:109:4706)
+    at async Ye6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:218:2821)
+    at async GS (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:885:14698)
+    at async Zv7 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:3895)
+    at async _U1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10466)
+    at async Ed (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10890)
+    at async bs4 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3520:554)
+2026-03-12T21:20:46.818Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-12T21:20:47.222Z [DEBUG] countTokensWithFallback: haiku fallback failed: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytLxt3K6g9wpiqRmQos"}
+2026-03-12T21:20:47.222Z [ERROR] Error: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytLxt3K6g9wpiqRmQos"}
+    at Z4.generate (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:359:8823)
+    at LC.makeStatusError (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:2195)
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Zv7 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:4041)
+    at async _U1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10466)
+    at async Ed (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10890)
+    at async bs4 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3520:554)
+2026-03-12T21:20:47.222Z [DEBUG] countToolDefinitionTokens returned null for 21 tools: Task, TaskOutput, Bash, Glob, Grep, ExitPlanMode, Read, Edit, Write, NotebookEdit, WebFetch, WebSear...
+2026-03-12T21:21:00.486Z [DEBUG] Writing to temp file: /Users/canerden/.claude/settings.json.tmp.22141.1773350460486
+2026-03-12T21:21:00.486Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:00.486Z [DEBUG] Temp file written successfully, size: 24 bytes
+2026-03-12T21:21:00.487Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:00.487Z [DEBUG] Renaming /Users/canerden/.claude/settings.json.tmp.22141.1773350460486 to /Users/canerden/.claude/settings.json
+2026-03-12T21:21:00.487Z [DEBUG] File /Users/canerden/.claude/settings.json written atomically
+2026-03-12T21:21:00.499Z [DEBUG] Full reset (shrink->below): prevHeight=24, nextHeight=19, viewport=24
+2026-03-12T21:21:00.503Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-12T21:21:00.847Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-12T21:21:00.847Z [DEBUG] AutoUpdater: Using global update method
+2026-03-12T21:21:00.957Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-12T21:21:06.911Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-12T21:21:06.911Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-12T21:21:06.912Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-12T21:21:06.912Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-12T21:21:06.913Z [DEBUG] Sending 26 skills via attachment (initial, 26 total sent)
+2026-03-12T21:21:06.916Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-12T21:21:06.916Z [DEBUG] Found 0 hook matchers in settings
+2026-03-12T21:21:06.916Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-12T21:21:06.917Z [DEBUG] FileHistory: Added snapshot for 25cfce0d-9cbb-44b8-b6a9-ff4058c968c1, tracking 0 files
+2026-03-12T21:21:06.918Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-03-12T21:21:06.942Z [DEBUG] Started caffeinate to prevent sleep
+2026-03-12T21:21:06.943Z [DEBUG] Writing to temp file: /Users/canerden/.claude/todos/bda6dcf7-25bb-42cf-890c-2b66412a35e3-agent-bda6dcf7-25bb-42cf-890c-2b66412a35e3.json.tmp.22141.1773350466943
+2026-03-12T21:21:06.944Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-03-12T21:21:06.944Z [DEBUG] Renaming /Users/canerden/.claude/todos/bda6dcf7-25bb-42cf-890c-2b66412a35e3-agent-bda6dcf7-25bb-42cf-890c-2b66412a35e3.json.tmp.22141.1773350466943 to /Users/canerden/.claude/todos/bda6dcf7-25bb-42cf-890c-2b66412a35e3-agent-bda6dcf7-25bb-42cf-890c-2b66412a35e3.json
+2026-03-12T21:21:06.944Z [DEBUG] File /Users/canerden/.claude/todos/bda6dcf7-25bb-42cf-890c-2b66412a35e3-agent-bda6dcf7-25bb-42cf-890c-2b66412a35e3.json written atomically
+2026-03-12T21:21:06.945Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-12T21:21:06.945Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-12T21:21:06.948Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.e82; cc_entrypoint=cli;
+2026-03-12T21:21:06.948Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-12T21:21:06.948Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-12T21:21:06.974Z [DEBUG] Total plugin output styles loaded: 0
+2026-03-12T21:21:06.977Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-03-12T21:21:06.980Z [DEBUG] autocompact: tokens=2638 threshold=167000 effectiveWindow=180000
+2026-03-12T21:21:06.980Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-12T21:21:06.982Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.712; cc_entrypoint=cli;
+2026-03-12T21:21:06.985Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-12T21:21:06.985Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-12T21:21:06.987Z [DEBUG] [useDeferredValue] Messages deferred by 2 (0→2)
+2026-03-12T21:21:06.993Z [DEBUG] Stats cache stale (2026-02-20), processing 2026-02-21 to 2026-03-11 in background
+2026-03-12T21:21:07.141Z [DEBUG] Stats cache saved successfully (lastComputedDate: 2026-03-11)
+2026-03-12T21:21:07.141Z [DEBUG] Stats cache updated with 13 new sessions
+2026-03-12T21:21:07.263Z [ERROR] AxiosError: AxiosError: Request failed with status code 400
+    at Jx (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:25:1138)
+    at Unzip.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9813)
+    at Unzip.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Aw8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:109:4706)
+    at async Ye6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:218:2821)
+2026-03-12T21:21:07.293Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-12T21:21:07.293Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-12T21:21:07.536Z [ERROR] API error (attempt 1/11): 401 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytNUQ6N1guRNM4X2QKS"}
+2026-03-12T21:21:07.537Z [ERROR] Error in API request: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytNUQ6N1guRNM4X2QKS"}
+2026-03-12T21:21:07.537Z [ERROR] Error: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytNUQ6N1guRNM4X2QKS"}
+    at Z4.generate (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:359:8823)
+    at LC.makeStatusError (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:2195)
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-03-12T21:21:07.540Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-12T21:21:07.540Z [DEBUG] Found 0 hook matchers in settings
+2026-03-12T21:21:07.540Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-12T21:21:07.542Z [DEBUG] [useDeferredValue] Messages deferred by 1 (2→3)
+2026-03-12T21:21:07.545Z [DEBUG] Full reset (shrink->below): prevHeight=25, nextHeight=21, viewport=24
+2026-03-12T21:21:07.547Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-03-12T21:21:07.550Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350467550
+2026-03-12T21:21:07.550Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:07.550Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:21:07.550Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:07.550Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350467550 to /Users/canerden/.claude.json
+2026-03-12T21:21:07.550Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:21:07.552Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350467552
+2026-03-12T21:21:07.552Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:07.552Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:21:07.552Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:07.552Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350467552 to /Users/canerden/.claude.json
+2026-03-12T21:21:07.553Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:21:07.553Z [DEBUG] [useDeferredValue] Messages deferred by 1 (2→3)
+2026-03-12T21:21:07.589Z [ERROR] API error (attempt 1/11): 401 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytNUKNjgoy4cwDTHvsx"}
+2026-03-12T21:21:07.589Z [ERROR] Error in API request: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytNUKNjgoy4cwDTHvsx"}
+2026-03-12T21:21:07.589Z [ERROR] Error: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytNUKNjgoy4cwDTHvsx"}
+    at Z4.generate (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:359:8823)
+    at LC.makeStatusError (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:2195)
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-03-12T21:21:07.590Z [ERROR] SyntaxError: SyntaxError: Unexpected token 'A', "API Error:"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:59:812
+    at K (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:8:6814)
+    at XE7 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1151:4671)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-03-12T21:21:09.175Z [DEBUG] Full reset (shrink->below): prevHeight=25, nextHeight=24, viewport=24
+2026-03-12T21:21:17.619Z [DEBUG] [FileIndex] getProjectFiles called, respectGitignore=true
+2026-03-12T21:21:17.620Z [DEBUG] [FileIndex] getFilesUsingGit called
+2026-03-12T21:21:17.657Z [DEBUG] [FileIndex] git ls-files (tracked) took 29ms
+2026-03-12T21:21:17.657Z [DEBUG] [FileIndex] git ls-files: 38 tracked files in 37ms
+2026-03-12T21:21:17.658Z [DEBUG] [FileIndex] using git ls-files result (38 files)
+2026-03-12T21:21:17.860Z [DEBUG] [FileIndex] Not in bundled mode, using Fuse.js fallback
+2026-03-12T21:21:17.860Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:17.865Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/usr/local/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-03-12T21:21:18.100Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:18.340Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:18.709Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:18.711Z [DEBUG] Full reset (shrink->below): prevHeight=28, nextHeight=23, viewport=24
+2026-03-12T21:21:19.049Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:19.280Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:19.284Z [DEBUG] Full reset (shrink->below): prevHeight=24, nextHeight=22, viewport=24
+2026-03-12T21:21:19.285Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-12T21:21:19.673Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:19.719Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-12T21:21:19.719Z [DEBUG] AutoUpdater: Using global update method
+2026-03-12T21:21:19.832Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-12T21:21:24.124Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:24.575Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:25.059Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:26.553Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-12T21:21:26.553Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-12T21:21:26.553Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-12T21:21:26.553Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-12T21:21:26.556Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-03-12T21:21:26.556Z [DEBUG] Found 0 hook matchers in settings
+2026-03-12T21:21:26.556Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-12T21:21:26.556Z [DEBUG] FileHistory: Making snapshot for message 669d29f0-52f1-457a-82ea-c8ed667d159d
+2026-03-12T21:21:26.556Z [DEBUG] FileHistory: Added snapshot for 669d29f0-52f1-457a-82ea-c8ed667d159d, tracking 0 files
+2026-03-12T21:21:26.557Z [DEBUG] [useDeferredValue] Messages deferred by 1 (3→4)
+2026-03-12T21:21:26.566Z [DEBUG] Started caffeinate to prevent sleep
+2026-03-12T21:21:26.567Z [DEBUG] [useDeferredValue] Messages deferred by 1 (3→4)
+2026-03-12T21:21:26.569Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-12T21:21:26.569Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-12T21:21:26.570Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.383; cc_entrypoint=cli;
+2026-03-12T21:21:26.570Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-12T21:21:26.570Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-12T21:21:26.596Z [DEBUG] autocompact: tokens=2705 threshold=167000 effectiveWindow=180000
+2026-03-12T21:21:26.597Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-12T21:21:26.599Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.712; cc_entrypoint=cli;
+2026-03-12T21:21:26.601Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-12T21:21:26.601Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-12T21:21:26.602Z [DEBUG] [useDeferredValue] Messages deferred by 1 (3→4)
+2026-03-12T21:21:26.604Z [DEBUG] [FileIndex] Using Fuse.js fallback for search
+2026-03-12T21:21:26.818Z [ERROR] AxiosError: AxiosError: Request failed with status code 400
+    at Jx (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:25:1138)
+    at Unzip.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9813)
+    at Unzip.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Aw8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:109:4706)
+    at async Ye6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:218:2821)
+2026-03-12T21:21:26.839Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-12T21:21:26.839Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-12T21:21:27.034Z [ERROR] API error (attempt 1/11): 401 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytPujcojv2D3286Nvy2"}
+2026-03-12T21:21:27.034Z [ERROR] Error in API request: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytPujcojv2D3286Nvy2"}
+2026-03-12T21:21:27.034Z [ERROR] Error: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytPujcojv2D3286Nvy2"}
+    at Z4.generate (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:359:8823)
+    at LC.makeStatusError (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:2195)
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-03-12T21:21:27.035Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-12T21:21:27.035Z [DEBUG] Found 0 hook matchers in settings
+2026-03-12T21:21:27.035Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-12T21:21:27.036Z [DEBUG] [useDeferredValue] Messages deferred by 1 (4→5)
+2026-03-12T21:21:27.038Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-03-12T21:21:27.042Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350487042
+2026-03-12T21:21:27.042Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:27.042Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:21:27.042Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:27.042Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350487042 to /Users/canerden/.claude.json
+2026-03-12T21:21:27.042Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:21:27.043Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350487043
+2026-03-12T21:21:27.043Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:27.043Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:21:27.043Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:27.043Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350487043 to /Users/canerden/.claude.json
+2026-03-12T21:21:27.043Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:21:27.044Z [DEBUG] [useDeferredValue] Messages deferred by 1 (4→5)
+2026-03-12T21:21:27.047Z [ERROR] API error (attempt 1/11): 401 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytPuf9gQCKzQpEgEjeB"}
+2026-03-12T21:21:27.047Z [ERROR] Error in API request: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytPuf9gQCKzQpEgEjeB"}
+2026-03-12T21:21:27.047Z [ERROR] Error: Error: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired. Please obtain a new token or refresh your existing token."},"request_id":"req_011CYytPuf9gQCKzQpEgEjeB"}
+    at Z4.generate (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:359:8823)
+    at LC.makeStatusError (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:2195)
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:5420)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-03-12T21:21:27.047Z [ERROR] SyntaxError: SyntaxError: Unexpected token 'A', "API Error:"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:59:812
+    at K (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:8:6814)
+    at XE7 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1151:4671)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-03-12T21:21:41.270Z [DEBUG] Telemetry flushed successfully
+2026-03-12T21:21:41.318Z [ERROR] Error: Error: Failed to delete keychain entry
+    at Fd8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:217:16866)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async rd8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:218:627)
+    at async nd8 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:218:531)
+    at async B06 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1989:2313)
+    at async $m1.startOAuthFlow (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1989:3660)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:2002:29372
+2026-03-12T21:21:41.321Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350501321
+2026-03-12T21:21:41.321Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:41.321Z [DEBUG] Temp file written successfully, size: 18211 bytes
+2026-03-12T21:21:41.321Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:41.321Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350501321 to /Users/canerden/.claude.json
+2026-03-12T21:21:41.322Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:21:41.387Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350501387
+2026-03-12T21:21:41.387Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:41.387Z [DEBUG] Temp file written successfully, size: 17804 bytes
+2026-03-12T21:21:41.387Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:41.387Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350501387 to /Users/canerden/.claude.json
+2026-03-12T21:21:41.387Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:21:41.605Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350501605
+2026-03-12T21:21:41.605Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:41.605Z [DEBUG] Temp file written successfully, size: 18156 bytes
+2026-03-12T21:21:41.606Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:41.606Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350501605 to /Users/canerden/.claude.json
+2026-03-12T21:21:41.606Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:21:41.999Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350501999
+2026-03-12T21:21:41.999Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:21:42.000Z [DEBUG] Temp file written successfully, size: 18278 bytes
+2026-03-12T21:21:42.000Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:21:42.000Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350501999 to /Users/canerden/.claude.json
+2026-03-12T21:21:42.000Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:21:42.003Z [DEBUG] Getting matching hook commands for Notification with query: auth_success
+2026-03-12T21:21:42.003Z [DEBUG] Found 0 hook matchers in settings
+2026-03-12T21:21:42.003Z [DEBUG] Matched 0 unique hooks for query "auth_success" (0 before deduplication)
+2026-03-12T21:21:42.233Z [DEBUG] Metrics opt-out API response: enabled=true, vcsLinking=false
+2026-03-12T21:23:19.131Z [DEBUG] Programmatic settings change notification for policySettings
+2026-03-12T21:23:19.135Z [DEBUG] Plugin hooks: reloading due to policySettings change
+2026-03-12T21:23:19.161Z [DEBUG] Settings changed from policySettings, updating app state
+2026-03-12T21:23:19.163Z [DEBUG] Replacing all allow rules for destination 'localSettings' with 14 rule(s): ["Bash(du:*)","Bash(top:*)","Bash(sort:*)","Bash(killall:*)","Bash(system_profiler:*)","Bash(npx skills add:*)","Bash(while read d)","Bash(do du -sh $d)","Bash(done)","Bash(brew list:*)","Bash(brew cleanup:*)","Bash(tmutil listlocalsnapshots:*)","Bash(for dir in $HOME/Library/Application Support/Claude/*/)","Bash(do du -sh $dir)"]
+2026-03-12T21:23:19.172Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-12T21:23:19.173Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-12T21:23:19.173Z [DEBUG] FileHistory: Making snapshot for message 98245e47-e620-42cf-b6f4-3c226c68a495
+2026-03-12T21:23:19.173Z [DEBUG] FileHistory: Added snapshot for 98245e47-e620-42cf-b6f4-3c226c68a495, tracking 0 files
+2026-03-12T21:23:19.174Z [DEBUG] [useDeferredValue] Messages deferred by 3 (5→8)
+2026-03-12T21:23:19.199Z [DEBUG] High write ratio: blit=0, write=1247 (100.0% writes), screen=33x80
+2026-03-12T21:23:19.222Z [DEBUG] Started caffeinate to prevent sleep
+2026-03-12T21:23:19.225Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-12T21:23:19.225Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-12T21:23:19.225Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-03-12T21:23:19.225Z [DEBUG] [claudeai-mcp] Fetching from https://api.anthropic.com/v1/mcp_servers?limit=1000
+2026-03-12T21:23:19.229Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.22141.1773350599229
+2026-03-12T21:23:19.229Z [DEBUG] Preserving file permissions: 100644
+2026-03-12T21:23:19.229Z [DEBUG] Temp file written successfully, size: 18278 bytes
+2026-03-12T21:23:19.229Z [DEBUG] Applied original permissions to temp file
+2026-03-12T21:23:19.229Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.22141.1773350599229 to /Users/canerden/.claude.json
+2026-03-12T21:23:19.229Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-12T21:23:19.230Z [DEBUG] [useDeferredValue] Messages deferred by 3 (5→8)
+2026-03-12T21:23:19.231Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-03-12T21:23:19.471Z [DEBUG] [claudeai-mcp] Fetched 5 servers
+2026-03-12T21:23:19.472Z [DEBUG] MCP server "claude.ai Gamma": Initializing claude.ai proxy transport for server mcpsrv_017YtSaX2gW4Khk6QBJtMn9W
+2026-03-12T21:23:19.472Z [DEBUG] MCP server "claude.ai Gamma": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_017YtSaX2gW4Khk6QBJtMn9W
+2026-03-12T21:23:19.472Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy transport created successfully
+2026-03-12T21:23:19.475Z [DEBUG] MCP server "claude.ai Gamma": Starting connection with timeout of 30000ms
+2026-03-12T21:23:19.476Z [DEBUG] MCP server "claude.ai Google Calendar": Initializing claude.ai proxy transport for server mcpsrv_01JADKkPUkLncBTo84YeWxeW
+2026-03-12T21:23:19.476Z [DEBUG] MCP server "claude.ai Google Calendar": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01JADKkPUkLncBTo84YeWxeW
+2026-03-12T21:23:19.476Z [DEBUG] MCP server "claude.ai Google Calendar": claude.ai proxy transport created successfully
+2026-03-12T21:23:19.476Z [DEBUG] MCP server "claude.ai Google Calendar": Starting connection with timeout of 30000ms
+2026-03-12T21:23:19.476Z [DEBUG] MCP server "claude.ai Gmail": Initializing claude.ai proxy transport for server mcpsrv_01FskgR1eEvDc5V9eFkq6F8p
+2026-03-12T21:23:19.476Z [DEBUG] MCP server "claude.ai Gmail": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01FskgR1eEvDc5V9eFkq6F8p
+2026-03-12T21:23:19.476Z [DEBUG] MCP server "claude.ai Gmail": claude.ai proxy transport created successfully
+2026-03-12T21:23:19.477Z [DEBUG] MCP server "claude.ai Gmail": Starting connection with timeout of 30000ms
+2026-03-12T21:23:19.477Z [DEBUG] MCP server "claude.ai Excalidraw": Initializing claude.ai proxy transport for server mcpsrv_01FWYmyRDi3XYUEvf3QWGC9G
+2026-03-12T21:23:19.477Z [DEBUG] MCP server "claude.ai Excalidraw": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01FWYmyRDi3XYUEvf3QWGC9G
+2026-03-12T21:23:19.477Z [DEBUG] MCP server "claude.ai Excalidraw": claude.ai proxy transport created successfully
+2026-03-12T21:23:19.478Z [DEBUG] MCP server "claude.ai Excalidraw": Starting connection with timeout of 30000ms
+2026-03-12T21:23:19.478Z [DEBUG] MCP server "claude.ai Notion": Initializing claude.ai proxy transport for server mcpsrv_01N2CmXAzKHvD86vtMr6x1tr
+2026-03-12T21:23:19.478Z [DEBUG] MCP server "claude.ai Notion": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01N2CmXAzKHvD86vtMr6x1tr
+2026-03-12T21:23:19.478Z [DEBUG] MCP server "claude.ai Notion": claude.ai proxy transport created successfully
+2026-03-12T21:23:19.478Z [DEBUG] MCP server "claude.ai Notion": Starting connection with timeout of 30000ms
+2026-03-12T21:23:19.817Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-12T21:23:19.817Z [DEBUG] AutoUpdater: Using global update method
+2026-03-12T21:23:19.927Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-12T21:23:20.132Z [DEBUG] MCP server "claude.ai Gmail": Successfully connected to claudeai-proxy server in 656ms
+2026-03-12T21:23:20.132Z [DEBUG] MCP server "claude.ai Gmail": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"serverVersion":{"name":"mcp-server-gmail","version":"0.1.0"}}
+2026-03-12T21:23:20.171Z [DEBUG] MCP server "claude.ai Gamma": Successfully connected to claudeai-proxy server in 699ms
+2026-03-12T21:23:20.171Z [DEBUG] MCP server "claude.ai Gamma": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":true,"serverVersion":{"name":"gamma-mcp","version":"1.0.0"}}
+2026-03-12T21:23:20.264Z [DEBUG] MCP server "claude.ai Excalidraw": Successfully connected to claudeai-proxy server in 787ms
+2026-03-12T21:23:20.265Z [DEBUG] MCP server "claude.ai Excalidraw": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":true,"serverVersion":{"name":"Excalidraw","version":"1.0.0"}}
+2026-03-12T21:23:20.416Z [DEBUG] MCP server "claude.ai Google Calendar": Successfully connected to claudeai-proxy server in 940ms
+2026-03-12T21:23:20.417Z [DEBUG] MCP server "claude.ai Google Calendar": Connection established with capabilities: {"hasTools":true,"hasPrompts":true,"hasResources":false,"serverVersion":{"name":"mcp-server-gcal","version":"0.1.0"}}
+2026-03-12T21:23:20.518Z [DEBUG] MCP server "claude.ai Gamma": CLAUDEAI-PROXY connection dropped after 0s uptime
+2026-03-12T21:23:20.518Z [DEBUG] MCP server "claude.ai Gamma": Connection error: Streamable HTTP error: Failed to open SSE stream: Not Found
+2026-03-12T21:23:20.518Z [DEBUG] MCP server "claude.ai Gamma": CLAUDEAI-PROXY connection dropped after 0s uptime
+2026-03-12T21:23:20.518Z [DEBUG] MCP server "claude.ai Gamma": Connection error: Streamable HTTP error: Failed to open SSE stream: Not Found
+2026-03-12T21:23:21.231Z [DEBUG] MCP server "claude.ai Notion": Successfully connected to claudeai-proxy server in 1753ms
+2026-03-12T21:23:21.231Z [DEBUG] MCP server "claude.ai Notion": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":true,"serverVersion":{"name":"Notion MCP","icons":[{"src":"https://mcp.notion.com/notion-logo-block-main.svg","mimeType":"image/svg+xml"}],"version":"1.2.0","websiteUrl":"https://developers.notion.com/docs/mcp"}}
+2026-03-12T21:23:44.802Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-03-12T21:23:44.803Z [DEBUG] Found 0 hook matchers in settings
+2026-03-12T21:23:44.803Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)

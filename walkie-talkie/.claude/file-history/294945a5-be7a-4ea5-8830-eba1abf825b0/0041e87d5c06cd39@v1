@@ -1,0 +1,63 @@
+import { login } from '../actions'
+import Link from 'next/link'
+
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { error: string }
+}) {
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center bg-[#fafaf8] px-6">
+      <Link href="/" className="font-mono text-xl font-bold tracking-tighter mb-8 text-[#1c1b1a]">
+        Habitat<span className="text-[#3d5afc]">.</span>
+      </Link>
+      
+      <div className="w-full max-w-sm bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[rgba(28,27,26,0.08)]">
+        <h2 className="text-2xl font-bold text-[#1c1b1a] mb-2 text-center">Welcome back</h2>
+        <p className="text-[#6b6864] text-sm text-center mb-6">Enter your credentials to access your framework.</p>
+        
+        {searchParams?.error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-6 border border-red-200">
+            {searchParams.error}
+          </div>
+        )}
+
+        <form className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[#1c1b1a]" htmlFor="email">Email</label>
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              required 
+              className="px-4 py-2.5 rounded-lg border border-[rgba(28,27,26,0.18)] focus:border-[#3d5afc] focus:ring-1 focus:ring-[#3d5afc] outline-none transition-all text-[#1c1b1a]" 
+              placeholder="you@example.com"
+            />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-[#1c1b1a]" htmlFor="password">Password</label>
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              required 
+              className="px-4 py-2.5 rounded-lg border border-[rgba(28,27,26,0.18)] focus:border-[#3d5afc] focus:ring-1 focus:ring-[#3d5afc] outline-none transition-all text-[#1c1b1a]" 
+              placeholder="••••••••"
+            />
+          </div>
+          
+          <button 
+            formAction={login} 
+            className="mt-2 w-full bg-[#3d5afc] text-white py-3 rounded-lg font-semibold hover:bg-[#2d4ae8] transition-colors"
+          >
+            Sign In
+          </button>
+        </form>
+        
+        <div className="mt-6 text-center text-sm text-[#6b6864]">
+          Don't have an account? <Link href="/signup" className="text-[#3d5afc] font-medium hover:underline">Sign up</Link>
+        </div>
+      </div>
+    </div>
+  )
+}

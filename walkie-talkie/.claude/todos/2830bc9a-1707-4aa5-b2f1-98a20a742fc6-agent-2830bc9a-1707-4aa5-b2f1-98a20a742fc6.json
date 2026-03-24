@@ -1,0 +1,32 @@
+[
+  {
+    "content": "Initialize Next.js 16 project with TypeScript and Tailwind",
+    "status": "completed",
+    "activeForm": "Initializing Next.js 16 project with TypeScript and Tailwind"
+  },
+  {
+    "content": "Setup Prisma with PostgreSQL and create database schema",
+    "status": "completed",
+    "activeForm": "Setting up Prisma with PostgreSQL and creating database schema"
+  },
+  {
+    "content": "Configure NextAuth.js v5 with Google OAuth",
+    "status": "completed",
+    "activeForm": "Configuring NextAuth.js v5 with Google OAuth"
+  },
+  {
+    "content": "Port recording logic from granola-web-mvp",
+    "status": "completed",
+    "activeForm": "Porting recording logic from granola-web-mvp"
+  },
+  {
+    "content": "Create basic settings page for API keys",
+    "status": "in_progress",
+    "activeForm": "Creating basic settings page for API keys"
+  },
+  {
+    "content": "Build transcription API route with Vercel AI SDK",
+    "status": "pending",
+    "activeForm": "Building transcription API route with Vercel AI SDK"
+  }
+]

@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Comprehensive implementation plan for a Granola-style AI meeting notes web app MVP. Covers UI design, audio recording from microphone and system audio, real-time transcription via Groq Whisper API, draft note-taking, and AI-powered note enhancement using Groq LLM. Built with Vite + vanilla JavaScript for a fast, minimal stack.",
+  "updatedAt": "2026-02-05T18:15:13.394541Z"
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "sessionId": "3ec09da8-71ee-435d-8bbf-e96980d78175",
+    "messageId": 0,
+    "type": "user",
+    "message": "/model",
+    "timestamp": "2026-03-23T21:36:16.806Z"
+  },
+  {
+    "sessionId": "3ec09da8-71ee-435d-8bbf-e96980d78175",
+    "messageId": 1,
+    "type": "user",
+    "message": "push to github please",
+    "timestamp": "2026-03-23T21:37:00.579Z"
+  }
+]

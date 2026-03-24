@@ -1,0 +1,173 @@
+2026-03-20T22:59:03.891Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-20T22:59:03.895Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-20T22:59:03.895Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-20T22:59:03.895Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-20T22:59:03.902Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-20T22:59:03.929Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-03-20T22:59:03.929Z [DEBUG] [STARTUP] Running setup()...
+2026-03-20T22:59:03.929Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-20T22:59:03.931Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-20T22:59:03.944Z [DEBUG] Error log sink initialized
+2026-03-20T22:59:03.948Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-20T22:59:03.948Z [DEBUG] Total plugin skills loaded: 0
+2026-03-20T22:59:03.948Z [DEBUG] Total plugin commands loaded: 0
+2026-03-20T22:59:03.949Z [DEBUG] [STARTUP] setup() completed in 20ms
+2026-03-20T22:59:03.949Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-20T22:59:03.950Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-20T22:59:03.950Z [DEBUG] Total plugin agents loaded: 0
+2026-03-20T22:59:03.951Z [DEBUG] Loaded 25 unique skills (managed: 0, user: 25, project: 0, additional: 0, legacy commands: 0)
+2026-03-20T22:59:03.951Z [DEBUG] getSkills returning: 25 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-03-20T22:59:03.951Z [DEBUG] [STARTUP] Commands and agents loaded in 2ms
+2026-03-20T22:59:03.951Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-03-20T22:59:03.952Z [DEBUG] [render] initLayout starting
+2026-03-20T22:59:03.952Z [DEBUG] Layout engine: yoga
+2026-03-20T22:59:03.958Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default
+2026-03-20T22:59:03.963Z [DEBUG] [render] initLayout complete
+2026-03-20T22:59:03.967Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T22:59:03.972Z [DEBUG] [render] first ink render: 615ms since process start
+2026-03-20T22:59:05.379Z [DEBUG] Grove: Using fresh cached config
+2026-03-20T22:59:05.400Z [DEBUG] [render] initLayout starting
+2026-03-20T22:59:05.400Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-20T22:59:05.402Z [DEBUG] [render] initLayout complete
+2026-03-20T22:59:05.403Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T22:59:05.411Z [DEBUG] [render] first ink render: 2055ms since process start
+2026-03-20T22:59:05.414Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-03-20T22:59:05.415Z [DEBUG] [keybindings] Watching for changes to /Users/canerden/.claude/keybindings.json
+2026-03-20T22:59:05.416Z [DEBUG] [keybindings] Watching for changes to /Users/canerden/.claude/keybindings.json
+2026-03-20T22:59:05.425Z [DEBUG] Git remote URL: https://github.com/ycanerden/notetakertest.git
+2026-03-20T22:59:05.425Z [DEBUG] Parsed repository: ycanerden/notetakertest from https://github.com/ycanerden/notetakertest.git
+2026-03-20T22:59:05.425Z [DEBUG] Parsed repository: ycanerden/notetakertest from URL: https://github.com/ycanerden/notetakertest.git
+2026-03-20T22:59:05.425Z [DEBUG] Path /Users/canerden/Library/Application Support/CodexBar/ClaudeProbe already tracked for repo ycanerden/notetakertest
+2026-03-20T22:59:05.661Z [DEBUG] [STARTUP] showSetupScreens() completed in 1710ms
+2026-03-20T22:59:05.661Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-20T22:59:05.662Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-20T22:59:05.662Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-20T22:59:05.662Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T22:59:05.662Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T22:59:05.663Z [DEBUG] Total LSP servers loaded: 0
+2026-03-20T22:59:05.664Z [DEBUG] [STARTUP] MCP configs loaded in 1762ms
+2026-03-20T22:59:05.667Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-03-20T22:59:05.671Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.26566.1774047545671
+2026-03-20T22:59:05.671Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T22:59:05.671Z [DEBUG] Temp file written successfully, size: 23488 bytes
+2026-03-20T22:59:05.671Z [DEBUG] Applied original permissions to temp file
+2026-03-20T22:59:05.671Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.26566.1774047545671 to /Users/canerden/.claude.json
+2026-03-20T22:59:05.671Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T22:59:05.672Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-20T22:59:05.672Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-20T22:59:05.673Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-20T22:59:05.673Z [DEBUG] Found 0 hook matchers in settings
+2026-03-20T22:59:05.673Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-03-20T22:59:05.673Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-20T22:59:05.673Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-20T22:59:05.673Z [DEBUG] LSP server manager initialized successfully
+2026-03-20T22:59:05.673Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-20T22:59:05.674Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T22:59:05.678Z [DEBUG] [render] initLayout starting
+2026-03-20T22:59:05.678Z [DEBUG] [render] initLayout complete
+2026-03-20T22:59:05.686Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T22:59:05.858Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-03-20T22:59:05.859Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-03-20T22:59:05.860Z [DEBUG] performStartupChecks called
+2026-03-20T22:59:05.860Z [DEBUG] Starting background plugin installations
+2026-03-20T22:59:05.860Z [DEBUG] performBackgroundPluginInstallations called
+2026-03-20T22:59:05.863Z [DEBUG] [render] first ink render: 2506ms since process start
+2026-03-20T22:59:05.863Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-20T22:59:05.866Z [DEBUG] Watching for changes in setting files /Users/canerden/.claude/settings.json...
+2026-03-20T22:59:05.867Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-20T22:59:05.867Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-03-20T22:59:05.867Z [DEBUG] [claudeai-mcp] Fetching from https://api.anthropic.com/v1/mcp_servers?limit=1000
+2026-03-20T22:59:05.868Z [DEBUG] Found 1 extra marketplaces in settings
+2026-03-20T22:59:05.870Z [DEBUG] Loaded plugins - Enabled: 0, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-03-20T22:59:05.870Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-03-20T22:59:05.902Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.26566.1774047545902
+2026-03-20T22:59:05.902Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T22:59:05.903Z [DEBUG] Temp file written successfully, size: 23488 bytes
+2026-03-20T22:59:05.903Z [DEBUG] Applied original permissions to temp file
+2026-03-20T22:59:05.903Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.26566.1774047545902 to /Users/canerden/.claude.json
+2026-03-20T22:59:05.903Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T22:59:05.911Z [DEBUG] High write ratio: blit=0, write=1130 (100.0% writes), screen=18x160
+2026-03-20T22:59:05.912Z [DEBUG] Watching for changes in skill/command directories: /Users/canerden/.claude/skills...
+2026-03-20T22:59:05.913Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/usr/local/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-03-20T22:59:05.925Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T22:59:05.925Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T22:59:05.925Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T22:59:05.937Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-20T22:59:05.938Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.95b; cc_entrypoint=cli;
+2026-03-20T22:59:05.939Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T22:59:05.939Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T22:59:05.939Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T22:59:06.025Z [DEBUG] [claudeai-mcp] Fetched 5 servers
+2026-03-20T22:59:06.026Z [DEBUG] MCP server "claude.ai Gamma": Initializing claude.ai proxy transport for server mcpsrv_017YtSaX2gW4Khk6QBJtMn9W
+2026-03-20T22:59:06.026Z [DEBUG] MCP server "claude.ai Gamma": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_017YtSaX2gW4Khk6QBJtMn9W
+2026-03-20T22:59:06.026Z [DEBUG] MCP server "claude.ai Gamma": claude.ai proxy transport created successfully
+2026-03-20T22:59:06.029Z [DEBUG] MCP server "claude.ai Gamma": Starting connection with timeout of 30000ms
+2026-03-20T22:59:06.029Z [DEBUG] MCP server "claude.ai Google Calendar": Initializing claude.ai proxy transport for server mcpsrv_01JADKkPUkLncBTo84YeWxeW
+2026-03-20T22:59:06.029Z [DEBUG] MCP server "claude.ai Google Calendar": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01JADKkPUkLncBTo84YeWxeW
+2026-03-20T22:59:06.029Z [DEBUG] MCP server "claude.ai Google Calendar": claude.ai proxy transport created successfully
+2026-03-20T22:59:06.029Z [DEBUG] MCP server "claude.ai Google Calendar": Starting connection with timeout of 30000ms
+2026-03-20T22:59:06.029Z [DEBUG] MCP server "claude.ai Gmail": Initializing claude.ai proxy transport for server mcpsrv_01FskgR1eEvDc5V9eFkq6F8p
+2026-03-20T22:59:06.029Z [DEBUG] MCP server "claude.ai Gmail": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01FskgR1eEvDc5V9eFkq6F8p
+2026-03-20T22:59:06.029Z [DEBUG] MCP server "claude.ai Gmail": claude.ai proxy transport created successfully
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Gmail": Starting connection with timeout of 30000ms
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Excalidraw": Initializing claude.ai proxy transport for server mcpsrv_01FWYmyRDi3XYUEvf3QWGC9G
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Excalidraw": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01FWYmyRDi3XYUEvf3QWGC9G
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Excalidraw": claude.ai proxy transport created successfully
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Excalidraw": Starting connection with timeout of 30000ms
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Notion": Initializing claude.ai proxy transport for server mcpsrv_01N2CmXAzKHvD86vtMr6x1tr
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Notion": Using claude.ai proxy at https://mcp-proxy.anthropic.com/v1/mcp/mcpsrv_01N2CmXAzKHvD86vtMr6x1tr
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Notion": claude.ai proxy transport created successfully
+2026-03-20T22:59:06.030Z [DEBUG] MCP server "claude.ai Notion": Starting connection with timeout of 30000ms
+2026-03-20T22:59:06.375Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-20T22:59:06.375Z [DEBUG] AutoUpdater: Using global update method
+2026-03-20T22:59:06.500Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-20T22:59:06.559Z [DEBUG] MCP server "claude.ai Gmail": Successfully connected to claudeai-proxy server in 530ms
+2026-03-20T22:59:06.559Z [DEBUG] MCP server "claude.ai Gmail": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":false,"serverVersion":{"name":"mcp-server-gmail","version":"0.1.0"}}
+2026-03-20T22:59:06.576Z [DEBUG] MCP server "claude.ai Google Calendar": Successfully connected to claudeai-proxy server in 547ms
+2026-03-20T22:59:06.576Z [DEBUG] MCP server "claude.ai Google Calendar": Connection established with capabilities: {"hasTools":true,"hasPrompts":true,"hasResources":false,"serverVersion":{"name":"mcp-server-gcal","version":"0.1.0"}}
+2026-03-20T22:59:06.605Z [DEBUG] MCP server "claude.ai Gamma": Successfully connected to claudeai-proxy server in 579ms
+2026-03-20T22:59:06.605Z [DEBUG] MCP server "claude.ai Gamma": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":true,"serverVersion":{"name":"gamma-mcp","version":"1.0.0"}}
+2026-03-20T22:59:06.627Z [DEBUG] MCP server "claude.ai Excalidraw": Successfully connected to claudeai-proxy server in 597ms
+2026-03-20T22:59:06.627Z [DEBUG] MCP server "claude.ai Excalidraw": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":true,"serverVersion":{"name":"Excalidraw","version":"1.0.0"}}
+2026-03-20T22:59:06.835Z [DEBUG] MCP server "claude.ai Gamma": CLAUDEAI-PROXY connection dropped after 0s uptime
+2026-03-20T22:59:06.835Z [DEBUG] MCP server "claude.ai Gamma": Connection error: Streamable HTTP error: Failed to open SSE stream: Not Found
+2026-03-20T22:59:06.836Z [DEBUG] MCP server "claude.ai Gamma": CLAUDEAI-PROXY connection dropped after 0s uptime
+2026-03-20T22:59:06.836Z [DEBUG] MCP server "claude.ai Gamma": Connection error: Streamable HTTP error: Failed to open SSE stream: Not Found
+2026-03-20T22:59:06.891Z [DEBUG] Stream started - received first chunk
+2026-03-20T22:59:07.869Z [DEBUG] MCP server "claude.ai Notion": Successfully connected to claudeai-proxy server in 1839ms
+2026-03-20T22:59:07.869Z [DEBUG] MCP server "claude.ai Notion": Connection established with capabilities: {"hasTools":true,"hasPrompts":false,"hasResources":true,"serverVersion":{"name":"Notion MCP","icons":[{"src":"https://mcp.notion.com/notion-logo-block-main.svg","mimeType":"image/svg+xml"}],"version":"1.2.0","websiteUrl":"https://developers.notion.com/docs/mcp"}}
+2026-03-20T22:59:15.659Z [DEBUG] Writing to temp file: /Users/canerden/.claude/todos/cff57d0a-c863-4465-998e-478dcb9b3340-agent-cff57d0a-c863-4465-998e-478dcb9b3340.json.tmp.26566.1774047555659
+2026-03-20T22:59:15.659Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-03-20T22:59:15.659Z [DEBUG] Renaming /Users/canerden/.claude/todos/cff57d0a-c863-4465-998e-478dcb9b3340-agent-cff57d0a-c863-4465-998e-478dcb9b3340.json.tmp.26566.1774047555659 to /Users/canerden/.claude/todos/cff57d0a-c863-4465-998e-478dcb9b3340-agent-cff57d0a-c863-4465-998e-478dcb9b3340.json
+2026-03-20T22:59:15.659Z [DEBUG] File /Users/canerden/.claude/todos/cff57d0a-c863-4465-998e-478dcb9b3340-agent-cff57d0a-c863-4465-998e-478dcb9b3340.json written atomically
+2026-03-20T22:59:15.671Z [DEBUG] Stats cache is up to date
+2026-03-20T22:59:15.696Z [ERROR] AxiosError: AxiosError: Request failed with status code 429
+    at Jx (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:25:1138)
+    at IncomingMessage.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9813)
+    at IncomingMessage.emit (node:events:536:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D6q (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3666:9229)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3666:13117
+2026-03-20T22:59:16.261Z [ERROR] Failed to refresh marketplace claude-plugins-official: The marketplace.json file is no longer present in this repository.
+
+This marketplace may have been deprecated or moved to a new location.
+Source: anthropics/claude-plugins-official
+
+You can remove this marketplace with: claude plugin marketplace remove "claude-plugins-official"
+2026-03-20T22:59:16.261Z [WARN] Plugin autoupdate: failed to refresh marketplace claude-plugins-official: Failed to refresh marketplace 'claude-plugins-official': The marketplace.json file is no longer present in this repository.
+
+This marketplace may have been deprecated or moved to a new location.
+Source: anthropics/claude-plugins-official
+
+You can remove this marketplace with: claude plugin marketplace remove "claude-plugins-official"
+2026-03-20T22:59:16.261Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-03-20T22:59:27.806Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-03-20T22:59:27.806Z [DEBUG] Found 0 hook matchers in settings
+2026-03-20T22:59:27.806Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)

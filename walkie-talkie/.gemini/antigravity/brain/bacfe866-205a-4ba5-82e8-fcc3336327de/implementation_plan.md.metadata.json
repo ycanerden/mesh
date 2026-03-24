@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Phase 3 implementation plan for shifting to a local Node.js backend to support true Markdown files, MCP (Notion/Google Sheets) integration, and local API key authentication.",
+  "updatedAt": "2026-03-05T16:10:00.784279Z",
+  "version": "2"
+}

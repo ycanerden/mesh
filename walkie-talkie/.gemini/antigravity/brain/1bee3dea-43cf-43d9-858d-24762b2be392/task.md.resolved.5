@@ -1,0 +1,23 @@
+# Meeting Notes App (Granola Clone) - Development Tasks
+
+## Planning Phase
+- [/] Research Granola features and UI patterns
+- [/] Research Groq API pricing and capabilities
+- [/] Research browser audio recording APIs
+- [x] Create implementation plan
+- [x] Get user approval on plan
+
+## Implementation Phase
+- [x] Set up project structure (Vite + vanilla JS)
+- [x] Create minimal, sleek UI design
+- [x] Implement audio recording (mic + system audio)
+- [x] Implement draft notes editor
+- [x] Integrate Groq Whisper API for transcription
+- [x] Integrate Groq LLM for note enhancement
+- [x] Add meeting notes list/history
+
+## Verification Phase
+- [x] Test audio recording functionality
+- [x] Test transcription flow
+- [x] Test AI enhancement
+- [x] Create walkthrough documentation

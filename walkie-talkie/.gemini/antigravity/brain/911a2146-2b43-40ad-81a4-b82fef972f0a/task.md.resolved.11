@@ -1,0 +1,25 @@
+# AI Project Manager Bot - Task List
+
+- [ ] **Project Initialization**
+    - [x] Create Project Scaffolding (Node.js + TS)
+    - [ ] Configure TypeScript & Environment
+    - [ ] Set up Slack App Credentials (User Input Needed)
+
+- [ ] **Core Infrastructure**
+    - [ ] Setup Supabase (Database + Vector Store)
+    - [ ] Configure OpenAI Client
+    - [ ] Create RAG Ingestion Pipeline
+
+- [ ] **Integrations (Data Sources)**
+    - [ ] GitHub Integration (Commits/PRs)
+    - [ ] Jira Integration (Tickets)
+    - [ ] Google Workspace Integration (Calendar/Docs)
+
+- [ ] **Features (MVP)**
+    - [ ] **Daily Digest**: Cron job to aggregate & post summaries
+    - [ ] **Slash Commands**: `/pm-status`, `/pm-blockers`
+    - [ ] **Pre-Meeting Briefs**: Calendar-triggered alerts
+
+- [ ] **Polishing & Deployment**
+    - [ ] Error Handling & Logging
+    - [ ] User Testing in Slack

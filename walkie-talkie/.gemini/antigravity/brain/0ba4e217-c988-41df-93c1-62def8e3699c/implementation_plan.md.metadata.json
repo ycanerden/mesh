@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Plan for integrating Firebase Firestore as a cloud database and Brave Search API as a discovery engine to keep the Builder's Toolkit data fresh. Includes architecture diagram, free tier analysis, file changes needed, and user setup steps.",
+  "updatedAt": "2026-02-11T22:36:00.316916Z",
+  "version": "1"
+}

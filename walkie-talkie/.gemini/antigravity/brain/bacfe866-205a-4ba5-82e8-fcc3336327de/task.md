@@ -1,0 +1,45 @@
+# Greg CRM - Development Task List
+
+## Phase 1: Core Setup & Storage (Completed)
+- [x] Bootstrapped barebones React project (Vite)
+- [x] Base Layout (Sidebar + Main Content Area + Empty State)
+- [x] Mock Local Storage (simulating Markdown DB reads/writes)
+- [x] Contact Creation Flow (modal with essential fields)
+- [x] Contact Detail Viewer (basic markdown rendering)
+- [x] Cmd+K Command Palette Interface (Fuzzy Search + Global Actions)
+- [x] Markdown Activity Logger (`## Activity` appending logic)
+- [x] Search & Filtering Panel (Tags, Status, Needs Follow-up)
+
+## Phase 2: Folk CRM Redesign & Workflows (Completed)
+- [x] Overhauled the UI from dark-developer to a clean, light, and airy interface (Folk CRM inspired)
+- [x] Improved Typography and "Groups" sidebar navigation
+- [x] Pipeline (Kanban) View
+  - [x] Designed info-dense contact cards mapping to `.md` frontmatter
+  - [x] Built native drag-and-drop column logic
+  - [x] Wired drag-and-drop actions to save updated `status` directly to markdown mock store
+- [x] Table / Spreadsheet View (for high-density data reading)
+- [x] Slide-in Detail Panel
+  - [x] Added Inline Editing for Status dropdown and Tags input
+  - [x] Built visual Activity Timeline parsed from markdown history
+  - [x] Integrated fully interactive markdown notes editor
+
+## Phase 3: Agentic Data Ingestion Layer (In Progress)
+- [x] **Local Node Backend Foundation**
+  - [x] Replaced `localStorage` with `express` and `gray-matter` file system operations.
+  - [x] Rewrote React Hooks (`src/lib/contacts.js`) to `fetch` asynchronously.
+  - [x] Started `vite` and `node` API together via `concurrently`.
+- [x] **Authentication UI**
+  - [x] Created `SettingsModal.jsx` to configure AI agent keys (Gemini, OpenAI, Anthropic).
+  - [x] Added Notion integration variables (Integration API Secret, CRM Database ID).
+  - [x] Saved configuration locally into `.env` (safely ignored in git).
+- [ ] **Data Architecture & Sync Logic**
+  - [ ] Connect MCP Client to local backend and wrap Notion integration correctly.
+  - [ ] Hook the LLM pipeline using the verified `.env` to pull items from Notion.
+  - [ ] Process Notion results intelligently (enriching Markdown fields) before writing to the local `/contacts` directory.
+- [ ] Implement sync/refresh UX states to the Main Pipeline UI.
+
+## Phase 4: Full Local App Distribution (Backlog)
+- [ ] Wrap the web app into a robust desktop environment (Tauri / Electron) 
+- [ ] Build macOS `.dmg`
+- [ ] Setup GitHub releases
+- [ ] Create a Vercel-hosted landing page with a direct download button

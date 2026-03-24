@@ -1,0 +1,6 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Implementation plan for AI Project Manager Bot. Architecture includes Node.js backend, Slack Bolt, and RAG pipeline.",
+  "updatedAt": "2026-02-04T18:45:12.095640Z",
+  "version": "4"
+}

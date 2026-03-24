@@ -1,0 +1,20 @@
+// Single source of truth for all model metadata.
+// Add new models here — UI, judge prompt, and API calls all derive from this.
+export type ModelConfig = {
+  id: string
+  displayName: string
+  abbreviation: string
+  envKey: string
+  optional?: boolean // if true, silently skip when env key is missing
+}
+
+export const MODELS: ModelConfig[] = [
+  { id: 'gpt-4o',                         displayName: 'GPT-4o',        abbreviation: 'G',  envKey: 'OPENAI_API_KEY' },
+  { id: 'claude-sonnet-4-5-20251001',      displayName: 'Claude Sonnet', abbreviation: 'C',  envKey: 'ANTHROPIC_API_KEY' },
+  { id: 'gemini-1.5-pro',                  displayName: 'Gemini 1.5',    abbreviation: 'Gm', envKey: 'GOOGLE_AI_API_KEY' },
+  { id: 'llama-3.1-sonar-large-128k-online', displayName: 'Perplexity',  abbreviation: 'P',  envKey: 'PERPLEXITY_API_KEY' },
+  { id: 'deepseek-chat',                   displayName: 'DeepSeek',      abbreviation: 'D',  envKey: 'DEEPSEEK_API_KEY' },
+  { id: 'moonshot-v1-8k',                  displayName: 'Kimi',          abbreviation: 'K',  envKey: 'MOONSHOT_API_KEY', optional: true },
+]
+
+export const JUDGE_MODEL = 'claude-opus-4-6'

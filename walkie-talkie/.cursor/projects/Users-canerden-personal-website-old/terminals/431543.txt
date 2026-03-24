@@ -1,0 +1,17 @@
+---
+pid: 17946
+cwd: "/Users/canerden/personal-website-old/vc-aggregator/backend"
+command: "source .venv/bin/activate && uvicorn main:app --host 0.0.0.0 --port 8000"
+started_at: 2026-03-20T22:32:40.880Z
+running_for_ms: 340162   
+---
+INFO:     Started server process [17953]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53691 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53692 - "GET /api/companies HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53719 - "GET /api/companies?sector=saas&page=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53719 - "GET /api/companies?sector=fintech&page=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53725 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53728 - "GET /api/stats HTTP/1.1" 200 OK

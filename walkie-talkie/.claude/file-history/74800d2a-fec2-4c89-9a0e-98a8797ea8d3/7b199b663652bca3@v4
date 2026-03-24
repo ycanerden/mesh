@@ -1,0 +1,159 @@
+import OpenAI from 'openai'
+import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
+import type { ModelResult } from './types'
+import { MODELS } from './models-config'
+
+const TIMEOUT_MS = 25_000
+const MAX_RESPONSE_CHARS = 6_000
+
+function truncate(text: string): string {
+  if (text.length <= MAX_RESPONSE_CHARS) return text
+  return text.slice(0, MAX_RESPONSE_CHARS) + '...[truncated]'
+}
+
+function unavailable(id: string): ModelResult {
+  const cfg = MODELS.find(m => m.id === id)!
+  return { model: id, displayName: cfg.displayName, abbreviation: cfg.abbreviation, response: '', available: false }
+}
+
+// Shared helper for OpenAI-compatible REST APIs (Perplexity, DeepSeek, Kimi)
+async function callOpenAICompatible(
+  baseUrl: string,
+  apiKey: string,
+  modelId: string,
+  prompt: string,
+  signal: AbortSignal,
+): Promise<string> {
+  const res = await fetch(`${baseUrl}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({ model: modelId, messages: [{ role: 'user', content: prompt }], max_tokens: 1000 }),
+    signal,
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const data = await res.json()
+  return data.choices?.[0]?.message?.content ?? ''
+}
+
+async function callGPT4o(prompt: string): Promise<ModelResult> {
+  const key = process.env.OPENAI_API_KEY
+  if (!key) return unavailable('gpt-4o')
+  try {
+    const client = new OpenAI({ apiKey: key })
+    const signal = AbortSignal.timeout(TIMEOUT_MS)
+    const res = await client.chat.completions.create(
+      { model: 'gpt-4o', messages: [{ role: 'user', content: prompt }], max_tokens: 1000 },
+      { signal },
+    )
+    const text = truncate(res.choices[0]?.message?.content ?? '')
+    return { model: 'gpt-4o', displayName: 'GPT-4o', abbreviation: 'G', response: text, available: true }
+  } catch {
+    return unavailable('gpt-4o')
+  }
+}
+
+async function callClaude(prompt: string): Promise<ModelResult> {
+  const key = process.env.ANTHROPIC_API_KEY
+  // Pick the first Anthropic model in the config (Haiku in budget mode, Sonnet in full mode)
+  const cfg = MODELS.find(m => m.envKey === 'ANTHROPIC_API_KEY')!
+  const modelId = cfg.id
+  if (!key) return unavailable(modelId)
+  try {
+    const client = new Anthropic({ apiKey: key })
+    const signal = AbortSignal.timeout(TIMEOUT_MS)
+    const res = await client.messages.create(
+      { model: modelId, max_tokens: 1000, messages: [{ role: 'user', content: prompt }] },
+      { signal },
+    )
+    const text = truncate(res.content[0]?.type === 'text' ? res.content[0].text : '')
+    return { model: modelId, displayName: cfg.displayName, abbreviation: cfg.abbreviation, response: text, available: true }
+  } catch {
+    return unavailable(modelId)
+  }
+}
+
+async function callGemini(prompt: string): Promise<ModelResult> {
+  const key = process.env.GOOGLE_AI_API_KEY
+  const cfg = MODELS.find(m => m.envKey === 'GOOGLE_AI_API_KEY')!
+  const modelId = cfg.id
+  if (!key) return unavailable(modelId)
+  try {
+    const genai = new GoogleGenerativeAI(key)
+    const model = genai.getGenerativeModel({ model: modelId })
+    // Gemini SDK doesn't accept AbortSignal natively; wrap in a race
+    const result = await Promise.race([
+      model.generateContent(prompt),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), TIMEOUT_MS)),
+    ])
+    const text = truncate((result as Awaited<ReturnType<typeof model.generateContent>>).response.text())
+    return { model: modelId, displayName: cfg.displayName, abbreviation: cfg.abbreviation, response: text, available: true }
+  } catch {
+    return unavailable(modelId)
+  }
+}
+
+async function callPerplexity(prompt: string): Promise<ModelResult> {
+  const key = process.env.PERPLEXITY_API_KEY
+  const modelId = 'llama-3.1-sonar-large-128k-online'
+  if (!key) return unavailable(modelId)
+  try {
+    const text = await callOpenAICompatible(
+      'https://api.perplexity.ai',
+      key,
+      modelId,
+      prompt,
+      AbortSignal.timeout(TIMEOUT_MS),
+    )
+    return { model: modelId, displayName: 'Perplexity', abbreviation: 'P', response: truncate(text), available: true }
+  } catch {
+    return unavailable(modelId)
+  }
+}
+
+async function callDeepSeek(prompt: string): Promise<ModelResult> {
+  const key = process.env.DEEPSEEK_API_KEY
+  const modelId = 'deepseek-chat'
+  if (!key) return unavailable(modelId)
+  try {
+    const text = await callOpenAICompatible(
+      'https://api.deepseek.com',
+      key,
+      modelId,
+      prompt,
+      AbortSignal.timeout(TIMEOUT_MS),
+    )
+    return { model: modelId, displayName: 'DeepSeek', abbreviation: 'D', response: truncate(text), available: true }
+  } catch {
+    return unavailable(modelId)
+  }
+}
+
+// Groq — free tier, OpenAI-compatible, fast inference
+async function callGroq(prompt: string): Promise<ModelResult> {
+  const key = process.env.GROQ_API_KEY
+  const modelId = 'llama-3.3-70b-versatile'
+  if (!key) return unavailable(modelId)
+  try {
+    const text = await callOpenAICompatible(
+      'https://api.groq.com/openai',
+      key,
+      modelId,
+      prompt,
+      AbortSignal.timeout(TIMEOUT_MS),
+    )
+    return { model: modelId, displayName: 'Llama 3.3 (Groq)', abbreviation: 'L', response: truncate(text), available: true }
+  } catch {
+    return unavailable(modelId)
+  }
+}
+
+export async function fanOut(prompt: string): Promise<ModelResult[]> {
+  const results = await Promise.allSettled([
+    callClaude(prompt),   // Haiku — cheap
+    callGemini(prompt),   // Flash — free tier
+    callDeepSeek(prompt), // Very cheap
+    callGroq(prompt),     // Llama 3.3 70B — free
+  ])
+  return results.map(r => (r.status === 'fulfilled' ? r.value : unavailable((r as PromiseRejectedResult).reason)))
+}

@@ -1,0 +1,9 @@
+# Greg CRM Verification Plan
+
+- [ ] Navigate to http://localhost:5173/
+- [ ] Verify 5 contact cards are visible in the pipeline view
+- [ ] Take screenshot of the main page
+- [ ] Open Settings Modal (gear icon)
+- [ ] Verify Settings Modal looks polished
+- [ ] Take screenshot of the Settings Modal
+- [ ] Report results

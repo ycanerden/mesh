@@ -1,0 +1,60 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { fanOut } from '@/lib/models'
+import { callJudge } from '@/lib/judge'
+import type { CouncilResponse } from '@/lib/types'
+
+// Simple in-memory cache — keyed by prompt, expires after 10 minutes
+// Resets on server restart (intentional for v1)
+type CacheEntry = { response: CouncilResponse; cachedAt: number }
+const cache = new Map<string, CacheEntry>()
+const CACHE_TTL_MS = 10 * 60 * 1000
+
+function getCached(prompt: string): CouncilResponse | null {
+  const entry = cache.get(prompt)
+  if (!entry) return null
+  if (Date.now() - entry.cachedAt > CACHE_TTL_MS) {
+    cache.delete(prompt)
+    return null
+  }
+  return entry.response
+}
+
+function setCached(prompt: string, response: CouncilResponse): void {
+  cache.set(prompt, { response, cachedAt: Date.now() })
+}
+
+export async function POST(req: NextRequest) {
+  let body: { prompt?: string }
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  const prompt = body.prompt?.trim() ?? ''
+
+  if (!prompt) {
+    return NextResponse.json({ error: 'Prompt is required' }, { status: 400 })
+  }
+  if (prompt.length > 4000) {
+    return NextResponse.json({ error: 'Prompt must be 4000 characters or fewer' }, { status: 400 })
+  }
+
+  // Return cached result if available
+  const cached = getCached(prompt)
+  if (cached) {
+    return NextResponse.json({ ...cached, fromCache: true })
+  }
+
+  // Fan out to all models in parallel
+  const modelResponses = await fanOut(prompt)
+
+  // Judge synthesizes all responses
+  const { verdict, divergence } = await callJudge(prompt, modelResponses)
+
+  const response: CouncilResponse = { verdict, divergence, modelResponses }
+
+  setCached(prompt, response)
+
+  return NextResponse.json(response)
+}

@@ -1,0 +1,8 @@
+# GymBuddyGemini Tracker Development
+
+## Checklist
+
+- [x] Initial setup
+  - [x] Copy [tracker.jsx](file:///Users/canerden/Downloads/tracker.jsx) to `gymbuddygemini.jsx`
+  - [x] Rename app title to GYM BUDDY GEMINI
+- [ ] Determine next development steps with the user

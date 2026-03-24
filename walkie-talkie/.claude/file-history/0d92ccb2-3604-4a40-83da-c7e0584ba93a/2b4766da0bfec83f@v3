@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "walkie-talkie": {
+      "type": "http",
+      "url": "http://localhost:3001/mcp?room=rp7zau&name=Alfred"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+# Council — TODOs
+
+## v2: Streaming responses (SSE)
+**What:** Replace the "spinner then boom" UX with live token streaming — watch all 6 models fill in simultaneously in real time.
+**Why:** Dramatically better UX. The "whoa" moment of parallel streams is the best demo this product has.
+**How:** Next.js App Router + ReadableStream (native), or Vercel AI SDK (easier). Each model streams independently; UI updates as chunks arrive.
+**Pros:** Makes the product feel alive. Massively better latency perception.
+**Cons:** Each provider has different streaming format. Some complexity in error handling mid-stream.
+**Depends on:** v1 shipped and working
+**Where to start:** `app/api/council/route.ts` — replace `Promise.allSettled()` batch with a streaming pipeline
+
+## v2: Model selector UI
+**What:** Let users toggle which models to include in the council (default: all 6).
+**Why:** Some queries only need 2-3 models. Some users want to add Grok, o3, or remove models they don't trust. Saves API costs.
+**How:** Map the `MODELS` config array (lib/models-config.ts) to checkbox chips in the UI. Pass `selectedModels: string[]` in the POST body. Route filters model functions accordingly.
+**Pros:** Configurable councils. Enables "premium council" (Opus for all) vs "fast council" (Sonnet + GPT-4o only).
+**Cons:** Client state, minimum-selection enforcement (≥2 models required), API request parameterization.
+**Depends on:** MODELS config array in lib/models-config.ts (already part of v1 design)
+**Where to start:** `app/page.tsx` (chips) + `app/api/council/route.ts` (filter by selectedModels)

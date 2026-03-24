@@ -1,0 +1,18 @@
+# Greg CRM Verification Plan
+
+- [x] Navigate to http://localhost:5174/
+- [ ] Wait for page load and verify UI state (Current issue: Page is blank, root div is empty)
+- [ ] Take screenshot of homepage
+- [ ] Check console for errors
+- [ ] Interact with sidebar (click first contact)
+- [ ] Take screenshot of contact detail view
+- [ ] Open command palette (Meta+K or click hint)
+- [ ] Take screenshot of command palette
+- [ ] Final report summary
+
+## Observations
+- The page loads with title "Greg — Your contacts are markdown. Your agent does the work."
+- `document.body.innerHTML` shows `<div id="root"></div>` and `<script type="module" src="/src/main.jsx"></script>`.
+- However, the `#root` div remains empty.
+- Console logs show Vite is connected but no other output.
+- No immediate errors in console after reload.

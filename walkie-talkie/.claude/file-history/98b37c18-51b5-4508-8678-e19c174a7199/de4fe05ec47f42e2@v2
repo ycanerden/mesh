@@ -1,0 +1,57 @@
+# Habitat Residency Website
+
+The official website for Habitat Residency — a 3-month in-person program for solo founders.
+
+## Tech Stack
+
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **TypeScript:** Full type safety
+
+## Design Philosophy
+
+Clean, minimal, YC-inspired design:
+- Generous whitespace
+- Clear typography hierarchy
+- Mobile-first responsive
+- Fast and accessible
+
+## Getting Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Open [http://localhost:3000](http://localhost:3000)
+
+## Deployment
+
+Deploy on [Vercel](https://vercel.com/) for zero-config Next.js support:
+
+```bash
+npm run build
+```
+
+## Content Updates
+
+Content is managed in:
+- `/app/page.tsx` — Homepage content
+- `/app/layout.tsx` — Site metadata
+
+To update copy, edit these files directly.
+
+## Inspirations
+
+- [Solo Founders](https://solofounders.com) — Community-first positioning
+- [Y Combinator](https://www.ycombinator.com) — Clean, minimal design
+- [The Bridge](https://www.join-thebridge.com) — Clear value proposition
+
+---
+
+Built for solo founders, by solo founders.

@@ -1,0 +1,71 @@
+import { MODELS } from '@/lib/models-config'
+import type { DivergenceEntry, ModelResult } from '@/lib/types'
+
+type Props = {
+  divergence: DivergenceEntry[]
+  modelResponses: ModelResult[]
+}
+
+function consensusDotColor(entry: DivergenceEntry, availableNames: string[]): string {
+  if (availableNames.length <= 1) return 'bg-gray-300'
+  if (entry.disagree.length > 0) return 'bg-red-500'
+  if (entry.agree.length === availableNames.length) return 'bg-green-500'
+  return 'bg-yellow-400'
+}
+
+function modelDotStyle(modelDisplayName: string, entry: DivergenceEntry): string {
+  if (entry.agree.includes(modelDisplayName)) return 'bg-green-100 border-green-500 text-green-800'
+  if (entry.disagree.includes(modelDisplayName)) return 'bg-red-100 border-red-500 text-red-800'
+  if (entry.partial.includes(modelDisplayName)) return 'bg-yellow-100 border-yellow-400 text-yellow-800'
+  return 'bg-gray-100 border-gray-300 text-gray-400'
+}
+
+export function DivergenceMap({ divergence, modelResponses }: Props) {
+  if (divergence.length === 0) return null
+
+  const availableNames = modelResponses.filter(r => r.available).map(r => r.displayName)
+
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Divergence Map</p>
+      <div className="space-y-2">
+        {divergence.map((entry, i) => (
+          <div key={i} className="flex items-center gap-3 bg-white border border-gray-100 rounded-lg px-4 py-3">
+            {/* Consensus dot */}
+            <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${consensusDotColor(entry, availableNames)}`} />
+
+            {/* Claim text */}
+            <p className="text-sm text-gray-700 flex-1">{entry.claim}</p>
+
+            {/* Per-model dots */}
+            <div className="flex gap-1 flex-shrink-0">
+              {MODELS.map(cfg => {
+                const modelResult = modelResponses.find(r => r.model === cfg.id)
+                if (!modelResult) return null
+                const style = modelResult.available
+                  ? modelDotStyle(modelResult.displayName, entry)
+                  : 'bg-gray-100 border-gray-200 text-gray-300'
+                return (
+                  <div
+                    key={cfg.id}
+                    title={modelResult.displayName}
+                    className={`w-6 h-6 rounded-full border flex items-center justify-center text-[9px] font-bold ${style}`}
+                  >
+                    {cfg.abbreviation}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Legend */}
+      <div className="flex gap-4 mt-3 text-xs text-gray-400">
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" /> All agree</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-400 inline-block" /> Mixed</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500 inline-block" /> Disagree</span>
+      </div>
+    </div>
+  )
+}

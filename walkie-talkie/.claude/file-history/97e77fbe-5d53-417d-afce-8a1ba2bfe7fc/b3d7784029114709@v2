@@ -1,0 +1,192 @@
+import { useEffect, useState, useCallback } from 'react';
+import { useSprintTimer } from '@/hooks/useSprintTimer';
+import { cn } from '@/lib/utils';
+import { Check } from 'lucide-react';
+import { formatTime } from '@/lib/timerUtils';
+import { phaseNames, phaseOrder } from '@/lib/phaseConstants';
+
+const phases = phaseOrder.map((key) => ({
+  key,
+  label: key === 'waiting' ? '0' : key === 'completed' ? '✓' : key.replace('phase_', ''),
+  name: phaseNames[key],
+}));
+
+function getTimerColor(remainingSeconds: number, status: string): string {
+  if (status === 'stopped') return 'text-muted-foreground';
+  if (status === 'paused') return 'text-yellow-500';
+  if (remainingSeconds <= 60) return 'text-red-500 animate-pulse';
+  if (remainingSeconds <= 600) return 'text-red-500';
+  if (remainingSeconds <= 1800) return 'text-yellow-500';
+  return 'text-green-500';
+}
+
+function getStatusLabel(status: string): string {
+  switch (status) {
+    case 'running': return 'LIVE';
+    case 'paused': return 'PAUSED';
+    default: return 'READY';
+  }
+}
+
+export default function AdminDisplay() {
+  const { remainingSeconds, status, displayPhase, promoCode, appLink, displayImageUrl, loading } = useSprintTimer();
+  const [cursorVisible, setCursorVisible] = useState(true);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }, []);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleFullscreen]);
+
+  // Auto-hide cursor after inactivity
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    const handleMouseMove = () => {
+      setCursorVisible(true);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setCursorVisible(false), 3000);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    handleMouseMove(); // Start the timer
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-foreground border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const currentPhaseInfo = phases.find(p => p.key === displayPhase) || phases[0];
+  const currentIndex = phaseOrder.indexOf(displayPhase);
+  const timerColor = getTimerColor(remainingSeconds, status);
+
+  return (
+    <div 
+      className={cn(
+        "min-h-screen bg-background flex flex-col items-center justify-center p-4 gap-4",
+        !cursorVisible && "cursor-none"
+      )}
+    >
+      {/* Title */}
+      <h1 className="font-mono text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+        [HABITAT] SPRINT
+      </h1>
+
+      {/* Timer Section */}
+      <div className="flex flex-col items-center gap-2">
+        <div className={cn('font-mono text-6xl md:text-7xl lg:text-8xl font-bold tracking-wider', timerColor)}>
+          {formatTime(remainingSeconds)}
+        </div>
+        <div className={cn(
+          'px-3 py-1 text-lg md:text-xl font-mono font-bold',
+          status === 'running' && 'bg-green-600 text-white',
+          status === 'paused' && 'bg-yellow-600 text-white',
+          status === 'stopped' && 'bg-muted text-muted-foreground'
+        )}>
+          {getStatusLabel(status)}
+        </div>
+      </div>
+
+      {/* Phase Name */}
+      <div className="text-center">
+        <p className="font-mono text-xl md:text-2xl font-bold text-foreground">
+          {displayPhase === 'completed' 
+            ? 'Sprint Complete! 🎉' 
+            : displayPhase === 'waiting'
+            ? 'Getting Started'
+            : `PHASE ${displayPhase.replace('phase_', '')} - ${currentPhaseInfo.name.toUpperCase()}`
+          }
+        </p>
+      </div>
+
+      {/* Phase Progress Dots */}
+      <div className="flex items-center justify-center gap-3 py-2">
+        {phases.slice(1, 5).map((phase, index) => {
+          const phaseIndex = phaseOrder.indexOf(phase.key);
+          const isCompleted = currentIndex > phaseIndex;
+          const isCurrent = displayPhase === phase.key;
+          
+          return (
+            <div key={phase.key} className="flex items-center">
+              <div
+                className={cn(
+                  'w-12 h-12 md:w-14 md:h-14 border-4 border-foreground flex items-center justify-center font-bold text-xl md:text-2xl transition-all',
+                  isCompleted && `phase-${index + 1} text-white`,
+                  isCurrent && `phase-${index + 1} text-white animate-pulse`,
+                  !isCompleted && !isCurrent && 'bg-muted text-muted-foreground'
+                )}
+              >
+                {isCompleted ? <Check className="w-6 h-6 md:w-8 md:h-8" /> : phase.label}
+              </div>
+              {index < 3 && (
+                <div
+                  className={cn(
+                    'w-8 md:w-12 h-1 border-y-2 border-foreground',
+                    currentIndex > phaseIndex + 1 ? 'bg-foreground' : 'bg-muted'
+                  )}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* App Link Section */}
+      {appLink && (
+        <div className="text-center mt-2">
+          <p className="font-mono text-sm md:text-base text-muted-foreground mb-1">📱 JOIN AT</p>
+          <p className="font-mono text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
+            {appLink}
+          </p>
+        </div>
+      )}
+
+      {/* Promo Code & QR Image Section */}
+      {(promoCode || displayImageUrl) && (
+        <div className="flex flex-col md:flex-row items-center gap-4 mt-2">
+          {displayImageUrl && (
+            <div className="border-4 border-foreground p-2">
+              <img
+                src={displayImageUrl}
+                alt="WhatsApp QR Code"
+                className="max-h-32 md:max-h-40 object-contain"
+              />
+            </div>
+          )}
+          {promoCode && (
+            <div className="border-4 border-foreground p-4 md:p-6 text-center">
+              <p className="font-mono text-sm md:text-base text-muted-foreground mb-1">🎁 PROMO CODE</p>
+              <p className="font-mono text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-widest">
+                {promoCode}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Fullscreen hint */}
+      <p className="fixed bottom-4 right-4 font-mono text-xs text-muted-foreground opacity-50">
+        Press F for fullscreen
+      </p>
+    </div>
+  );
+}

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Council — Wireframe Sketch</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #fafafa;
+    color: #111;
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .logo {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .logo span { opacity: 0.4; font-weight: 400; font-size: 14px; margin-left: 6px; }
+
+  /* Prompt input area */
+  .prompt-section {
+    background: white;
+    border: 1px solid #d0d0d0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .prompt-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  .prompt-textarea {
+    width: 100%;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 15px;
+    color: #333;
+    background: #f8f8f8;
+    resize: none;
+    font-family: inherit;
+    min-height: 72px;
+    line-height: 1.5;
+  }
+  .prompt-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+  .model-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    font-size: 11px;
+    padding: 3px 9px;
+    border: 1px solid #d0d0d0;
+    border-radius: 20px;
+    color: #444;
+    background: white;
+  }
+  .chip.active {
+    background: #111;
+    color: white;
+    border-color: #111;
+  }
+  .run-btn {
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+  }
+
+  /* Synthesis block */
+  .synthesis-section {
+    background: white;
+    border: 2px solid #111;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+  .synthesis-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .synthesis-badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: #111;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .synthesis-judge {
+    font-size: 12px;
+    color: #888;
+  }
+  .synthesis-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #222;
+  }
+  .synthesis-body p { margin-bottom: 10px; }
+
+  /* Divergence map */
+  .divergence-section {
+    margin-bottom: 28px;
+  }
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #666;
+    margin-bottom: 12px;
+  }
+  .divergence-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    background: white;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .consensus-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-agree { background: #2d9d5c; }
+  .dot-mixed { background: #e8a020; }
+  .dot-disagree { background: #d04040; }
+  .divergence-label {
+    font-size: 13px;
+    color: #333;
+    flex: 1;
+  }
+  .model-dots {
+    display: flex;
+    gap: 4px;
+  }
+  .model-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px;
+    font-weight: 700;
+    color: #555;
+  }
+  .model-dot.yes { background: #d4edda; border-color: #2d9d5c; color: #1a6e3e; }
+  .model-dot.no  { background: #fde8e8; border-color: #d04040; color: #9a2020; }
+  .model-dot.partial { background: #fff3cd; border-color: #e8a020; color: #805010; }
+
+  /* Individual model responses */
+  .responses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .model-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .model-name {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #888;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .model-name::before {
+    content: '';
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+  }
+  .card-gpt .model-name::before { background: #10a37f; }
+  .card-claude .model-name::before { background: #d97559; }
+  .card-gemini .model-name::before { background: #4285f4; }
+  .card-perp .model-name::before { background: #7c5cbf; }
+  .card-deep .model-name::before { background: #4a8cf7; }
+  .card-kimi .model-name::before { background: #ff6a3d; }
+  .model-excerpt {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #444;
+  }
+  .model-excerpt .highlight {
+    background: #fffde7;
+    border-left: 2px solid #e8a020;
+    padding: 4px 6px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #666;
+  }
+
+  /* Annotation note */
+  .annotation {
+    font-size: 11px;
+    color: #999;
+    font-style: italic;
+    border-top: 1px dashed #e0e0e0;
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">Council <span>multi-model research</span></div>
+</div>
+
+<!-- Prompt input -->
+<div class="prompt-section">
+  <div class="prompt-label">Your question</div>
+  <textarea class="prompt-textarea">Should our startup expand into the EU market in 2025, or consolidate in North America first?</textarea>
+  <div class="prompt-footer">
+    <div class="model-chips">
+      <div class="chip active">GPT-4o</div>
+      <div class="chip active">Claude Opus</div>
+      <div class="chip active">Gemini 1.5</div>
+      <div class="chip active">Perplexity</div>
+      <div class="chip active">DeepSeek</div>
+      <div class="chip active">Kimi</div>
+    </div>
+    <button class="run-btn">Ask the Council →</button>
+  </div>
+</div>
+
+<!-- Synthesis -->
+<div class="synthesis-section">
+  <div class="synthesis-header">
+    <span class="synthesis-badge">Council Verdict</span>
+    <span class="synthesis-judge">synthesized by Claude Opus 4.6</span>
+  </div>
+  <div class="synthesis-body">
+    <p><strong>Consolidate North America first.</strong> 4 of 6 models agree this is the lower-risk path for an early-stage startup. The EU opportunity is real but the regulatory overhead (GDPR, VAT, entity setup) typically adds 6-9 months and $50-100K before you see revenue — capital most early startups should deploy elsewhere.</p>
+    <p>The dissenting view (GPT-4o, Gemini) argues that EU customers acquired early have higher LTV and lower churn, making the upfront cost worthwhile if your product has strong product-market fit signals already. That's the crux of the disagreement — see the divergence map below.</p>
+  </div>
+</div>
+
+<!-- Divergence map -->
+<div class="divergence-section">
+  <div class="section-label">Divergence Map — where models agree & split</div>
+
+  <div class="divergence-row">
+    <div class="consensus-dot dot-agree"></div>
+    <div class="divergence-label">EU regulatory overhead is significant (GDPR, VAT, entity)</div>
+    <div class="model-dots">
+      <div class="model-dot yes">G</div>
+      <div class="model-dot yes">C</div>
+      <div class="model-dot yes">Gm</div>
+      <div class="model-dot yes">P</div>
+      <div class="model-dot yes">D</div>
+      <div class="model-dot yes">K</div>
+    </div>
+  </div>
+
+  <div class="divergence-row">
+    <div class="consensus-dot dot-disagree"></div>
+    <div class="divergence-label">EU customers have meaningfully higher LTV than NA</div>
+    <div class="model-dots">
+      <div class="model-dot yes">G</div>
+      <div class="model-dot no">C</div>
+      <div class="model-dot yes">Gm</div>
+      <div class="model-dot no">P</div>
+      <div class="model-dot no">D</div>
+      <div class="model-dot no">K</div>
+    </div>
+  </div>
+
+  <div class="divergence-row">
+    <div class="consensus-dot dot-mixed"></div>
+    <div class="divergence-label">Hiring a EU-based GTM person in year 1 is necessary</div>
+    <div class="model-dots">
+      <div class="model-dot yes">G</div>
+      <div class="model-dot partial">C</div>
+      <div class="model-dot yes">Gm</div>
+      <div class="model-dot no">P</div>
+      <div class="model-dot no">D</div>
+      <div class="model-dot partial">K</div>
+    </div>
+  </div>
+
+  <div class="divergence-row">
+    <div class="consensus-dot dot-agree"></div>
+    <div class="divergence-label">Consolidate NA first if &lt;$2M ARR or pre-PMF</div>
+    <div class="model-dots">
+      <div class="model-dot no">G</div>
+      <div class="model-dot yes">C</div>
+      <div class="model-dot no">Gm</div>
+      <div class="model-dot yes">P</div>
+      <div class="model-dot yes">D</div>
+      <div class="model-dot yes">K</div>
+    </div>
+  </div>
+</div>
+
+<!-- Individual model responses -->
+<div class="section-label">Individual Responses</div>
+<div class="responses-grid">
+  <div class="model-card card-gpt">
+    <div class="model-name">GPT-4o</div>
+    <div class="model-excerpt">
+      EU expansion makes sense if you already have inbound demand there. The LTV data across B2B SaaS generally shows EU customers churn 20-30% less than NA equivalents...
+      <div class="highlight">↳ disagrees with consensus on LTV point</div>
+    </div>
+  </div>
+  <div class="model-card card-claude">
+    <div class="model-name">Claude Opus</div>
+    <div class="model-excerpt">
+      Consolidate NA first. The regulatory complexity is underestimated by most founders — GDPR compliance alone can cost 3 months of eng time if you're storing any user data...
+    </div>
+  </div>
+  <div class="model-card card-gemini">
+    <div class="model-name">Gemini 1.5</div>
+    <div class="model-excerpt">
+      Consider a hybrid: a lightweight EU entity (Ireland or Netherlands) with minimal ops, just to close EU enterprise deals. Full expansion later.
+      <div class="highlight">↳ unique angle not raised by other models</div>
+    </div>
+  </div>
+  <div class="model-card card-perp">
+    <div class="model-name">Perplexity</div>
+    <div class="model-excerpt">
+      Most YC companies that expanded to EU pre-$5M ARR report it as their biggest mistake. PMF in NA first is the dominant playbook...
+    </div>
+  </div>
+  <div class="model-card card-deep">
+    <div class="model-name">DeepSeek</div>
+    <div class="model-excerpt">
+      NA consolidation. EU market entry should be demand-pull (customers asking for it) not supply-push. If no EU inbound, not the time.
+    </div>
+  </div>
+  <div class="model-card card-kimi">
+    <div class="model-name">Kimi</div>
+    <div class="model-excerpt">
+      Wait until $3-5M ARR. The EU is not disappearing. Time spent on compliance before product-market fit is time not spent on the product.
+    </div>
+  </div>
+</div>
+
+<div class="annotation">
+  <!-- Design note: "Ask the Council" fires parallel API calls to all 6 models.
+       Judge model receives all 6 responses + original prompt. Divergence map
+       is extracted by the judge via structured output (JSON).
+       Individual cards are collapsible — default shows ~3 lines + key flag. -->
+  Wireframe sketch · Council v0.1 · generated by /office-hours
+</div>
+
+</body>
+</html>

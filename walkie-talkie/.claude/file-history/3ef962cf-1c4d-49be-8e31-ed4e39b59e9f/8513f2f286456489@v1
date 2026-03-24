@@ -1,0 +1,7 @@
+
+## gstack-app: Windows/Linux support (v2)
+**What:** Port to Windows and Linux after macOS v1 ships.
+**Why:** Non-technical co-founders exist on all platforms. macOS-first reduces v1 scope.
+**How to start:** Replace `tauri-plugin-keyring` macOS Keychain calls with platform-conditional storage (`windows-credentials` on Windows, `libsecret` on Linux). Test PTY bridge on both platforms — `portable-pty` supports all three, so that part should mostly work.
+**Depends on:** v1 shipped and validated on macOS.
+**Context:** Explicitly out of v1 scope. Flagged during plan-eng-review 2026-03-23.

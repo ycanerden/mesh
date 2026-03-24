@@ -1,0 +1,5 @@
+{
+  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
+  "summary": "Comprehensive implementation plan for the Student Cohort RAG Chatbot MVP. Uses Next.js 14 with App Router, Groq + Llama 3 for LLM, HuggingFace embeddings, ChromaDB for vectors, and pdf-parse for document processing. Includes detailed component structure, API routes, and system architecture with focus on simplicity and free-tier friendly services.",
+  "updatedAt": "2026-02-04T19:33:24.877336Z"
+}

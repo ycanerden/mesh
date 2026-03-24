@@ -1,0 +1,16 @@
+2026-03-22T10:28:26.746Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-22T10:28:26.746Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-22T10:28:26.746Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-22T10:28:26.747Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-22T10:28:26.785Z [DEBUG] [render] initLayout starting
+2026-03-22T10:28:26.785Z [DEBUG] Layout engine: yoga
+2026-03-22T10:28:26.795Z [DEBUG] [render] initLayout complete
+2026-03-22T10:28:26.800Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-22T10:28:26.833Z [DEBUG] High write ratio: blit=0, write=1148 (100.0% writes), screen=30x80
+2026-03-22T10:28:26.837Z [DEBUG] [render] first ink render: 796ms since process start
+2026-03-22T10:28:26.837Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-22T10:28:26.837Z [DEBUG] Total plugin commands loaded: 0
+2026-03-22T10:28:26.837Z [DEBUG] Total plugin agents loaded: 0
+2026-03-22T10:28:26.838Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-22T10:28:26.838Z [DEBUG] Loaded plugins - Enabled: 0, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-03-22T10:28:26.838Z [DEBUG] [keybindings] Watching for changes to /Users/canerden/.claude/keybindings.json

@@ -1,0 +1,83 @@
+/**
+ * Walkie-Talkie stdio MCP bridge
+ * Wraps the HTTP walkie-talkie server as a local stdio MCP server.
+ *
+ * Env vars:
+ *   SERVER_URL — base URL of the walkie-talkie server (default: http://localhost:3001)
+ *   ROOM       — room code to join
+ *   NAME       — agent name shown in messages
+ */
+
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+
+const SERVER_URL = process.env.SERVER_URL || "http://localhost:3001";
+const ROOM = process.env.ROOM || "";
+const NAME = process.env.NAME || "Agent";
+
+async function callTool(toolName: string, args: Record<string, string> = {}) {
+  const url = `${SERVER_URL}/mcp?room=${ROOM}&name=${NAME}`;
+  const body = {
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: { name: toolName, arguments: args },
+  };
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json, text/event-stream" },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  // Parse SSE or plain JSON
+  const jsonLine = text.split("\n").find((l) => l.startsWith("data:") || l.startsWith("{"));
+  if (!jsonLine) return { content: [{ type: "text", text }] };
+  const data = jsonLine.startsWith("data:") ? jsonLine.slice(5).trim() : jsonLine;
+  try {
+    const parsed = JSON.parse(data);
+    return parsed.result || parsed;
+  } catch {
+    return { content: [{ type: "text", text: data }] };
+  }
+}
+
+const mcp = new Server({ name: "walkie-talkie", version: "1.0.0" }, { capabilities: { tools: {} } });
+
+mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools: [
+    {
+      name: "room_status",
+      description: "Check if your partner has joined the room.",
+      inputSchema: { type: "object" as const, properties: {} },
+    },
+    {
+      name: "send_to_partner",
+      description: "Send a message to your partner's AI.",
+      inputSchema: {
+        type: "object" as const,
+        properties: { message: { type: "string", description: "The message to send" } },
+        required: ["message"],
+      },
+    },
+    {
+      name: "get_partner_messages",
+      description: "Get unread messages from your partner's AI.",
+      inputSchema: { type: "object" as const, properties: {} },
+    },
+  ],
+}));
+
+mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+  try {
+    const result = await callTool(name, (args || {}) as Record<string, string>);
+    const text = typeof result === "string" ? result : JSON.stringify(result, null, 2);
+    return { content: [{ type: "text" as const, text }] };
+  } catch (e: unknown) {
+    return { content: [{ type: "text" as const, text: `Error: ${e instanceof Error ? e.message : String(e)}` }] };
+  }
+});
+
+const transport = new StdioServerTransport();
+await mcp.connect(transport);

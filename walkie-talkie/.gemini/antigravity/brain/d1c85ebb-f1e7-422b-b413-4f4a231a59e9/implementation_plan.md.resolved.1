@@ -1,0 +1,99 @@
+# IDE-Like UX Overhaul — Non-Intimidating for Non-Technical Users
+
+Transform VibeMarketer from a simple sidebar+form app into an **IDE-like workspace** (inspired by Zed/VSCode layout) — but designed so a marketer or PM would never feel intimidated. No code, no terminal, no technical jargon.
+
+## Core Design Principles
+
+1. **IDE structure, human language** — Activity bar, tabs, panels, status bar — but everything says "skills", "outputs", "workspace" instead of "files", "terminal", "console"
+2. **Zero code visibility** — Skills are friendly cards, outputs are polished documents
+3. **Progressive disclosure** — Simple by default, powerful on demand
+
+## Layout Architecture
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ Activity Bar │  Tabs (open skills)                       │
+│ (left icons) │──────────────────────────────────────────│
+│              │                                           │
+│  🏠 Home     │  Main Editor Panel                        │
+│  🧰 Skills   │  (Skill form OR output document)          │
+│  📊 History  │                                           │
+│  ⚙️ Settings │                                           │
+│              │                                           │
+│              ├───────────────────────────────────────────│
+│              │  Status Bar (bottom)                      │
+└──────────────┴───────────────────────────────────────────┘
+```
+
+## Proposed Changes
+
+### App Shell & Layout
+
+#### [MODIFY] [App.jsx](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/App.jsx)
+- Add tab system: open multiple skills as tabs, switch between them
+- Add `openTabs` state tracking `[{ id, type: 'skill'|'settings', title }]`
+- Replace single `view` state with tab-based navigation
+- Add status bar component at bottom
+
+---
+
+### New Components
+
+#### [NEW] [ActivityBar.jsx](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/components/ActivityBar.jsx)
+- Narrow icon-only bar on the far left (like VS Code's activity bar)
+- Icons: Home, Skills (toolkit), History, Settings
+- Clicking "Skills" toggles the sidebar panel
+- Visually: 48px wide, icon + tooltip on hover
+
+#### [NEW] [TabBar.jsx](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/components/TabBar.jsx)
+- Horizontal tab bar across top of editor area
+- Each open skill = a tab with icon + name + close button
+- Active tab highlighted with accent underline
+- Clicking a tab switches the editor panel content
+
+#### [NEW] [StatusBar.jsx](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/components/StatusBar.jsx)
+- Thin bar at bottom of the window
+- Shows: skill count, API status (connected/missing), "Ready" / "Running..." state
+- Friendly language: "15 skills available · API connected · Ready"
+
+---
+
+### Modified Components
+
+#### [MODIFY] [Sidebar.jsx](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/components/Sidebar.jsx)
+- Becomes a collapsible panel (toggled by Activity Bar "Skills" icon)
+- Remove the titlebar and settings button (moved to Activity Bar)
+- Add subtle search/filter at top
+- Skills still grouped by phase
+
+#### [MODIFY] [Welcome.jsx](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/components/Welcome.jsx)
+- Redesign as a friendly "Home" tab that's always available
+- Show quick-start cards: "Get started" steps, recent skills, context status
+- Make it feel like a dashboard, not a landing page
+
+#### [MODIFY] [SkillRunner.jsx](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/components/SkillRunner.jsx)
+- No structural changes needed — already clean form-based
+- Minor: rename "Run" button text to friendlier language if needed
+
+#### [MODIFY] [OutputPanel.jsx](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/components/OutputPanel.jsx)
+- No major changes — already shows formatted output without code exposure
+
+---
+
+### Design System
+
+#### [MODIFY] [index.css](file:///Users/canerden/.gemini/antigravity/scratch/vibemarketer/src/index.css)
+- Add styles for Activity Bar (narrow left column, icon-based)
+- Add styles for Tab Bar (tabs with close buttons, active state)
+- Add styles for Status Bar (thin bottom bar)
+- Add collapsible sidebar panel styles
+- Adjust app shell grid layout to accommodate new panels
+
+## Verification Plan
+
+### Browser Testing
+- Verify all new IDE-like elements render correctly at `http://localhost:5173/`
+- Test tab open/close/switch behavior
+- Test sidebar toggle via Activity Bar
+- Test status bar shows correct state
+- Capture screenshots of the final result

@@ -1,0 +1,494 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+interface Phase1Data {
+  problem: string;
+  solution: string;
+  customer: string;
+  name: string;
+  mvpScope?: string;
+  targetCustomer?: string;
+  unfairAdvantage?: string;
+  problemValidation?: string;
+  successMetrics?: string;
+  workflow?: string;
+  painPoints?: string;
+  toolsUsed?: string;
+  timeSpent?: string;
+  aiAnalysis?: string;
+}
+
+interface SegmentData {
+  id?: string;
+  name: string;
+  companyType: string;
+  jobTitles: string[];
+  whyTheyCare: string;
+  isCustom?: boolean;
+}
+
+interface SearchFilters {
+  location?: string;
+  connectionLevel?: '1st' | '2nd' | '3rd+' | 'all';
+  companySize?: string;
+}
+
+type GeneratorType = 
+  | 'mvp-scope' 
+  | 'lovable-prompt' 
+  | 'target-customer' 
+  | 'outreach-messages'
+  | 'customer-segments'
+  | 'single-segment'
+  | 'linkedin-search'
+  | 'segment-outreach'
+  | 'automation-analysis';
+
+type TrackType = 'startup' | 'automation';
+
+function getSystemPrompt(type: GeneratorType, track: TrackType = 'startup'): string {
+  if (type === 'automation-analysis') {
+    return `You are an expert process automation analyst. Your job is to analyze a user's workflow, identify the highest-impact automation opportunity, and recommend the BEST specific tool to build it with.
+
+Be concrete and actionable — name exact tools, explain why they fit, and describe the automation flow clearly.
+
+Tools you can recommend:
+- No-code automation: n8n (self-hosted, powerful integrations), Zapier (easiest, biggest app library), Make (visual, complex logic)
+- Frontend/UI builders: Lovable (AI app builder), v0 (UI generation)
+- For developers / vibe coders: Cursor (AI code editor), Claude Code (CLI coding), Antigravity, Codex
+
+Always pick ONE primary recommendation based on the user's tool stack and technical level.`;
+  }
+
+  if (track === 'automation' && type === 'lovable-prompt') {
+    return `You are an expert at writing implementation prompts for automation tools and workflow builders.
+Your job is to create a detailed, tool-specific prompt that can be pasted directly into the recommended tool to start building.
+
+If the user has an AI analysis from Phase 1 that recommends a specific tool, tailor the prompt for THAT tool:
+- For n8n: Include specific nodes, triggers, webhook configs, and data transformations
+- For Zapier: Include specific Zaps, triggers, actions, and filter steps
+- For Make: Include specific modules, scenarios, and data routing
+- For Lovable/v0: Include UI components, pages, and functionality
+- For Cursor/Claude Code: Include code architecture, APIs to integrate, and implementation steps
+
+The prompt should be immediately actionable — the user should be able to paste it and start building.`;
+  }
+
+  switch (type) {
+    case 'mvp-scope':
+      return `You are a startup advisor helping teams define focused MVP scopes. 
+Your job is to take their startup idea and distill it into ONE core feature that can be built in 90 minutes.
+Be specific, actionable, and ruthlessly focused. The MVP should demonstrate the core value proposition.
+Keep your response to 2-3 sentences maximum.`;
+
+    case 'lovable-prompt':
+      return `You are an expert at writing prompts for Lovable AI, a no-code app builder.
+Your job is to create detailed, specific prompts that Lovable can use to build working prototypes.
+Include specific UI components, pages, layouts, and functionality.
+Be clear about user flows and what the user should be able to do.
+Format the prompt in a clear, structured way that's easy to paste into Lovable.`;
+
+    case 'target-customer':
+      return `You are a customer discovery expert helping startups identify and understand their ideal customers.
+Your job is to create a detailed, actionable customer profile based on the startup's problem and solution.
+Focus on specifics that help the founder actually find and reach these people.
+Be concrete about demographics, behaviors, and where to find them online.`;
+
+    case 'outreach-messages':
+      return `You are an expert at writing cold outreach messages that get responses.
+Your job is to create short, personal, non-salesy messages that spark genuine conversations.
+The goal is to get feedback on an idea, NOT to sell anything.
+Messages should be under 100 words each, feel human, and have a clear but soft ask.
+Do NOT include any product links - the product will be shown during the conversation.`;
+
+    case 'customer-segments':
+      return `You are a market segmentation expert helping startups identify distinct customer groups.
+Your job is to identify 3-5 specific, actionable customer segments based on the startup's idea.
+Each segment should be distinct enough to need different messaging and outreach approaches.
+Focus on segments the founder can actually reach and test with.`;
+
+    case 'single-segment':
+      return `You are a market segmentation expert helping startups identify distinct customer groups.
+Your job is to identify ONE specific, actionable customer segment based on the startup's idea.
+The segment should be distinct and targetable with specific messaging.
+Focus on a segment the founder can actually reach and test with.`;
+
+    case 'linkedin-search':
+      return `You are an expert at creating SHORT, EFFECTIVE LinkedIn search queries.
+Your job is to create simple search strings that actually return results.
+Keep queries UNDER 50 CHARACTERS. Focus only on job titles.
+Do NOT use complex Boolean logic - keep it simple.
+Return ONLY the search query string, nothing else.`;
+
+    case 'segment-outreach':
+      return `You are an expert at writing personalized cold outreach messages.
+Your job is to create 3 DISTINCT message variants for a specific customer segment.
+Each message should be under 80 words, personal, and with a clear ask for a conversation.
+Do NOT include any product links.
+Format as: **Variant 1 - Problem-focused:** [message] **Variant 2 - Curiosity-driven:** [message] **Variant 3 - Direct ask:** [message]`;
+
+    default:
+      return 'You are a helpful startup advisor.';
+  }
+}
+
+function getUserPrompt(type: GeneratorType, data: Phase1Data, segmentData?: SegmentData, searchFilters?: SearchFilters): string {
+  if (type === 'automation-analysis') {
+    return `Analyze this workflow and recommend the best automation opportunity:
+
+**Weekly Workflow:** ${data.workflow || data.problem}
+**Pain Points:** ${data.painPoints || 'Not specified'}
+**Tools Currently Used:** ${data.toolsUsed || 'Not specified'}
+**Time Spent Per Week:** ${data.timeSpent || 'Not specified'}
+
+Please provide:
+1. **What to automate**: The specific step(s) with the highest impact to automate
+2. **Recommended tool**: Pick ONE primary tool (n8n, Zapier, Make, Lovable, Cursor, etc.) and explain WHY it's the best fit for this specific workflow and tool stack
+3. **How it works**: Describe the automation flow — trigger → actions → output
+4. **Alternative tools**: 1-2 alternatives if the primary doesn't fit
+5. **Expected time savings**: Estimate how much time this will save per week
+
+Be specific and practical. The user will use this analysis to build the automation tonight.`;
+  }
+
+  switch (type) {
+    case 'mvp-scope':
+      return `Based on this startup idea, define a focused MVP scope with ONE core feature that can be built in 90 minutes:
+
+**Startup Name:** ${data.name}
+**Problem:** ${data.problem}
+**Solution:** ${data.solution}
+**Target Customer:** ${data.customer}
+${data.unfairAdvantage ? `**Unfair Advantage:** ${data.unfairAdvantage}` : ''}
+${data.problemValidation ? `**Problem Validation:** ${data.problemValidation}` : ''}
+
+What is the single most important feature to build first? Leverage the unfair advantage if possible. Be specific and actionable.`;
+
+    case 'lovable-prompt': {
+      // Check if this is automation track with AI analysis
+      if (data.aiAnalysis && data.workflow) {
+        return `Create a detailed, tool-specific implementation prompt based on this automation analysis:
+
+**Workflow Being Automated:** ${data.workflow}
+**Pain Points:** ${data.painPoints || 'Not specified'}
+**Tools Involved:** ${data.toolsUsed || 'Not specified'}
+**Time Spent:** ${data.timeSpent || 'Not specified'}
+**AI Analysis & Tool Recommendation:**
+${data.aiAnalysis}
+
+${data.successMetrics ? `**Success Metrics:** ${data.successMetrics}` : ''}
+
+Based on the AI analysis above, generate a prompt that:
+1. Is tailored to the SPECIFIC tool recommended in the analysis
+2. Includes step-by-step setup instructions for that tool
+3. Specifies exact triggers, actions, and data flows
+4. References the actual tools from the user's stack for integrations
+5. Can be pasted directly into the recommended tool to start building
+
+Make the prompt immediately actionable — the user should be able to copy-paste it and start building right away.`;
+      }
+
+      // Default startup lovable-prompt
+      return `Create a detailed prompt for Lovable AI to build a prototype for this startup:
+
+**Startup Name:** ${data.name}
+**Problem:** ${data.problem}
+**Solution:** ${data.solution}
+**Target Customer:** ${data.customer}
+${data.mvpScope ? `**MVP Scope:** ${data.mvpScope}` : ''}
+${data.unfairAdvantage ? `**Unfair Advantage:** ${data.unfairAdvantage}` : ''}
+${data.successMetrics ? `**Success Metrics:** ${data.successMetrics}` : ''}
+
+Generate a complete prompt that includes:
+1. App overview and purpose
+2. Key pages/screens needed
+3. Specific UI components and layout
+4. Core functionality and user flows
+5. Any important design considerations
+6. Features that highlight the unfair advantage
+
+Format it so it can be directly pasted into Lovable.`;
+    }
+
+    case 'target-customer':
+      return `Based on this startup idea, describe the ideal target customer in detail:
+
+**Startup Name:** ${data.name}
+**Problem:** ${data.problem}
+**Solution:** ${data.solution}
+**Initial Customer Idea:** ${data.customer}
+${data.problemValidation ? `**Problem Validation:** ${data.problemValidation}` : ''}
+
+Create a detailed customer profile that includes:
+1. **Who they are** - Job title, company size, industry, demographics
+2. **Pain points** - Specific frustrations they experience daily related to this problem
+3. **Current solutions** - What they've tried before and why it falls short
+4. **Where to find them** - LinkedIn groups, communities, forums, events
+5. **What makes them pay attention** - Triggers that would make them interested in a solution
+
+Use the problem validation evidence to ground the profile in reality. Be specific and actionable.`;
+
+    case 'outreach-messages':
+      return `Create 3 different outreach message variants for reaching potential customers:
+
+**Startup Name:** ${data.name}
+**Problem:** ${data.problem}
+**Solution:** ${data.solution}
+**Target Customer:** ${data.targetCustomer || data.customer}
+${data.problemValidation ? `**Problem Validation:** ${data.problemValidation}` : ''}
+${data.unfairAdvantage ? `**Unfair Advantage:** ${data.unfairAdvantage}` : ''}
+
+Generate 3 distinct messages (each under 100 words):
+
+**Message 1 - Problem-focused:** Lead with the pain point and empathy. Reference validation evidence as social proof if relevant.
+**Message 2 - Curiosity-driven:** Tease the idea without revealing too much, spark interest
+**Message 3 - Direct ask:** Straightforward request for feedback/conversation
+
+Each message should:
+- Feel personal and human, not salesy
+- Include a soft ask for a quick call or chat
+- NOT include any product links (the product will be shown during the conversation)
+- Reference validation evidence when appropriate for credibility
+
+Format each message clearly separated and labeled.`;
+
+    case 'customer-segments':
+      return `Based on this startup and target customer, identify 3-5 distinct customer segments:
+
+**Startup Name:** ${data.name}
+**Problem:** ${data.problem}
+**Solution:** ${data.solution}
+**Target Customer Profile:** ${data.targetCustomer || data.customer}
+${data.unfairAdvantage ? `**Unfair Advantage:** ${data.unfairAdvantage}` : ''}
+${data.successMetrics ? `**Success Metrics (30-day goal):** ${data.successMetrics}` : ''}
+
+For each segment, provide:
+1. **Segment Name** - A clear, descriptive name (2-4 words)
+2. **Company Type** - Industry and typical company size
+3. **Job Titles** - 2-3 specific titles to target
+4. **Why They'd Care** - Specific reason this solution matters to them
+5. **Unique Angle** - One differentiating factor for reaching this segment
+
+Prioritize segments that align with the unfair advantage and can help achieve the success metrics.
+Keep segments distinct enough that each needs different messaging.
+Format as a numbered list with clear structure.`;
+
+    case 'single-segment':
+      return `Based on this startup and target customer, identify ONE distinct customer segment:
+
+**Startup Name:** ${data.name}
+**Problem:** ${data.problem}
+**Solution:** ${data.solution}
+**Target Customer Profile:** ${data.targetCustomer || data.customer}
+${data.unfairAdvantage ? `**Unfair Advantage:** ${data.unfairAdvantage}` : ''}
+
+Provide ONLY ONE segment with:
+1. **Segment Name** - A clear, descriptive name (2-4 words)
+2. **Company Type** - Industry and typical company size
+3. **Job Titles** - 2-3 specific titles to target
+4. **Why They'd Care** - Specific reason this solution matters to them
+
+Prioritize segments that align with the unfair advantage. Format as a single segment with clear labels. Make it different from common/obvious segments.`;
+
+    case 'linkedin-search':
+      if (!segmentData) {
+        return 'Create a general LinkedIn search query for startup founders: "Founder" OR "CEO"';
+      }
+      
+      let prompt = `Create a SHORT LinkedIn search query (UNDER 50 characters) for finding:
+
+**Job Titles:** ${segmentData.jobTitles.join(', ')}
+
+Rules:
+- Use ONLY job titles with OR between them
+- Keep it SIMPLE - example: "Product Manager" OR "PM" OR "Head of Product"
+- Do NOT include industry, company types, or complex Boolean logic`;
+
+      if (searchFilters?.location) {
+        prompt += `\n\nNote: Location filter "${searchFilters.location}" will be applied separately in LinkedIn - do NOT include it in the query.`;
+      }
+      if (searchFilters?.connectionLevel && searchFilters.connectionLevel !== 'all') {
+        prompt += `\nConnection level "${searchFilters.connectionLevel}" will be applied separately.`;
+      }
+      if (searchFilters?.companySize) {
+        prompt += `\nCompany size "${searchFilters.companySize}" will be applied separately.`;
+      }
+
+      prompt += `\n\nReturn ONLY the search query string, nothing else. Maximum 50 characters.`;
+      
+      return prompt;
+
+    case 'segment-outreach':
+      if (!segmentData) {
+        return 'Create 3 general outreach message variants.';
+      }
+      return `Create 3 DISTINCT outreach message variants for this customer segment:
+
+**Startup Name:** ${data.name}
+**Problem:** ${data.problem}
+**Solution:** ${data.solution}
+**Segment:** ${segmentData.name}
+**Their Role:** ${segmentData.jobTitles.join(' or ')}
+**Company Type:** ${segmentData.companyType}
+**Why They'd Care:** ${segmentData.whyTheyCare}
+
+Write 3 different messages (each under 80 words):
+
+**Variant 1 - Problem-focused:** Lead with empathy about their pain point
+**Variant 2 - Curiosity-driven:** Spark interest without revealing everything
+**Variant 3 - Direct ask:** Straightforward request for feedback
+
+Each message should:
+- Speak directly to their specific context
+- Feel personal and non-salesy
+- Ask for a quick conversation
+- NOT include any product links
+
+Format exactly as:
+**Variant 1 - Problem-focused:**
+[message]
+
+**Variant 2 - Curiosity-driven:**
+[message]
+
+**Variant 3 - Direct ask:**
+[message]`;
+
+    default:
+      return 'Help with startup advice.';
+  }
+}
+
+// In-memory rate limiter: 20 requests per hour per auth token
+const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+interface RateLimitEntry {
+  count: number;
+  windowStart: number;
+}
+
+const rateLimitMap = new Map<string, RateLimitEntry>();
+
+function checkRateLimit(token: string): { allowed: boolean; retryAfterSec?: number } {
+  const now = Date.now();
+  const entry = rateLimitMap.get(token);
+
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(token, { count: 1, windowStart: now });
+    return { allowed: true };
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    const retryAfterSec = Math.ceil((entry.windowStart + RATE_LIMIT_WINDOW_MS - now) / 1000);
+    return { allowed: false, retryAfterSec };
+  }
+
+  entry.count++;
+  return { allowed: true };
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { type, phase1Data, segmentData, searchFilters, track } = await req.json() as {
+      type: GeneratorType;
+      phase1Data: Phase1Data;
+      segmentData?: SegmentData;
+      searchFilters?: SearchFilters;
+      track?: TrackType;
+    };
+
+    // Rate limit by authorization token
+    const authToken = req.headers.get("authorization") || "anonymous";
+    const rateCheck = checkRateLimit(authToken);
+    if (!rateCheck.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: `You've used all ${RATE_LIMIT_MAX} AI generations this hour. Try again in ${Math.ceil((rateCheck.retryAfterSec || 60) / 60)} minutes.`,
+        }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!type || !phase1Data) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields: type and phase1Data" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "AI service not configured" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: getSystemPrompt(type, track || 'startup') },
+          { role: "user", content: getUserPrompt(type, phase1Data, segmentData, searchFilters) },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      const errorText = await response.text();
+      console.error("AI gateway error:", response.status, errorText);
+      return new Response(
+        JSON.stringify({ error: "Failed to generate content" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const result = await response.json();
+    const content = result.choices?.[0]?.message?.content;
+
+    if (!content) {
+      return new Response(
+        JSON.stringify({ error: "No content generated" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({ content }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("generate-startup-content error:", error);
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  }
+});

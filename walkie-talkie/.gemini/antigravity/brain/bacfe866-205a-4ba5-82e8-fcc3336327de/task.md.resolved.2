@@ -1,0 +1,37 @@
+# Greg CRM - Development Task List
+
+## Phase 1: Core Setup & Storage (Completed)
+- [x] Bootstrapped barebones React project (Vite)
+- [x] Base Layout (Sidebar + Main Content Area + Empty State)
+- [x] Mock Local Storage (simulating Markdown DB reads/writes)
+- [x] Contact Creation Flow (modal with essential fields)
+- [x] Contact Detail Viewer (basic markdown rendering)
+- [x] Cmd+K Command Palette Interface (Fuzzy Search + Global Actions)
+- [x] Markdown Activity Logger (`## Activity` appending logic)
+- [x] Search & Filtering Panel (Tags, Status, Needs Follow-up)
+
+## Phase 2: Folk CRM Redesign & Workflows (Completed)
+- [x] Overhauled the UI from dark-developer to a clean, light, and airy interface (Folk CRM inspired)
+- [x] Improved Typography and "Groups" sidebar navigation
+- [x] Pipeline (Kanban) View
+  - [x] Designed info-dense contact cards mapping to [.md](file:///Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/task.md) frontmatter
+  - [x] Built native drag-and-drop column logic
+  - [x] Wired drag-and-drop actions to save updated `status` directly to markdown mock store
+- [x] Table / Spreadsheet View (for high-density data reading)
+- [x] Slide-in Detail Panel
+  - [x] Added Inline Editing for Status dropdown and Tags input
+  - [x] Built visual Activity Timeline parsed from markdown history
+  - [x] Integrated fully interactive markdown notes editor
+
+## Phase 3: Agentic Data Ingestion Layer (Pending)
+- [ ] Connect the application to real AI agent workflows via MCPs
+  - [ ] Implement Notion CRM Database connection to sync prospects
+  - [ ] Implement Google Sheets connection to sync lead lists
+- [ ] Setup the agent logic to read these external sources and generate local [.md](file:///Users/canerden/.gemini/antigravity/brain/bacfe866-205a-4ba5-82e8-fcc3336327de/task.md) contact files automatically
+- [ ] Implement sync/refresh UI in the frontend
+
+## Phase 4: Full Local App Distribution (Backlog)
+- [ ] Wrap the web app into a robust desktop environment (Tauri / Electron) to allow actual filesystem access instead of `localStorage` 
+- [ ] Build macOS `.dmg`
+- [ ] Setup GitHub releases
+- [ ] Create a Vercel-hosted landing page with a direct download button

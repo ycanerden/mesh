@@ -1,0 +1,226 @@
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { ChevronDown, ChevronRight, Check, Info } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { TaskInputItem } from './TaskInputItem';
+import { AIGeneratedTaskItem } from './AIGeneratedTaskItem';
+import confetti from 'canvas-confetti';
+import type { SprintTask } from '@/data/sprintTasks';
+import type { Phase1Data } from '@/hooks/useAIGeneration';
+import { phaseOrder } from '@/lib/phaseConstants';
+
+interface PhaseChecklistProps {
+  phase: string;
+  label: string;
+  description: string;
+  phaseNote?: string;
+  tasks: SprintTask[];
+  teamId: string;
+  currentPhase: string;
+  completedTasks: Set<string>;
+  taskContents: Map<string, string | null>;
+  phase1Data: Phase1Data;
+  phase1Complete: boolean;
+  missingPhase1Tasks: string[];
+  onTaskSave: (taskKey: string, content: string, phase: string) => Promise<void>;
+}
+
+const phaseColorClasses: Record<string, string> = {
+  phase_1: 'phase-1',
+  phase_2: 'phase-2',
+  phase_3: 'phase-3',
+  phase_4: 'phase-4',
+};
+
+const taskTitleMap: Record<string, string> = {
+  p1_problem: 'Problem Statement',
+  p1_solution: 'Solution',
+  p1_customer: 'Target Customer',
+  a1_workflow: 'Workflow Description',
+  a1_pain_points: 'Pain Points',
+  a1_tools: 'Tools Involved',
+  a1_time_spent: 'Time Spent',
+};
+
+export function PhaseChecklist({
+  phase,
+  label,
+  description,
+  phaseNote,
+  tasks,
+  teamId,
+  currentPhase,
+  completedTasks,
+  taskContents,
+  phase1Data,
+  phase1Complete,
+  missingPhase1Tasks,
+  onTaskSave,
+}: PhaseChecklistProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const prevCompletedCount = useRef(0);
+
+  const currentIndex = phaseOrder.indexOf(currentPhase);
+  const phaseIndex = phaseOrder.indexOf(phase);
+  const isActive = currentPhase === phase;
+  const isPast = currentIndex > phaseIndex;
+  const isFuture = currentIndex < phaseIndex;
+
+  // Auto-expand current phase
+  useEffect(() => {
+    if (isActive) {
+      setIsOpen(true);
+    }
+  }, [isActive]);
+
+  const completedCount = tasks.filter((t) => completedTasks.has(t.key)).length;
+  const allCompleted = completedCount === tasks.length;
+
+  // Trigger confetti when phase is completed
+  useEffect(() => {
+    if (allCompleted && prevCompletedCount.current < tasks.length && prevCompletedCount.current > 0) {
+      // Big celebration for phase completion
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#34d399', '#6ee7b7', '#fbbf24', '#f59e0b'],
+      });
+      
+      // Second burst
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#10b981', '#34d399', '#6ee7b7'],
+        });
+      }, 200);
+      
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#10b981', '#34d399', '#6ee7b7'],
+        });
+      }, 400);
+    }
+    prevCompletedCount.current = completedCount;
+  }, [allCompleted, completedCount, tasks.length]);
+
+  const handleSave = async (taskKey: string, content: string) => {
+    await onTaskSave(taskKey, content, phase);
+  };
+
+  // Get human-readable missing task names
+  const missingTaskNames = useMemo(() => {
+    return missingPhase1Tasks.map(key => taskTitleMap[key] || key);
+  }, [missingPhase1Tasks]);
+
+  // Build phase1Data with mvpScope if available
+  const enrichedPhase1Data = useMemo(() => {
+    const mvpScope = taskContents.get('p2_scope') || undefined;
+    return { ...phase1Data, mvpScope };
+  }, [phase1Data, taskContents]);
+
+  return (
+    <div
+      className={cn(
+        'border-4 border-foreground overflow-hidden',
+        isFuture && 'opacity-50'
+      )}
+    >
+      <div
+        className={cn(
+          'flex items-center justify-between p-4 transition-colors',
+          isActive && phaseColorClasses[phase],
+          isActive && 'text-white',
+          isPast && allCompleted && 'bg-success text-success-foreground',
+          isPast && !allCompleted && 'bg-secondary',
+          isFuture && 'bg-muted'
+        )}
+      >
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-4 text-left flex-1"
+        >
+          {isOpen ? (
+            <ChevronDown className="w-6 h-6" />
+          ) : (
+            <ChevronRight className="w-6 h-6" />
+          )}
+          <div>
+            <h3 className="font-bold text-xl">{label}</h3>
+            <p className="font-mono text-sm opacity-80">{description}</p>
+          </div>
+        </button>
+        <div className="flex items-center gap-3">
+          <span className="font-mono text-sm">
+            {completedCount}/{tasks.length}
+          </span>
+          {allCompleted && <Check className="w-6 h-6" />}
+        </div>
+      </div>
+
+      {isOpen && (
+        <div className="p-4 space-y-3 bg-card">
+          {/* Phase note at the top */}
+          {phaseNote && (
+            <div className="flex items-start gap-2 p-3 bg-muted/50 border-2 border-foreground/20 rounded mb-4">
+              <Info className="w-4 h-4 mt-0.5 text-muted-foreground flex-shrink-0" />
+              <p className="font-mono text-sm text-muted-foreground">
+                {phaseNote}
+              </p>
+            </div>
+          )}
+          
+          {tasks.map((task) => {
+            if (task.inputType === 'ai-generated' && task.aiConfig) {
+              return (
+                <AIGeneratedTaskItem
+                  key={task.key}
+                  id={task.key}
+                  title={task.title}
+                  description={task.description}
+                  aiConfig={task.aiConfig}
+                  checked={completedTasks.has(task.key)}
+                  content={taskContents.get(task.key) || undefined}
+                  phase1Data={enrichedPhase1Data}
+                  phase1Complete={phase1Complete}
+                  missingTasks={missingTaskNames}
+                  onSave={handleSave}
+                  disabled={isFuture}
+                />
+              );
+            }
+
+            return (
+              <TaskInputItem
+                key={task.key}
+                id={task.key}
+                title={task.title}
+                description={task.description}
+                exampleText={task.exampleText}
+                warningText={task.warningText}
+                helperText={task.helperText}
+                toolLink={task.toolLink}
+                inputType={task.inputType}
+                placeholder={task.placeholder}
+                checked={completedTasks.has(task.key)}
+                content={taskContents.get(task.key) || undefined}
+                optional={task.optional}
+                recommended={task.recommended}
+                subNote={task.subNote}
+                checklist={task.checklist}
+                onSave={handleSave}
+                disabled={isFuture}
+              />
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

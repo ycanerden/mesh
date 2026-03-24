@@ -1,0 +1,186 @@
+2026-03-20T09:24:52.315Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-20T09:24:52.315Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-20T09:24:52.315Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-20T09:24:52.315Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-20T09:24:52.321Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-20T09:24:52.339Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-03-20T09:24:52.340Z [DEBUG] [STARTUP] Running setup()...
+2026-03-20T09:24:52.340Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-20T09:24:52.341Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-20T09:24:52.349Z [DEBUG] Error log sink initialized
+2026-03-20T09:24:52.353Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-20T09:24:52.353Z [DEBUG] Total plugin skills loaded: 0
+2026-03-20T09:24:52.353Z [DEBUG] Total plugin commands loaded: 0
+2026-03-20T09:24:52.353Z [DEBUG] [STARTUP] setup() completed in 13ms
+2026-03-20T09:24:52.353Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-20T09:24:52.354Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-20T09:24:52.354Z [DEBUG] Total plugin agents loaded: 0
+2026-03-20T09:24:52.355Z [DEBUG] Loaded 25 unique skills (managed: 0, user: 25, project: 0, additional: 0, legacy commands: 0)
+2026-03-20T09:24:52.355Z [DEBUG] getSkills returning: 25 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-03-20T09:24:52.355Z [DEBUG] [STARTUP] Commands and agents loaded in 2ms
+2026-03-20T09:24:52.355Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-03-20T09:24:52.356Z [DEBUG] [render] initLayout starting
+2026-03-20T09:24:52.356Z [DEBUG] Layout engine: yoga
+2026-03-20T09:24:52.360Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default
+2026-03-20T09:24:52.363Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-03-20T09:24:52.365Z [DEBUG] [render] initLayout complete
+2026-03-20T09:24:52.369Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T09:24:52.373Z [DEBUG] [keybindings] Skipping file watcher - user customization disabled
+2026-03-20T09:24:52.373Z [DEBUG] [render] first ink render: 543ms since process start
+2026-03-20T09:24:53.887Z [DEBUG] Grove: Using fresh cached config
+2026-03-20T09:24:53.907Z [DEBUG] [render] initLayout starting
+2026-03-20T09:24:53.907Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-20T09:24:53.908Z [DEBUG] [render] initLayout complete
+2026-03-20T09:24:53.909Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T09:24:53.917Z [DEBUG] [keybindings] Skipping file watcher - user customization disabled
+2026-03-20T09:24:53.917Z [DEBUG] [render] first ink render: 2087ms since process start
+2026-03-20T09:24:53.934Z [ERROR] Error: Error: getaddrinfo ENOTFOUND api.anthropic.com
+    at Tz1.from (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:12:64207)
+    at Of.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9973)
+    at Of.emit (node:events:524:28)
+    at IR6.<computed> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:29:1120)
+    at ClientRequest.emit (node:events:524:28)
+    at emitErrorEvent (node:_http_client:104:11)
+    at TLSSocket.socketErrorListener (node:_http_client:512:5)
+    at TLSSocket.emit (node:events:524:28)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async JJ6 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1938:1762)
+    at async ZM1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:1938:1986)
+    at async Promise.all (index 0)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:4222:13376
+2026-03-20T09:24:53.934Z [DEBUG] Failed to fetch Grove notice config: Error: getaddrinfo ENOTFOUND api.anthropic.com
+2026-03-20T09:24:53.983Z [DEBUG] [STARTUP] showSetupScreens() completed in 1628ms
+2026-03-20T09:24:53.983Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-20T09:24:53.983Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-20T09:24:53.983Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-20T09:24:53.984Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T09:24:53.984Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T09:24:53.985Z [DEBUG] Total LSP servers loaded: 0
+2026-03-20T09:24:53.986Z [DEBUG] [STARTUP] MCP configs loaded in 1665ms
+2026-03-20T09:24:53.988Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-03-20T09:24:53.991Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.3524.1773998693991
+2026-03-20T09:24:53.991Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T09:24:53.991Z [DEBUG] Temp file written successfully, size: 23124 bytes
+2026-03-20T09:24:53.991Z [DEBUG] Applied original permissions to temp file
+2026-03-20T09:24:53.991Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.3524.1773998693991 to /Users/canerden/.claude.json
+2026-03-20T09:24:53.991Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T09:24:53.992Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-20T09:24:53.992Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-20T09:24:53.993Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-20T09:24:53.993Z [DEBUG] Found 0 hook matchers in settings
+2026-03-20T09:24:53.993Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-03-20T09:24:53.993Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-20T09:24:53.993Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-20T09:24:53.993Z [DEBUG] LSP server manager initialized successfully
+2026-03-20T09:24:53.993Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-20T09:24:53.994Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T09:24:53.995Z [DEBUG] [render] initLayout starting
+2026-03-20T09:24:53.995Z [DEBUG] [render] initLayout complete
+2026-03-20T09:24:54.004Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T09:24:54.188Z [DEBUG] [keybindings] Skipping file watcher - user customization disabled
+2026-03-20T09:24:54.188Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-03-20T09:24:54.191Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-03-20T09:24:54.192Z [DEBUG] performStartupChecks called
+2026-03-20T09:24:54.192Z [DEBUG] Starting background plugin installations
+2026-03-20T09:24:54.192Z [DEBUG] performBackgroundPluginInstallations called
+2026-03-20T09:24:54.195Z [DEBUG] [render] first ink render: 2365ms since process start
+2026-03-20T09:24:54.196Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-20T09:24:54.202Z [DEBUG] Watching for changes in setting files /Users/canerden/.claude/settings.json...
+2026-03-20T09:24:54.204Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-20T09:24:54.204Z [DEBUG] [claudeai-mcp] Gate returned: false
+2026-03-20T09:24:54.204Z [DEBUG] [claudeai-mcp] Disabled via gate
+2026-03-20T09:24:54.204Z [DEBUG] Found 1 extra marketplaces in settings
+2026-03-20T09:24:54.205Z [DEBUG] Loaded plugins - Enabled: 0, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-03-20T09:24:54.205Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-03-20T09:24:54.232Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/usr/local/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-03-20T09:24:54.233Z [DEBUG] Git remote URL: https://github.com/ycanerden/notetakertest.git
+2026-03-20T09:24:54.233Z [DEBUG] Parsed repository: ycanerden/notetakertest from https://github.com/ycanerden/notetakertest.git
+2026-03-20T09:24:54.233Z [DEBUG] Parsed repository: ycanerden/notetakertest from URL: https://github.com/ycanerden/notetakertest.git
+2026-03-20T09:24:54.233Z [DEBUG] Path /Users/canerden/Library/Application Support/CodexBar/ClaudeProbe already tracked for repo ycanerden/notetakertest
+2026-03-20T09:24:54.234Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.3524.1773998694234
+2026-03-20T09:24:54.234Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T09:24:54.235Z [DEBUG] Temp file written successfully, size: 23124 bytes
+2026-03-20T09:24:54.235Z [DEBUG] Applied original permissions to temp file
+2026-03-20T09:24:54.235Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.3524.1773998694234 to /Users/canerden/.claude.json
+2026-03-20T09:24:54.235Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T09:24:54.236Z [DEBUG] Watching for changes in skill/command directories: /Users/canerden/.claude/skills...
+2026-03-20T09:24:54.241Z [DEBUG] High write ratio: blit=0, write=1154 (100.0% writes), screen=18x160
+2026-03-20T09:24:54.248Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T09:24:54.248Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T09:24:54.248Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T09:24:54.264Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-20T09:24:54.265Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.95b; cc_entrypoint=cli;
+2026-03-20T09:24:54.265Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T09:24:54.265Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T09:24:54.266Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T09:24:54.268Z [ERROR] API error (attempt 1/11): undefined Connection error.
+2026-03-20T09:24:54.668Z [ERROR] Error: Error: Connection error.
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:4542)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:3349
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:2232
+    at async Xq9 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:935:3953)
+    at async Mv7 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:2165)
+    at async _U1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10194)
+    at async Ed (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10890)
+    at async bs4 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3520:554)
+2026-03-20T09:24:54.668Z [DEBUG] countTokensWithFallback: API returned null, trying haiku fallback (21 tools)
+2026-03-20T09:24:54.669Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T09:24:54.669Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T09:24:54.669Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T09:24:54.849Z [ERROR] API error (attempt 2/11): undefined Connection error.
+2026-03-20T09:24:55.095Z [DEBUG] countTokensWithFallback: haiku fallback failed: Connection error.
+2026-03-20T09:24:55.095Z [ERROR] Error: Error: Connection error.
+    at LC.makeRequest (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:376:4542)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Zv7 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:936:4041)
+    at async _U1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10466)
+    at async Ed (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3503:10890)
+    at async bs4 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3520:554)
+2026-03-20T09:24:55.095Z [DEBUG] countToolDefinitionTokens returned null for 21 tools: Task, TaskOutput, Bash, Glob, Grep, ExitPlanMode, Read, Edit, Write, NotebookEdit, WebFetch, WebSear...
+2026-03-20T09:24:56.706Z [DEBUG] Stream started - received first chunk
+2026-03-20T09:24:59.228Z [DEBUG] npm view failed with code 1
+2026-03-20T09:24:59.228Z [DEBUG] npm stderr: (empty)
+2026-03-20T09:25:54.873Z [DEBUG] Writing to temp file: /Users/canerden/.claude/todos/d2a854f8-e002-4478-8434-a49e77ff6ef6-agent-d2a854f8-e002-4478-8434-a49e77ff6ef6.json.tmp.3524.1773998754873
+2026-03-20T09:25:54.873Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-03-20T09:25:54.873Z [DEBUG] Renaming /Users/canerden/.claude/todos/d2a854f8-e002-4478-8434-a49e77ff6ef6-agent-d2a854f8-e002-4478-8434-a49e77ff6ef6.json.tmp.3524.1773998754873 to /Users/canerden/.claude/todos/d2a854f8-e002-4478-8434-a49e77ff6ef6-agent-d2a854f8-e002-4478-8434-a49e77ff6ef6.json
+2026-03-20T09:25:54.873Z [DEBUG] File /Users/canerden/.claude/todos/d2a854f8-e002-4478-8434-a49e77ff6ef6-agent-d2a854f8-e002-4478-8434-a49e77ff6ef6.json written atomically
+2026-03-20T09:25:54.878Z [ERROR] Error: Error: connect EADDRNOTAVAIL 160.79.104.10:443 - Local (192.168.216.73:50642)
+    at Tz1.from (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:12:64207)
+    at Of.<anonymous> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:30:9973)
+    at Of.emit (node:events:536:35)
+    at IR6.<computed> (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:29:1120)
+    at ClientRequest.emit (node:events:524:28)
+    at emitErrorEvent (node:_http_client:104:11)
+    at TLSSocket.socketErrorListener (node:_http_client:512:5)
+    at TLSSocket.emit (node:events:524:28)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at rV1.request (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:32:2132)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async D6q (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3666:9229)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3666:13117
+2026-03-20T09:25:54.883Z [DEBUG] Stats cache is up to date
+2026-03-20T09:25:54.922Z [ERROR] Failed to refresh marketplace claude-plugins-official: Failed to clone marketplace repository: SSH authentication failed. Please ensure your SSH keys are configured for GitHub, or use an HTTPS URL instead.
+
+Original error: Cloning into '/Users/canerden/.claude/plugins/marketplaces/claude-plugins-official'...
+ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+2026-03-20T09:25:54.922Z [WARN] Plugin autoupdate: failed to refresh marketplace claude-plugins-official: Failed to refresh marketplace 'claude-plugins-official': Failed to clone marketplace repository: SSH authentication failed. Please ensure your SSH keys are configured for GitHub, or use an HTTPS URL instead.
+
+Original error: Cloning into '/Users/canerden/.claude/plugins/marketplaces/claude-plugins-official'...
+ssh: connect to host github.com port 22: Undefined error: 0
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+2026-03-20T09:25:54.922Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-03-20T09:26:52.836Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-03-20T09:26:52.836Z [DEBUG] Found 0 hook matchers in settings
+2026-03-20T09:26:52.836Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)

@@ -1,0 +1,23 @@
+<current_dom_explanation>
+This is a temporary snapshot of the current page's DOM structure. The DOM will change if you navigate to or interact with another page. Use a tool like browser_get_dom to capture and preserve the DOM in your trajectory if needed for later reference.
+</current_dom_explanation>
+<current_dom>
+[0] (305,37)<a class='flex items-center gap-2' href='/' />
+	[1] (313,37)<span >GYM BUDDY />
+		[2] (342,37)<span >GEMINI />
+[3] (678,37)<a class='text-sm text-slate-300 hover:text-white transition-colors' href='/login'>Log In />
+[4] (723,37)<a class='text-sm px-4 py-2 bg-orange-500 hover:bg-orange-600 text-[#0a0a0f] font-bold rounded-lg transition-colors' href='/signup'>Sign Up />
+Open Source AI Fitness Tracker
+GYM BUDDY
+GEMINI
+Your intelligent, personalized workout tracker. Generate custom plans, log workouts effortlessly, and just paste your raw gym notes for AI to parse.
+[5] (422,529)<a class='flex items-center gap-2 px-8 py-4 bg-orange-500 hover:bg-orange-600 text-[#0a0a0f] font-bold rounded-lg transition-all' href='/signup'>Start Tracking />
+[6] (563,529)<a class='flex items-center gap-2 px-8 py-4 bg-slate-800/50 hover:bg-slate-800 border border-slate-700 text-white font-medium rounded-lg transition-all' href='/login'>I already have an account />
+Smart Generation
+Get a weekly training plan based on your exact body stats and fitness aspirations.
+AI Logging
+Copy and paste your raw iPhone notes. Our AI parses the exercises, sets, and reps automatically.
+Iron Progress
+Open source design. Clean, terminal-inspired aesthetics with zero distractions.
+
+</current_dom>

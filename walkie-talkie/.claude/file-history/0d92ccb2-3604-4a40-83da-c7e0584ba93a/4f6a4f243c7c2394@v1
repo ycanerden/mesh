@@ -1,0 +1,214 @@
+/**
+ * Agent Bridge v2 — Regular MCP server (no Channels required)
+ *
+ * Works as a normal MCP tool, no --channels flag or org policy needed.
+ * Provides two tools:
+ *   - send_message: POST a message to the partner agent
+ *   - check_messages: Read any messages that arrived from the partner
+ *
+ * Environment variables (set in .mcp.json):
+ *   PARTNER_IP   — the other laptop's local IP
+ *   PARTNER_PORT — the other laptop's listening port (default 8788)
+ *   LOCAL_PORT   — this laptop's listening port (default 8788)
+ *   AGENT_NAME   — friendly name shown in messages (e.g. "Vincent")
+ */
+
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+
+const PARTNER_IP = process.env.PARTNER_IP || "127.0.0.1";
+const PARTNER_PORT = parseInt(process.env.PARTNER_PORT || "8788");
+const LOCAL_PORT = parseInt(process.env.LOCAL_PORT || "8788");
+const AGENT_NAME = process.env.AGENT_NAME || "Partner";
+
+// ── Message inbox ───────────────────────────────────────────────────
+
+interface Message {
+  from: string;
+  message: string;
+  timestamp: string;
+}
+
+const inbox: Message[] = [];
+
+// ── MCP server (regular, no channel capability) ─────────────────────
+
+const mcp = new Server(
+  { name: "agent-bridge", version: "2.0.0" },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
+
+// ── Tools ───────────────────────────────────────────────────────────
+
+mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
+  tools: [
+    {
+      name: "send_message",
+      description: `Send a message to ${AGENT_NAME}'s Claude Code agent over the WiFi network. Use this to communicate, delegate tasks, share updates, or ask questions.`,
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          message: {
+            type: "string",
+            description: "The message to send to the partner agent",
+          },
+        },
+        required: ["message"],
+      },
+    },
+    {
+      name: "check_messages",
+      description: `Check for new messages from ${AGENT_NAME}'s Claude Code agent. Call this to see if the partner has sent anything. Returns all unread messages and clears the inbox.`,
+      inputSchema: {
+        type: "object" as const,
+        properties: {},
+      },
+    },
+  ],
+}));
+
+mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
+  // ── send_message ──────────────────────────────────────────────────
+  if (request.params.name === "send_message") {
+    const { message } = request.params.arguments as { message: string };
+
+    try {
+      const response = await fetch(
+        `http://${PARTNER_IP}:${PARTNER_PORT}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: AGENT_NAME,
+            message,
+            timestamp: new Date().toISOString(),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: `Failed to send: HTTP ${response.status}. Is ${AGENT_NAME}'s session running?`,
+            },
+          ],
+        };
+      }
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Message sent to ${AGENT_NAME} at ${PARTNER_IP}:${PARTNER_PORT}`,
+          },
+        ],
+      };
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `Connection failed: ${errMsg}. Is ${AGENT_NAME}'s Claude Code session running?`,
+          },
+        ],
+      };
+    }
+  }
+
+  // ── check_messages ────────────────────────────────────────────────
+  if (request.params.name === "check_messages") {
+    if (inbox.length === 0) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `No new messages from ${AGENT_NAME}.`,
+          },
+        ],
+      };
+    }
+
+    const messages = inbox
+      .map((m) => `[${m.from} @ ${m.timestamp}]\n${m.message}`)
+      .join("\n\n---\n\n");
+
+    const count = inbox.length;
+    inbox.length = 0; // Clear inbox after reading
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: `${count} new message${count > 1 ? "s" : ""}:\n\n${messages}`,
+        },
+      ],
+    };
+  }
+
+  return {
+    content: [
+      { type: "text" as const, text: `Unknown tool: ${request.params.name}` },
+    ],
+  };
+});
+
+// ── Connect MCP over stdio ──────────────────────────────────────────
+
+const transport = new StdioServerTransport();
+await mcp.connect(transport);
+
+// ── HTTP server: receive messages from partner ──────────────────────
+
+Bun.serve({
+  port: LOCAL_PORT,
+  hostname: "0.0.0.0",
+  async fetch(req) {
+    if (req.method !== "POST") {
+      return new Response(
+        JSON.stringify({
+          status: "running",
+          agent: AGENT_NAME,
+          inbox_count: inbox.length,
+        }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    try {
+      const body = await req.json();
+      const msg: Message = {
+        from: body.from || "Unknown",
+        message: body.message || body.text || JSON.stringify(body),
+        timestamp: body.timestamp || new Date().toISOString(),
+      };
+
+      inbox.push(msg);
+
+      console.error(
+        `\n>> New message from ${msg.from}: "${msg.message.slice(0, 80)}${msg.message.length > 80 ? "..." : ""}"`
+      );
+
+      return new Response(JSON.stringify({ status: "delivered" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch {
+      return new Response("Bad request", { status: 400 });
+    }
+  },
+});
+
+console.error(`Agent Bridge v2 listening on 0.0.0.0:${LOCAL_PORT}`);
+console.error(`Partner: ${AGENT_NAME} at ${PARTNER_IP}:${PARTNER_PORT}`);
+console.error(`Mode: MCP tool (no --channels flag needed)`);

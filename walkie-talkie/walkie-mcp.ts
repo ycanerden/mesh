@@ -11,6 +11,8 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 
 const SERVER_URL = process.env.SERVER_URL || "http://localhost:3001";
 const ROOM = process.env.ROOM || "";
@@ -65,6 +67,28 @@ async function startEventStream() {
           if (dataLine) {
             try {
               const msg = JSON.parse(dataLine.slice(6));
+              
+              // Intercept FILE_SYNC for P2P code updates
+              try {
+                const parsedContent = JSON.parse(msg.content);
+                if (parsedContent.type === "FILE_SYNC") {
+                  const targetPath = path.resolve(process.cwd(), parsedContent.filename);
+                  if (targetPath.startsWith(process.cwd())) {
+                    await fs.mkdir(path.dirname(targetPath), { recursive: true });
+                    await fs.writeFile(targetPath, parsedContent.content, "utf-8");
+                    console.error(`[sse] 🔄 Received code update for ${parsedContent.filename} from ${msg.from}`);
+                    messageBuffer.push({
+                      from: "SYSTEM",
+                      content: `Peer ${msg.from} broadcasted a code update for ${parsedContent.filename}. The file was updated automatically on your local drive.`,
+                      ts: Date.now()
+                    });
+                  }
+                  continue;
+                }
+              } catch(e) {
+                // Not a JSON message or not FILE_SYNC, proceed normally
+              }
+
               messageBuffer.push(msg);
             } catch (e) {
               console.error(`[sse] Failed to parse message: ${e}`);
@@ -159,6 +183,23 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
         required: ["targetAgent", "projectId", "founder", "taskType", "payload"],
       },
     },
+    {
+      name: "view_trust_dashboard",
+      description: "Return the HTML for the Tokora Trust Dashboard for the CEO to review security settings.",
+      inputSchema: { type: "object" as const, properties: {} },
+    },
+    {
+      name: "broadcast_code_update",
+      description: "Send a code update directly to all partner agents in the room over the P2P mesh. Their local files will be automatically updated!",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          filename: { type: "string", description: "The relative path to the file to update (e.g., src/index.ts)" },
+          content: { type: "string", description: "The complete new content of the file" },
+        },
+        required: ["filename", "content"],
+      },
+    },
   ],
 }));
 
@@ -222,31 +263,66 @@ mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
       return { content: [{ type: "text" as const, text: formatted }] };
     }
 
-    if (name === "send_to_partner") {
-      const { message, to } = args as { message: string; to?: string };
-      const res = await fetch(`${BASE}/send${params}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message, to }),
-      });
-      const data = await res.json();
-      return { content: [{ type: "text" as const, text: data.ok ? `Sent ✓ (id: ${data.id}${to ? `, to: ${to}` : ""})` : `Error: ${data.error}` }] };
+    if (name === "view_trust_dashboard") {
+      try {
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        // Try reading from parent directory or local based on setup
+        const dashboardPath = path.resolve(process.cwd(), "trust-dashboard.html"); // Assuming trust-dashboard.html is in the root of walkie-talkie
+        const html = await fs.readFile(dashboardPath, "utf-8");
+        return { content: [{ type: "text" as const, text: html }] };
+      } catch (e) {
+        // Fallback mock if file isn't physically present on this specific agent's node yet
+        const mockHtml = `<html><body><h1>Tokora Trust Dashboard</h1><p>Status: ENFORCED</p><button style="background:red;color:white;padding:20px;font-size:24px;border-radius:8px;">KILL-SWITCH: SEVER MESH</button></body></html>`;
+        return { content: [{ type: "text" as const, text: mockHtml }] };
+      }
     }
 
-    if (name === "handoff_to_partner") {
-      const { targetAgent, projectId, founder, taskType, payload } = args as any;
-      const handoffMessage = {
-        type: "COLLABORATIVE_HANDOFF",
-        context: { projectId, founder, taskType, payload }
+    if (name === "view_trust_dashboard") {
+      try {
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        // Try reading from parent directory or local based on setup
+        const dashboardPath = path.resolve(process.cwd(), "trust-dashboard.html"); // Assuming trust-dashboard.html is in the root of walkie-talkie
+        const html = await fs.readFile(dashboardPath, "utf-8");
+        return { content: [{ type: "text" as const, text: html }] };
+      } catch (e) {
+        // Fallback mock if file isn't physically present on this specific agent's node yet
+        const mockHtml = `<html><body><h1>Tokora Trust Dashboard</h1><p>Status: ENFORCED</p><button style="background:red;color:white;padding:20px;font-size:24px;border-radius:8px;">KILL-SWITCH: SEVER MESH</button></body></html>`;
+        return { content: [{ type: "text" as const, text: mockHtml }] };
+      }
+    }
+
+    if (name === "view_trust_dashboard") {
+      try {
+        const fs = await import("fs/promises");
+        const path = await import("path");
+        // Try reading from parent directory or local based on setup
+        const dashboardPath = path.resolve(process.cwd(), "trust-dashboard.html");
+        const html = await fs.readFile(dashboardPath, "utf-8");
+        return { content: [{ type: "text" as const, text: html }] };
+      } catch (e) {
+        // Fallback mock if file isn't physically present on this specific agent's node yet
+        const mockHtml = `<html><body><h1>Tokora Trust Dashboard</h1><p>Status: ENFORCED</p><button style="background:red;color:white;padding:20px;font-size:24px;border-radius:8px;">KILL-SWITCH: SEVER MESH</button></body></html>`;
+        return { content: [{ type: "text" as const, text: mockHtml }] };
+      }
+    }
+
+    if (name === "broadcast_code_update") {
+      const { filename, content } = args as { filename: string; content: string };
+      const syncMessage = {
+        type: "FILE_SYNC",
+        filename,
+        content
       };
       
       const res = await fetch(`${BASE}/send${params}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: JSON.stringify(handoffMessage), to: targetAgent }),
+        body: JSON.stringify({ message: JSON.stringify(syncMessage) }),
       });
       const data = await res.json();
-      return { content: [{ type: "text" as const, text: data.ok ? `Successfully passed the baton to ${targetAgent} for project ${projectId}. 🚀` : `Error during handoff: ${data.error}` }] };
+      return { content: [{ type: "text" as const, text: data.ok ? `Code update for ${filename} broadcasted to all partners! 🚀` : `Error broadcasting code: ${data.error}` }] };
     }
 
     return { content: [{ type: "text" as const, text: `Unknown tool: ${name}` }] };

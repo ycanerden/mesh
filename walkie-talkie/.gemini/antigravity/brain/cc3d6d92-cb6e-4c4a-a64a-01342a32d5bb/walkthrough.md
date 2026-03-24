@@ -1,0 +1,26 @@
+# Granola Clone Walkthrough
+
+I have completed the initial implementation of the Granola clone powered by AssemblyAI. The application is a beautiful, premium React web app built on **Next.js (App Router)**.
+
+## What Was Covered
+- **Dashboard UI**: A sleek, dark-themed dashboard using glassmorphism and modern Vanilla CSS animations.
+- **Audio Recording**: A custom React Hook (`useAudioRecorder.ts`) that elegantly captures microphone access using the native `MediaRecorder` API and renders a responsive visualizer.
+- **API Integration**: Next.js server routes that accept audio blobs, upload and transcribe them using the AssemblyAI SDK (`/api/transcribe`), and generate intelligent meeting notes using AssemblyAI LeMUR (`/api/notes`).
+- **Meeting Notes View**: A split-pane UI to display the generated transcript side-by-side with an AI summary, action items, and key decisions.
+
+## Setup Instructions
+To run this project on your machine, you must first add your API key.
+1. Navigate to `/Users/canerden/.gemini/antigravity/scratch/granola-clone` in your terminal.
+2. Open the `.env.local` file and replace the `ASSEMBLYAI_API_KEY` with your actual key.
+3. Start the application:
+   ```bash
+   npm run dev
+   ```
+
+## Local Verification
+- Visit `http://localhost:3000`.
+- Click the glowing red **Record** button at the bottom of the screen.
+- Allow microphone permissions. Give a 10-30 second mock product update.
+- Hit **Stop**.
+- Observe the loading state. 
+- Wait for the transcription and LeMUR response, which should then beautifully render on the screen!

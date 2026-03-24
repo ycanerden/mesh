@@ -1,0 +1,235 @@
+2026-03-20T12:32:36.677Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-20T12:32:36.681Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-20T12:32:36.681Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-20T12:32:36.681Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-20T12:32:36.688Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-20T12:32:36.716Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-03-20T12:32:36.717Z [DEBUG] [STARTUP] Running setup()...
+2026-03-20T12:32:36.717Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-20T12:32:36.718Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-20T12:32:36.733Z [DEBUG] Error log sink initialized
+2026-03-20T12:32:36.738Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-20T12:32:36.738Z [DEBUG] Total plugin skills loaded: 0
+2026-03-20T12:32:36.738Z [DEBUG] Total plugin commands loaded: 0
+2026-03-20T12:32:36.739Z [DEBUG] [STARTUP] setup() completed in 22ms
+2026-03-20T12:32:36.739Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-20T12:32:36.740Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-20T12:32:36.740Z [DEBUG] Total plugin agents loaded: 0
+2026-03-20T12:32:36.741Z [DEBUG] Loaded 25 unique skills (managed: 0, user: 25, project: 0, additional: 0, legacy commands: 0)
+2026-03-20T12:32:36.741Z [DEBUG] getSkills returning: 25 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-03-20T12:32:36.742Z [DEBUG] [STARTUP] Commands and agents loaded in 3ms
+2026-03-20T12:32:36.742Z [DEBUG] [STARTUP] Running showSetupScreens()...
+2026-03-20T12:32:36.742Z [DEBUG] [render] initLayout starting
+2026-03-20T12:32:36.742Z [DEBUG] Layout engine: yoga
+2026-03-20T12:32:36.748Z [DEBUG] [Claude in Chrome] Found chrome profiles: Default
+2026-03-20T12:32:36.752Z [DEBUG] [render] initLayout complete
+2026-03-20T12:32:36.756Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T12:32:36.774Z [DEBUG] [keybindings] Skipping file watcher - user customization disabled
+2026-03-20T12:32:36.774Z [DEBUG] [render] first ink render: 610ms since process start
+2026-03-20T12:32:38.143Z [DEBUG] Grove: Cache stale, returning cached data and refreshing in background
+2026-03-20T12:32:38.165Z [DEBUG] [render] initLayout starting
+2026-03-20T12:32:38.165Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-20T12:32:38.166Z [DEBUG] [render] initLayout complete
+2026-03-20T12:32:38.167Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T12:32:38.169Z [DEBUG] [keybindings] Skipping file watcher - user customization disabled
+2026-03-20T12:32:38.169Z [DEBUG] [render] first ink render: 2004ms since process start
+2026-03-20T12:32:38.172Z [DEBUG] [Claude in Chrome] Extension fcoeoabgfenejglbffodgkkbkcdhcgfn found in chrome Default
+2026-03-20T12:32:38.182Z [DEBUG] Git remote URL: https://github.com/ycanerden/notetakertest.git
+2026-03-20T12:32:38.182Z [DEBUG] Parsed repository: ycanerden/notetakertest from https://github.com/ycanerden/notetakertest.git
+2026-03-20T12:32:38.182Z [DEBUG] Parsed repository: ycanerden/notetakertest from URL: https://github.com/ycanerden/notetakertest.git
+2026-03-20T12:32:38.182Z [DEBUG] Path /Users/canerden/Library/Application Support/CodexBar/ClaudeProbe already tracked for repo ycanerden/notetakertest
+2026-03-20T12:32:38.487Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958487
+2026-03-20T12:32:38.487Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.487Z [DEBUG] Temp file written successfully, size: 23297 bytes
+2026-03-20T12:32:38.487Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.488Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958487 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.488Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.491Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958491
+2026-03-20T12:32:38.491Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.491Z [DEBUG] Temp file written successfully, size: 23296 bytes
+2026-03-20T12:32:38.491Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.491Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958491 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.492Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.493Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958493
+2026-03-20T12:32:38.493Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.493Z [DEBUG] Temp file written successfully, size: 23295 bytes
+2026-03-20T12:32:38.493Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.493Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958493 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.494Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.495Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958495
+2026-03-20T12:32:38.495Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.495Z [DEBUG] Temp file written successfully, size: 23294 bytes
+2026-03-20T12:32:38.495Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.495Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958495 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.496Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.497Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958497
+2026-03-20T12:32:38.497Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.497Z [DEBUG] Temp file written successfully, size: 23293 bytes
+2026-03-20T12:32:38.497Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.497Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958497 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.497Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.499Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958499
+2026-03-20T12:32:38.500Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.500Z [DEBUG] Temp file written successfully, size: 23294 bytes
+2026-03-20T12:32:38.500Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.500Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958499 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.500Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.502Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958502
+2026-03-20T12:32:38.502Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.502Z [DEBUG] Temp file written successfully, size: 23293 bytes
+2026-03-20T12:32:38.502Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.502Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958502 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.502Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.559Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958559
+2026-03-20T12:32:38.559Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.559Z [DEBUG] Temp file written successfully, size: 23293 bytes
+2026-03-20T12:32:38.559Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.559Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958559 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.560Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.625Z [DEBUG] [STARTUP] showSetupScreens() completed in 1883ms
+2026-03-20T12:32:38.625Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-20T12:32:38.625Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-20T12:32:38.625Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-20T12:32:38.626Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T12:32:38.626Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T12:32:38.628Z [DEBUG] Total LSP servers loaded: 0
+2026-03-20T12:32:38.630Z [DEBUG] [STARTUP] MCP configs loaded in 1942ms
+2026-03-20T12:32:38.632Z [DEBUG] [Reconnection] computeInitialTeamContext: No teammate context set (not a teammate)
+2026-03-20T12:32:38.633Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958633
+2026-03-20T12:32:38.633Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.633Z [DEBUG] Temp file written successfully, size: 23293 bytes
+2026-03-20T12:32:38.634Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.634Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958633 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.634Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.635Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-20T12:32:38.635Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-20T12:32:38.636Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-20T12:32:38.636Z [DEBUG] Found 0 hook matchers in settings
+2026-03-20T12:32:38.636Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-03-20T12:32:38.636Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-20T12:32:38.636Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-20T12:32:38.636Z [DEBUG] LSP server manager initialized successfully
+2026-03-20T12:32:38.636Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-20T12:32:38.638Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T12:32:38.641Z [DEBUG] [render] initLayout starting
+2026-03-20T12:32:38.642Z [DEBUG] [render] initLayout complete
+2026-03-20T12:32:38.653Z [DEBUG] [keybindings] KeybindingSetup initialized with 100 bindings, 0 warnings
+2026-03-20T12:32:38.886Z [DEBUG] [REPL:mount] REPL mounted, disabled=false
+2026-03-20T12:32:38.889Z [DEBUG] Official marketplace auto-install skipped: already_attempted
+2026-03-20T12:32:38.890Z [DEBUG] performStartupChecks called
+2026-03-20T12:32:38.891Z [DEBUG] Starting background plugin installations
+2026-03-20T12:32:38.891Z [DEBUG] performBackgroundPluginInstallations called
+2026-03-20T12:32:38.894Z [DEBUG] [render] first ink render: 2730ms since process start
+2026-03-20T12:32:38.896Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-20T12:32:38.900Z [DEBUG] Watching for changes in setting files /Users/canerden/.claude/settings.json...
+2026-03-20T12:32:38.902Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958902
+2026-03-20T12:32:38.902Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.903Z [DEBUG] Temp file written successfully, size: 23290 bytes
+2026-03-20T12:32:38.903Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.903Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958902 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.903Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.904Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958904
+2026-03-20T12:32:38.904Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.905Z [DEBUG] Temp file written successfully, size: 23289 bytes
+2026-03-20T12:32:38.905Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.905Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958904 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.905Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.907Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958907
+2026-03-20T12:32:38.907Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.907Z [DEBUG] Temp file written successfully, size: 23288 bytes
+2026-03-20T12:32:38.907Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.907Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958907 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.907Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.907Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-20T12:32:38.908Z [DEBUG] [claudeai-mcp] Gate returned: false
+2026-03-20T12:32:38.908Z [DEBUG] [claudeai-mcp] Disabled via gate
+2026-03-20T12:32:38.908Z [DEBUG] Found 1 extra marketplaces in settings
+2026-03-20T12:32:38.910Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958910
+2026-03-20T12:32:38.910Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.910Z [DEBUG] Temp file written successfully, size: 23287 bytes
+2026-03-20T12:32:38.910Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.910Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958910 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.910Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.911Z [DEBUG] Loaded plugins - Enabled: 0, Disabled: 0, Commands: 0, Agents: 0, Errors: 0
+2026-03-20T12:32:38.911Z [DEBUG] Setting installation status: 0 marketplaces, 0 installable plugins, 0 uninstallable plugins
+2026-03-20T12:32:38.930Z [DEBUG] [keybindings] Watching for changes to /Users/canerden/.claude/keybindings.json
+2026-03-20T12:32:38.937Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958937
+2026-03-20T12:32:38.937Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.937Z [DEBUG] Temp file written successfully, size: 23287 bytes
+2026-03-20T12:32:38.937Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.937Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958937 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.938Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.939Z [DEBUG] Watching for changes in skill/command directories: /Users/canerden/.claude/skills...
+2026-03-20T12:32:38.949Z [DEBUG] High write ratio: blit=0, write=1130 (100.0% writes), screen=18x160
+2026-03-20T12:32:38.952Z [DEBUG] Ripgrep first use test: PASSED (mode=builtin, path=/usr/local/lib/node_modules/@anthropic-ai/claude-code/vendor/ripgrep/arm64-darwin/rg)
+2026-03-20T12:32:38.959Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T12:32:38.959Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T12:32:38.959Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T12:32:38.969Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-20T12:32:38.970Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958970
+2026-03-20T12:32:38.970Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.970Z [DEBUG] Temp file written successfully, size: 23304 bytes
+2026-03-20T12:32:38.970Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.970Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958970 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.970Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.971Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.95b; cc_entrypoint=cli;
+2026-03-20T12:32:38.972Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-20T12:32:38.972Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-20T12:32:38.973Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958973
+2026-03-20T12:32:38.973Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.973Z [DEBUG] Temp file written successfully, size: 23303 bytes
+2026-03-20T12:32:38.973Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.973Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958973 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.973Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.974Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009958974
+2026-03-20T12:32:38.974Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:38.975Z [DEBUG] Temp file written successfully, size: 23302 bytes
+2026-03-20T12:32:38.975Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:38.975Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009958974 to /Users/canerden/.claude.json
+2026-03-20T12:32:38.975Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:38.975Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-20T12:32:39.089Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009959089
+2026-03-20T12:32:39.089Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:39.089Z [DEBUG] Temp file written successfully, size: 23340 bytes
+2026-03-20T12:32:39.089Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:39.089Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009959089 to /Users/canerden/.claude.json
+2026-03-20T12:32:39.089Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:39.661Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-20T12:32:39.661Z [DEBUG] AutoUpdater: Using global update method
+2026-03-20T12:32:39.791Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-20T12:32:39.796Z [DEBUG] Stream started - received first chunk
+2026-03-20T12:32:48.366Z [DEBUG] Writing to temp file: /Users/canerden/.claude/todos/c105f90d-2249-4c82-8866-855c52c6bb96-agent-c105f90d-2249-4c82-8866-855c52c6bb96.json.tmp.6642.1774009968366
+2026-03-20T12:32:48.366Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-03-20T12:32:48.366Z [DEBUG] Renaming /Users/canerden/.claude/todos/c105f90d-2249-4c82-8866-855c52c6bb96-agent-c105f90d-2249-4c82-8866-855c52c6bb96.json.tmp.6642.1774009968366 to /Users/canerden/.claude/todos/c105f90d-2249-4c82-8866-855c52c6bb96-agent-c105f90d-2249-4c82-8866-855c52c6bb96.json
+2026-03-20T12:32:48.366Z [DEBUG] File /Users/canerden/.claude/todos/c105f90d-2249-4c82-8866-855c52c6bb96-agent-c105f90d-2249-4c82-8866-855c52c6bb96.json written atomically
+2026-03-20T12:32:48.370Z [DEBUG] Writing to temp file: /Users/canerden/.claude.json.tmp.6642.1774009968370
+2026-03-20T12:32:48.370Z [DEBUG] Preserving file permissions: 100644
+2026-03-20T12:32:48.370Z [DEBUG] Temp file written successfully, size: 23339 bytes
+2026-03-20T12:32:48.370Z [DEBUG] Applied original permissions to temp file
+2026-03-20T12:32:48.370Z [DEBUG] Renaming /Users/canerden/.claude.json.tmp.6642.1774009968370 to /Users/canerden/.claude.json
+2026-03-20T12:32:48.370Z [DEBUG] File /Users/canerden/.claude.json written atomically
+2026-03-20T12:32:48.375Z [DEBUG] Stats cache is up to date
+2026-03-20T12:32:49.174Z [ERROR] Failed to refresh marketplace claude-plugins-official: Failed to clone marketplace repository: SSH authentication failed. Please ensure your SSH keys are configured for GitHub, or use an HTTPS URL instead.
+
+Original error: Cloning into '/Users/canerden/.claude/plugins/marketplaces/claude-plugins-official'...
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+2026-03-20T12:32:49.174Z [WARN] Plugin autoupdate: failed to refresh marketplace claude-plugins-official: Failed to refresh marketplace 'claude-plugins-official': Failed to clone marketplace repository: SSH authentication failed. Please ensure your SSH keys are configured for GitHub, or use an HTTPS URL instead.
+
+Original error: Cloning into '/Users/canerden/.claude/plugins/marketplaces/claude-plugins-official'...
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+2026-03-20T12:32:49.174Z [DEBUG] Plugin autoupdate: checking installed plugins
+2026-03-20T12:33:01.125Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-03-20T12:33:01.125Z [DEBUG] Found 0 hook matchers in settings
+2026-03-20T12:33:01.125Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)

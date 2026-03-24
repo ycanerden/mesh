@@ -1,0 +1,61 @@
+import { useSprintTimer } from '@/hooks/useSprintTimer';
+import { cn } from '@/lib/utils';
+import { formatTime } from '@/lib/timerUtils';
+
+function getTimerColor(remainingSeconds: number, status: string): string {
+  if (status === 'stopped') return 'text-muted-foreground';
+  if (status === 'paused') return 'text-yellow-600';
+  
+  if (remainingSeconds <= 60) return 'text-red-600 animate-pulse';
+  if (remainingSeconds <= 600) return 'text-red-600'; // < 10 min
+  if (remainingSeconds <= 1800) return 'text-yellow-600'; // < 30 min
+  return 'text-green-600';
+}
+
+function getStatusBadge(status: string): { label: string; className: string } {
+  switch (status) {
+    case 'running':
+      return { label: 'LIVE', className: 'bg-green-600 text-white' };
+    case 'paused':
+      return { label: 'PAUSED', className: 'bg-yellow-600 text-white' };
+    default:
+      return { label: 'READY', className: 'bg-muted text-muted-foreground' };
+  }
+}
+
+export function SprintTimer() {
+  const { remainingSeconds, status, loading } = useSprintTimer();
+  
+  if (loading) {
+    return (
+      <div className="border-4 border-foreground p-4 flex items-center justify-center gap-4">
+        <div className="w-6 h-6 border-4 border-foreground border-t-transparent rounded-full animate-spin" />
+        <span className="font-mono text-sm">Loading timer...</span>
+      </div>
+    );
+  }
+
+  const badge = getStatusBadge(status);
+  const timerColor = getTimerColor(remainingSeconds, status);
+
+  return (
+    <div className="border-4 border-foreground p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <span className={cn('px-2 py-1 text-xs font-mono font-bold', badge.className)}>
+          {badge.label}
+        </span>
+        <span className="font-mono text-sm text-muted-foreground">SPRINT TIMER</span>
+      </div>
+      
+      <div className={cn('font-mono text-4xl sm:text-5xl font-bold tracking-wider', timerColor)}>
+        {formatTime(remainingSeconds)}
+      </div>
+      
+      {status === 'running' && remainingSeconds <= 1800 && (
+        <span className="font-mono text-xs text-muted-foreground animate-pulse">
+          {remainingSeconds <= 60 ? '⚡ FINAL MINUTE!' : remainingSeconds <= 600 ? '🔥 LESS THAN 10 MIN!' : '⏰ LESS THAN 30 MIN!'}
+        </span>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,60 @@
+# Implementation Plan - Granola Web (Copycat)
+
+This plan outlines the steps to build a web-based "Granola" clone—a beautiful, local-first meeting notepad that records audio and uses AI to enhance notes.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **API Keys**: To keep costs extremely low while maintaining quality:
+> - **LLM**: We will use **Google Gemini API** (specifically `gemini-1.5-flash`). It is incredibly cheap (often free within tier limits) and very fast.
+> - **Transcription**: We will use **Groq Cloud** to run `whisper-large-v3`. It is much faster and cheaper than standard OpenAI Whisper.
+> - *Fallback*: We can still support OpenAI keys if preferred.
+
+> [!NOTE]
+> **Tech Stack**:
+> - **Framework**: Next.js 14+ (App Router)
+> - **Styling**: Vanilla CSS (CSS Modules & Variables) for a bespoke, premium "Granola" look.
+> - **Storage**: IndexedDB (via `idb`) for local-first data storage.
+> - **AI Integration**:
+>   - **Google Generative AI SDK** (for Gemini).
+>   - **Groq SDK** (for high-speed Whisper transcription).
+
+## Proposed Changes
+
+### Project Setup
+- Initialize a new Next.js project at `/Users/canerden/.gemini/antigravity/scratch/granola-web`.
+- Implement **Gemini** & **Groq** client setup.
+- Clean up default styles and implement a custom Design System in `globals.css` focusing on:
+    - **Typography**: Inter (sans-serif) or similar clean font.
+    - **Colors**: Warm off-whites, sharp blacks, and "grainy" textures/gradients.
+
+### Core Components
+#### `components/Recorder/AudioRecorder.js`
+- **[UPDATE] System Audio**: Use `navigator.mediaDevices.getDisplayMedia({ audio: true })` to capture meeting audio (others talking).
+- **Audio Mixing**: Merge Microphone track + System Audio track into a single stream for the recorder.
+
+### Electron App ([NEW])
+#### `electron/main.ts`
+- Main process setup.
+- Load `localhost:3000` in dev, static files in prod.
+
+#### `package.json`
+- Add `electron` and `electron-builder` dependencies.
+- Add `npm run electron` script.
+
+### AI Integration
+#### `lib/ai/client.js`
+- **Gemini Client**: Setup for `gemini-1.5-flash`.
+- **Groq Client**: Setup for `whisper-large-v3`.
+
+#### `lib/ai/actions.js` (Server Actions)
+- `transcribeAudio(formData)`: Uploads file to Groq for transcription.
+- `enhanceNotes(transcript, rawNotes)`: Sends prompt to Gemini Flash to merge and format into "Granola-style" meeting notes.
+
+## Verification Plan
+
+### Manual Verification
+1. **Recording Test**: Click Record, talk, Stop.
+2. **Transcription Test**: Verify audio is sent to Groq and text is returned accurately.
+3. **Enhancement Test**: Verify Gemini Flash returns structured notes based on the transcript.
+4. **Cost Check**: Verify usage in dashboards (if available) to confirm low footprint.

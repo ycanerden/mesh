@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Habitat Residency — Coming soon</title>
+<meta name="description" content="A live-in residency for founders who've already shipped. Dedicated space, mentorship, and a demo day with investors. Coming soon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+:root {
+  --bg: #fafaf8;
+  --text: #1c1b1a;
+  --cream: #f0ede6;
+  --gray: #6b6864;
+  --gray-light: #8a8780;
+  --accent: #3d5afc;
+  --accent-glow: #2d4ae8;
+  --coral: #e85a35;
+  --teal: #16b889;
+  --purple: #7c4fcc;
+  --font-display: 'Space Mono', monospace;
+  --font-body: 'Outfit', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+section { padding: 120px 0; }
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 20px 0;
+  background: rgba(250,250,248,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(28,27,26,0.08);
+}
+nav .container { display: flex; align-items: center; justify-content: space-between; }
+.logo { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+
+.nav-links { display: flex; gap: 32px; align-items: center; list-style: none; }
+.nav-links a { font-size: 14px; font-weight: 400; color: var(--gray); transition: color 0.2s; }
+.nav-links a:hover { color: var(--text); }
+.nav-links a.active { color: var(--purple); font-weight: 500; }
+.nav-cta {
+  background: var(--accent); color: #ffffff !important;
+  padding: 10px 24px; border-radius: 6px;
+  font-weight: 600; font-size: 14px; transition: background 0.2s;
+}
+.nav-cta:hover { background: var(--accent-glow) !important; }
+
+/* HERO */
+.hero {
+  min-height: 80vh; display: flex; align-items: center;
+  padding-top: 100px; position: relative;
+}
+.hero::before {
+  content: ''; position: absolute; top: -100px; right: -200px;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(124,79,204,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-label {
+  font-family: var(--font-display); font-size: 13px;
+  color: var(--purple); letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
+}
+.hero-label::before { content: ''; width: 40px; height: 1px; background: var(--purple); }
+.coming-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-display); font-size: 11px;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  background: rgba(124,79,204,0.1); color: var(--purple);
+  padding: 6px 14px; border-radius: 4px; margin-bottom: 24px;
+}
+.hero h1 {
+  font-size: clamp(48px, 7vw, 76px); font-weight: 700;
+  line-height: 1.05; letter-spacing: -2px; margin-bottom: 28px;
+}
+.hero h1 em { font-style: normal; color: var(--purple); }
+.hero-sub {
+  font-size: 20px; color: var(--gray); max-width: 580px;
+  line-height: 1.6; margin-bottom: 48px; font-weight: 300;
+}
+.hero-meta { display: flex; gap: 32px; flex-wrap: wrap; margin-bottom: 48px; }
+.hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+.hero-meta-label { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; }
+.hero-meta-value { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+.hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--purple); color: #ffffff;
+  padding: 16px 32px; border-radius: 8px;
+  font-weight: 600; font-size: 16px;
+  transition: all 0.2s; border: none; cursor: pointer;
+}
+.btn-primary:hover { background: #6a3eb8; transform: translateY(-1px); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; color: var(--text);
+  padding: 16px 32px; border-radius: 8px;
+  font-weight: 500; font-size: 16px;
+  border: 1px solid rgba(28,27,26,0.18); transition: all 0.2s; cursor: pointer;
+}
+.btn-secondary:hover { border-color: rgba(28,27,26,0.35); background: rgba(28,27,26,0.04); }
+
+/* SECTION ELEMENTS */
+.section-label {
+  font-family: var(--font-display); font-size: 13px;
+  color: var(--purple); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px;
+}
+.section-title {
+  font-size: clamp(36px, 5vw, 56px); font-weight: 700;
+  letter-spacing: -1.5px; margin-bottom: 16px; line-height: 1.1;
+}
+.section-sub { font-size: 18px; color: var(--gray); max-width: 600px; margin-bottom: 64px; font-weight: 300; }
+
+/* WHAT IS IT */
+.intro-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: center; margin-top: 64px;
+}
+.intro-text h3 { font-size: 24px; font-weight: 600; margin-bottom: 16px; letter-spacing: -0.5px; }
+.intro-text p { font-size: 16px; color: var(--gray); line-height: 1.8; margin-bottom: 20px; }
+
+
+/* MENTORSHIP */
+.mentorship-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px; margin-top: 64px;
+}
+.mentorship-card {
+  background: #ffffff; border: 1px solid rgba(28,27,26,0.08);
+  border-radius: 16px; padding: 36px 32px;
+  box-shadow: 0 1px 4px rgba(28,27,26,0.04);
+  position: relative; overflow: hidden;
+}
+.mentorship-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--purple);
+}
+.mentorship-card h3 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+.mentorship-card p { font-size: 15px; color: var(--gray); line-height: 1.7; }
+
+/* WHO IT'S FOR */
+.criteria-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px; margin-top: 64px;
+}
+.criteria-card {
+  background: #ffffff; border: 1px solid rgba(28,27,26,0.08);
+  border-radius: 16px; padding: 32px;
+  box-shadow: 0 1px 4px rgba(28,27,26,0.04);
+}
+.criteria-check {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(124,79,204,0.1); color: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; margin-bottom: 16px;
+}
+.criteria-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+.criteria-card p { font-size: 14px; color: var(--gray); line-height: 1.6; }
+
+/* NOT FOR */
+.not-for { background: var(--cream); }
+.not-for-list {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px; margin-top: 40px;
+}
+.not-for-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: #ffffff; border: 1px solid rgba(28,27,26,0.08);
+  border-radius: 10px; padding: 20px;
+}
+.not-for-x { color: var(--coral); font-size: 16px; font-weight: 700; margin-top: 2px; }
+.not-for-text { font-size: 15px; color: var(--gray); line-height: 1.5; }
+
+/* DEMO DAY */
+.demo-day-content {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: start; margin-top: 64px;
+}
+.demo-day-left p { font-size: 17px; color: var(--gray); line-height: 1.8; margin-bottom: 24px; }
+.demo-day-right { display: flex; flex-direction: column; gap: 20px; }
+.demo-day-feature {
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.demo-day-feature-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--purple); margin-top: 7px; flex-shrink: 0;
+}
+.demo-day-feature-content h4 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+.demo-day-feature-content p { font-size: 14px; color: var(--gray); line-height: 1.5; }
+
+/* FAQ SECTION */
+.faq-section {
+  padding: 120px 0;
+  background: #ffffff;
+  border-top: 1px solid rgba(28,27,26,0.06);
+}
+.faq-container { max-width: 760px; margin: 0 auto; }
+.faq-category {
+  font-family: var(--font-display); font-size: 13px;
+  color: var(--purple); text-transform: uppercase;
+  letter-spacing: 2px; margin: 60px 0 24px 0; font-weight: 600;
+}
+.faq-category:first-of-type { margin-top: 0; }
+.faq-item { border-bottom: 1px solid rgba(28,27,26,0.08); }
+.faq-item details { width: 100%; }
+.faq-item summary {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 24px 0; font-size: 18px; font-weight: 500;
+  letter-spacing: -0.3px; color: var(--text); cursor: pointer; list-style: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after {
+  content: '+'; font-size: 28px; font-weight: 300;
+  color: var(--gray); transition: transform 0.3s ease;
+}
+.faq-item details[open] summary::after { transform: rotate(45deg); }
+.faq-item .faq-answer { padding-bottom: 32px; font-size: 16px; color: var(--gray); line-height: 1.6; }
+
+/* CTA */
+.cta-section {
+  padding: 160px 0; text-align: center; position: relative;
+  background: var(--cream);
+}
+.cta-section::before {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(124,79,204,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.cta-section h2 {
+  font-size: clamp(36px, 5vw, 60px); font-weight: 700;
+  letter-spacing: -1.5px; margin-bottom: 20px; line-height: 1.1;
+}
+.cta-section p { font-size: 18px; color: var(--gray); margin-bottom: 40px; font-weight: 300; }
+
+/* FOOTER */
+footer { background: #1c1b1a; color: #f5f2eb; padding: 60px 0 40px; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 60px; }
+.footer-brand p { color: #8a8780; font-size: 14px; margin-top: 12px; max-width: 280px; line-height: 1.6; }
+.footer-col h4 { font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #8a8780; margin-bottom: 16px; font-family: var(--font-display); }
+.footer-col a { display: block; font-size: 14px; color: #c4c1b8; padding: 4px 0; transition: color 0.2s; }
+.footer-col a:hover { color: #f5f2eb; }
+.footer-bottom { border-top: 1px solid rgba(245,242,235,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; color: #8a8780; font-size: 13px; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  section { padding: 80px 0; }
+  .hero { min-height: auto; padding-top: 120px; padding-bottom: 60px; }
+  .hero h1 { font-size: 40px; letter-spacing: -1px; }
+  .nav-links { display: none; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .intro-grid { grid-template-columns: 1fr; gap: 40px; }
+  .demo-day-content { grid-template-columns: 1fr; gap: 40px; }
+  .hero-meta { gap: 20px; }
+}
+
+/* ANIMATIONS */
+.fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <a href="index.html" class="logo">[Habitat]</a>
+    <ul class="nav-links">
+      <li><a href="https://luma.com/habitat" target="_blank">Events</a></li>
+      <li><a href="hackathon.html">Hackathons</a></li>
+      <li><a href="residency.html" class="active">Residency</a></li>
+      <li><a href="index.html#why">Why Habitat</a></li>
+      <li><a href="contact.html" class="nav-cta">Join waitlist &rarr;</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="coming-badge">Coming 2026</div>
+    <div class="hero-label">Habitat Residency</div>
+    <h1>Live and build<br><em>with other founders.</em></h1>
+    <p class="hero-sub">You've already shipped an MVP. Now it's time to go deeper. Full immersion, dedicated mentorship, and a demo day in front of investors.</p>
+    <div class="hero-meta">
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Format</span>
+        <span class="hero-meta-value">Live-in</span>
+      </div>
+      <div class="hero-meta-item">
+        <span class="hero-meta-label">Ends with</span>
+        <span class="hero-meta-value">Demo day</span>
+      </div>
+    </div>
+    <div class="hero-buttons">
+      <a href="contact.html?program=residency" class="btn-primary">Join the waitlist &rarr;</a>
+      <a href="#what" class="btn-secondary">How it works</a>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT IS IT -->
+<section id="what">
+  <div class="container">
+    <div class="section-label fade-up">What it is</div>
+    <h2 class="section-title fade-up">From MVP to<br>business in a week.</h2>
+    <p class="section-sub fade-up">Habitat Residency is not a course. Not a coworking space. Not another accelerator. It's one week where you only build.</p>
+
+    <div class="intro-grid fade-up">
+      <div class="intro-text">
+        <h3>The premise is simple.</h3>
+        <p>A small cohort of founders, already past idea stage, live and work together for consecutive days. No commute. No context-switching. No meetings except the ones that matter.</p>
+        <p>You get a dedicated mentor — a practitioner, not a professor — who works alongside you for the duration. You get access to a VC network for feedback and potential funding. And at the end, you pitch.</p>
+        <p>The goal isn't to raise money immediately (though it happens). The goal is to leave knowing exactly where you're going and why.</p>
+      </div>
+      <div class="intro-stats">
+        <div class="intro-stat">
+          <div class="intro-stat-num">5</div>
+          <div class="intro-stat-label">founders per cohort — small enough to build real trust</div>
+        </div>
+        <div class="intro-stat">
+          <div class="intro-stat-num">7</div>
+          <div class="intro-stat-label">consecutive days of focused, undistracted building</div>
+        </div>
+        <div class="intro-stat">
+          <div class="intro-stat-num">1</div>
+          <div class="intro-stat-label">dedicated mentor with you the entire week</div>
+        </div>
+        <div class="intro-stat">
+          <div class="intro-stat-num">0</div>
+          <div class="intro-stat-label">equity taken — ever</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THE WEEK -->
+<section class="week-section">
+  <div class="container">
+    <div class="section-label fade-up">The week</div>
+    <h2 class="section-title fade-up">Seven days, structured to ship.</h2>
+    <p class="section-sub fade-up">Each day has a clear theme. You're building the whole time — but we make sure you're building the right things in the right order.</p>
+
+    <div class="week-grid">
+      <div class="day-card fade-up">
+        <div class="day-label">Day 1</div>
+        <h3>Arrivals + alignment</h3>
+        <p>Move in, meet your cohort, set your week goal. What does success look like by Friday? Get brutally honest about where you are.</p>
+      </div>
+      <div class="day-card fade-up">
+        <div class="day-label">Day 2</div>
+        <h3>Customer conversations</h3>
+        <p>Your first full day is not building. It's talking to users. Structured interviews, real insights, kill your assumptions early.</p>
+      </div>
+      <div class="day-card fade-up">
+        <div class="day-label">Day 3 — 4</div>
+        <h3>Deep build</h3>
+        <p>Two full days of heads-down work. Morning standups with your mentor. Afternoon unblocking sessions. Evening reviews with the cohort.</p>
+      </div>
+      <div class="day-card fade-up">
+        <div class="day-label">Day 5</div>
+        <h3>Test &amp; iterate</h3>
+        <p>Get real users on your product. Run experiments. Fix what's broken. Stop adding features. Make what you have work better.</p>
+      </div>
+      <div class="day-card fade-up">
+        <div class="day-label">Day 6</div>
+        <h3>Story + pitch prep</h3>
+        <p>What's your narrative? Why this, why now, why you? Practice your demo until the story is effortless.</p>
+      </div>
+      <div class="day-card fade-up">
+        <div class="day-label">Day 7</div>
+        <h3>Demo Day</h3>
+        <p>Investors, mentors, and the broader Habitat community. 10-minute demo + Q&A. The beginning of the next chapter.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENTORSHIP -->
+<section>
+  <div class="container">
+    <div class="section-label fade-up">Support structure</div>
+    <h2 class="section-title fade-up">Not advice. Presence.</h2>
+    <p class="section-sub fade-up">The difference between a good program and a transformative one is whether the people helping you are actually in the room.</p>
+
+    <div class="mentorship-grid">
+      <div class="mentorship-card fade-up">
+        <h3>Dedicated mentor</h3>
+        <p>One practitioner — a founder, operator, or investor who has done what you're trying to do — works with your cohort for the duration. Not for 2 hours. For the whole time.</p>
+      </div>
+      <div class="mentorship-card fade-up">
+        <h3>VC office hours</h3>
+        <p>Investors from our network drop in for sessions. Not to evaluate you — to help you think clearer. Evaluation happens at Demo Day, not before.</p>
+      </div>
+      <div class="mentorship-card fade-up">
+        <h3>Peer cohort</h3>
+        <p>Other founders at the same stage, with complementary skills, working alongside you. The cohort is small enough to build genuine trust — and honest enough to tell you hard truths.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section style="background: var(--cream);">
+  <div class="container">
+    <div class="section-label fade-up">Who we select</div>
+    <h2 class="section-title fade-up">Already past zero.</h2>
+    <p class="section-sub fade-up">The Residency is for founders who've proven they can ship — and are ready to figure out whether they can build a business.</p>
+
+    <div class="criteria-grid">
+      <div class="criteria-card fade-up">
+        <div class="criteria-check">✓</div>
+        <h3>You've shipped an MVP</h3>
+        <p>You have a live product — not a landing page, not a deck. Real code, real users, even if early. You know you can build.</p>
+      </div>
+      <div class="criteria-card fade-up">
+        <div class="criteria-check">✓</div>
+        <h3>You're pre or early revenue</h3>
+        <p>You have some validation but you're not yet at scale. The Residency accelerates the period between "it works" and "it grows."</p>
+      </div>
+      <div class="criteria-card fade-up">
+        <div class="criteria-check">✓</div>
+        <h3>You can be all-in for the duration</h3>
+        <p>No day job meetings. No half-presence. Complete full focus. If you can't commit to that, the timing isn't right yet.</p>
+      </div>
+      <div class="criteria-card fade-up">
+        <div class="criteria-check">✓</div>
+        <h3>You want to be challenged</h3>
+        <p>The cohort and mentor will push you. Good feedback is uncomfortable. You need to want that, not just tolerate it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOT FOR -->
+<section class="not-for">
+  <div class="container">
+    <div class="section-label fade-up">Not for everyone</div>
+    <h2 class="section-title fade-up">Be honest with yourself.</h2>
+    <p class="section-sub fade-up">The Residency will make great founders better. It won't turn someone who isn't ready into a founder.</p>
+
+    <div class="not-for-list fade-up">
+      <div class="not-for-item">
+        <div class="not-for-x">✕</div>
+        <div class="not-for-text">You're still validating whether you want to be a founder</div>
+      </div>
+      <div class="not-for-item">
+        <div class="not-for-x">✕</div>
+        <div class="not-for-text">You haven't built or shipped anything yet</div>
+      </div>
+      <div class="not-for-item">
+        <div class="not-for-x">✕</div>
+        <div class="not-for-text">You're looking for co-founders (try our evenings first)</div>
+      </div>
+      <div class="not-for-item">
+        <div class="not-for-x">✕</div>
+        <div class="not-for-text">You can't step away from your current obligations for this intensive period</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO DAY -->
+<section>
+  <div class="container">
+    <div class="section-label fade-up">The culmination</div>
+    <h2 class="section-title fade-up">Demo Day.</h2>
+    <p class="section-sub fade-up">Day seven isn't a formality. It's the moment your week of work meets the people who can help you go further.</p>
+
+    <div class="demo-day-content">
+      <div class="demo-day-left fade-up">
+        <p>Demo Day is a curated event open to investors from our network, the broader Habitat community, and select guests. Each founder presents a live product demo, not slides.</p>
+        <p>Q&A follows. The conversation continues at the networking session after. Some founders leave with term sheets. Most leave with introductions, feedback, and a clearer path.</p>
+        <p>All of them leave knowing exactly what the next 90 days look like.</p>
+      </div>
+      <div class="demo-day-right fade-up">
+        <div class="demo-day-feature">
+          <div class="demo-day-feature-dot"></div>
+          <div class="demo-day-feature-content">
+            <h4>Live product demos only</h4>
+            <p>No decks. No mockups. Your product, live, in front of people who matter.</p>
+          </div>
+        </div>
+        <div class="demo-day-feature">
+          <div class="demo-day-feature-dot"></div>
+          <div class="demo-day-feature-content">
+            <h4>Curated investor audience</h4>
+            <p>Early-stage VCs and angels from our network — people who write checks at this stage.</p>
+          </div>
+        </div>
+        <div class="demo-day-feature">
+          <div class="demo-day-feature-dot"></div>
+          <div class="demo-day-feature-content">
+            <h4>Habitat community</h4>
+            <p>Alumni from our evenings and hackathons. Your first potential early adopters are in the room.</p>
+          </div>
+        </div>
+        <div class="demo-day-feature">
+          <div class="demo-day-feature-dot"></div>
+          <div class="demo-day-feature-content">
+            <h4>Post-event introductions</h4>
+            <p>We personally make intros from Demo Day onwards. The event is a start, not a finish.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="container">
+    <div class="section-label fade-up" style="text-align: center;">FAQ</div>
+    <h2 class="section-title fade-up" style="text-align: center; margin-bottom: 80px;">Got questions?</h2>
+    <div class="faq-container fade-up">
+
+      <div class="faq-category">Habitat Residency</div>
+
+      <div class="faq-item">
+        <details>
+          <summary>What is the Residency?</summary>
+          <div class="faq-answer">A small cohort of founders, full immersion. You live and build together with a dedicated mentor. The end of the residency is Demo Day in front of investors. It's not an accelerator — there's no curriculum, no lectures. Just focused building, honest feedback, and a push to go from MVP to business.</div>
+        </details>
+      </div>
+      <div class="faq-item">
+        <details>
+          <summary>Who is the Residency for?</summary>
+          <div class="faq-answer">Founders who have already shipped an MVP — real code, real users, even if early. You should be pre- or early-revenue, able to commit to a full week with zero distractions, and genuinely want to be challenged by peers and mentors.</div>
+        </details>
+      </div>
+      <div class="faq-item">
+        <details>
+          <summary>How do I get in?</summary>
+          <div class="faq-answer">The Residency is selective. The best performers from our Evenings get invited to Hackathons, and the best hackathon teams get first look at Residency spots. Merit shows up in code, not cover letters. Applications open in 2026 — join the waitlist.</div>
+        </details>
+      </div>
+      <div class="faq-item">
+        <details>
+          <summary>Does the Residency cost anything?</summary>
+          <div class="faq-answer">Details on costs and logistics will be shared when applications open. What we can confirm: we take zero equity. That will never change.</div>
+        </details>
+      </div>
+      <div class="faq-item">
+        <details>
+          <summary>What happens on Demo Day?</summary>
+          <div class="faq-answer">Each founder presents a live product demo (no slides), followed by Q&A from a curated audience of early-stage VCs, angels, and the Habitat community. Some founders leave with term sheets. Most leave with introductions, feedback, and a clear path forward.</div>
+        </details>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="fade-up">Applications opening soon.</h2>
+    <p class="fade-up">Join the waitlist and we'll reach out when the first cohort opens. Cohort size is small. We're selective.</p>
+    <div class="hero-buttons fade-up" style="justify-content:center">
+      <a href="contact.html?program=residency" class="btn-primary">Join the waitlist &rarr;</a>
+      <a href="index.html" class="btn-secondary">Back to Habitat</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo" style="font-size:20px">[Habitat]</div>
+        <p>The fastest path from zero to real. Building across Belgium since 2025.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Programs</h4>
+        <a href="https://luma.com/habitat" target="_blank">Evenings</a>
+        <a href="hackathon.html">Technical Hackathons</a>
+        <a href="residency.html">Residency</a>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <a href="https://luma.com/habitat" target="_blank">Events</a>
+        <a href="https://www.linkedin.com/company/joinhabitat">LinkedIn</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="contact.html">Apply / Partner</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Habitat. Made with care in Belgium.</span>
+      <span>Leuven &middot; Ghent &middot; Brussels &middot; Antwerp</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

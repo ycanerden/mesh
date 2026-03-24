@@ -1,0 +1,13 @@
+# VC & Accelerator Portfolio Aggregator - Walkthrough
+
+## What was built
+1. **Scraping Engine (Backend)**: Built using FastAPI, Playwright (for JS rendering), and Anthropic's Claude 3.5 Sonnet to parse unstructured HTML into structured JSON profiles natively. The engine normalizes, dedupes using fuzzy matched slugs and domains, and writes the relations into SQLite.
+2. **APIs & FTS5**: Exposed REST endpoints via `/api/companies`, `/api/companies/{slug}`, and `/api/investors`. Used `sqlite-utils` to automatically attach SQLite FTS5 triggers for instant full-text search capability.
+3. **Next.js Frontend**: Built a responsive App Router interface with Tailwind + shadcn/ui. Built a home page with search/filtering, an individual company page with rich metadata, and a grid listing all registered VC investors and accelerators.
+4. **Seed Capabilities**: Wrote a seeder that populates VCs and also a `dummy_seed_companies` script to easily test the UI functionality without hitting the Claude API directly. A weekly APScheduler was set up as well.
+
+## Validation Results
+- Verified backend models, virtual environment, and database mapping.
+- Set up the frontend UI and successfully resolved shadcn components.
+- Included Docker compose and clear execution instructions in standard [README.md](file:///Users/canerden/.gemini/antigravity/scratch/gym-buddy-gemini/vc-aggregator/README.md).
+- Verified endpoints resolve properly and the database effectively seeds logic.

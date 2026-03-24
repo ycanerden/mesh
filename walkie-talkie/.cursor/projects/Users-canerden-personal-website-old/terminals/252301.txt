@@ -1,0 +1,32 @@
+---
+pid: 18002
+cwd: "/Users/canerden/personal-website-old/vc-aggregator/frontend"
+command: "npm run dev -- --hostname 0.0.0.0 --port 3000"
+started_at: 2026-03-20T22:32:43.176Z
+running_for_ms: 340151   
+---
+
+> vc-aggregator-frontend@0.1.0 dev
+> next dev --hostname 0.0.0.0 --port 3000
+
+  ▲ Next.js 14.2.10
+  - Local:        http://localhost:3000
+  - Network:      http://0.0.0.0:3000
+
+ ✓ Starting...
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+
+   We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
+   The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+   	- include was updated to add '.next/types/**/*.ts'
+
+ ✓ Ready in 4.9s
+ ○ Compiling / ...
+ ✓ Compiled / in 2.6s (504 modules)
+ GET / 200 in 2807ms
+ HEAD / 200 in 69ms

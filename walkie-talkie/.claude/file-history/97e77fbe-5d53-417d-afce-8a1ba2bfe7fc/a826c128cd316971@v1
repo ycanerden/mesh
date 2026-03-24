@@ -1,0 +1,59 @@
+# habitatv5 Framework Quick Fixes + UX Improvements
+
+## Context
+Habitat's sprint framework (React + Supabase) runs during builder events. The eng review identified code duplication, missing AI rate limiting, and underutilized UX guidance fields. Admin display auth was confirmed already working — no change needed.
+
+## Changes (5 total, in order)
+
+### 1. Extract shared `formatTime` → `src/lib/timerUtils.ts` (new file)
+- Identical function duplicated in `SprintTimer.tsx:4-10` and `AdminDisplay.tsx:17-22`
+- Create `src/lib/timerUtils.ts` with exported `formatTime(seconds)`
+- Import in both files, delete local copies
+
+### 2. Extract shared phase constants → `src/lib/phaseConstants.ts` (new file)
+- `phaseLabels` duplicated in `TeamProgressCard.tsx:17-24` and implicitly in `AdminDisplay.tsx`
+- Create `src/lib/phaseConstants.ts` with `phaseLabels`, `phaseNames`, `phaseOrder`
+- Import in `TeamProgressCard.tsx`, `AdminDisplay.tsx`, `PhaseChecklist.tsx`
+- Keep component-specific color maps in place (different formats: CSS classes vs Tailwind)
+
+### 3. Client-side AI rate limiting → `src/hooks/useAIGeneration.ts`
+- Add `useRef` for `lastGenerationTime`, enforce 10s cooldown
+- Show toast "Please wait Xs before generating again" if too fast
+- ~9 lines of new code at top of `generate()` function
+
+### 4. Enrich sprint task guidance → `src/data/sprintTasks.ts` (data-only)
+- Add `helperText`, `warningText`, `checklist`, `toolLink`, `subNote` to key tasks
+- Components already render all these fields — zero component changes needed
+- Phase 1: problem, solution, customer, advantage, validation enriched
+- Phase 2: prototype, message, contacts enriched
+- Phase 3: pitch enriched
+- Phase 4: social enriched
+
+### 5. Server-side AI rate limiting → `supabase/functions/generate-startup-content/index.ts`
+- Add in-memory request counter (20 requests/hour per token)
+- Insert rate check after body parsing, before API call (~25 lines)
+- Returns 429 with friendly error message
+
+## Files Modified
+- `src/lib/timerUtils.ts` — NEW
+- `src/lib/phaseConstants.ts` — NEW
+- `src/components/sprint/SprintTimer.tsx` — remove local formatTime, add import
+- `src/pages/AdminDisplay.tsx` — remove local formatTime + phases array, add imports
+- `src/components/admin/TeamProgressCard.tsx` — remove local phaseLabels, add import
+- `src/components/sprint/PhaseChecklist.tsx` — remove local phaseOrder, add import
+- `src/hooks/useAIGeneration.ts` — add cooldown logic
+- `src/data/sprintTasks.ts` — enrich task objects with guidance fields
+- `supabase/functions/generate-startup-content/index.ts` — add rate limiter
+
+## NOT in scope
+- Gemini API integration (future session)
+- Batch AI reviews for admin (future session)
+- Auth migration to Supabase Auth (future, before residency)
+- Automation track task enrichment (separate track)
+
+## Verification
+- Run `npm run dev`, navigate sprint phases — timer displays correctly
+- Open `/admin/display` — timer + phase dots render
+- Open admin dashboard — team cards show correct phase labels/colors
+- Click AI generate, then immediately again — see cooldown toast
+- Check enriched tasks show helper text, warnings, checklists in sprint view

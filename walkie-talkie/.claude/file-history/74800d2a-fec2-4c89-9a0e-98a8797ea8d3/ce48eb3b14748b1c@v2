@@ -1,0 +1,90 @@
+import Anthropic from '@anthropic-ai/sdk'
+import { JUDGE_MODEL } from './models-config'
+import type { ModelResult, DivergenceEntry } from './types'
+
+const JUDGE_TIMEOUT_MS = 60_000
+
+type JudgeOutput = {
+  verdict: string
+  divergence: DivergenceEntry[]
+}
+
+function stripFences(text: string): string {
+  // Opus sometimes wraps JSON in ```json ... ``` markdown fences
+  return text.replace(/^```(?:json)?\n?/m, '').replace(/\n?```$/m, '').trim()
+}
+
+export function parseJudgeResponse(content: string): JudgeOutput {
+  try {
+    const cleaned = stripFences(content)
+    const parsed = JSON.parse(cleaned)
+    const verdict = typeof parsed.verdict === 'string' ? parsed.verdict : content
+    const divergence = Array.isArray(parsed.divergence) ? parsed.divergence : []
+    return { verdict, divergence }
+  } catch {
+    // Fallback: treat entire response as verdict text
+    return { verdict: content || 'Synthesis unavailable', divergence: [] }
+  }
+}
+
+export function buildJudgePrompt(prompt: string, results: ModelResult[]): string {
+  const responses = results
+    .map(r => `[${r.displayName}]: ${r.available ? r.response : 'UNAVAILABLE'}`)
+    .join('\n\n')
+
+  return `You are the head of a council. You have received responses from multiple AI models on the same question.
+Some models may be marked "UNAVAILABLE" — synthesize based on those that responded.
+
+Respond ONLY with a JSON object matching this exact schema:
+{
+  "verdict": "string (2-3 paragraphs synthesizing the council's view)",
+  "divergence": [
+    {
+      "claim": "string (one specific claim or position)",
+      "agree": ["model display names"],
+      "disagree": ["model display names"],
+      "partial": ["model display names"]
+    }
+  ]
+}
+
+Include 3-6 divergence entries covering the most meaningful points of agreement and disagreement.
+Do not include any text outside the JSON object.
+
+Question: ${prompt}
+
+Council responses:
+${responses}`
+}
+
+export async function callJudge(prompt: string, results: ModelResult[]): Promise<JudgeOutput> {
+  const availableCount = results.filter(r => r.available).length
+  if (availableCount === 0) {
+    return { verdict: 'No models responded — check your API keys and try again.', divergence: [] }
+  }
+
+  const key = process.env.ANTHROPIC_API_KEY
+  if (!key) {
+    return { verdict: 'Judge unavailable — ANTHROPIC_API_KEY not set.', divergence: [] }
+  }
+
+  try {
+    const client = new Anthropic({ apiKey: key })
+    const signal = AbortSignal.timeout(JUDGE_TIMEOUT_MS)
+    const judgePrompt = buildJudgePrompt(prompt, results)
+
+    const res = await client.messages.create(
+      {
+        model: JUDGE_MODEL,
+        max_tokens: 2500,
+        messages: [{ role: 'user', content: judgePrompt }],
+      },
+      { signal },
+    )
+
+    const content = res.content[0]?.type === 'text' ? res.content[0].text : ''
+    return parseJudgeResponse(content)
+  } catch {
+    return { verdict: 'Synthesis unavailable — judge timed out or failed.', divergence: [] }
+  }
+}

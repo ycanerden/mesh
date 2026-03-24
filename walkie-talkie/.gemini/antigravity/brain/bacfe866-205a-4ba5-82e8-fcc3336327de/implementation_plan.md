@@ -1,0 +1,48 @@
+# Phase 3: Agentic MCP Layer & Authentication
+
+## Goal Description
+To make Greg CRM truly "local-first" and "agent-native" with MCP support, we need to move beyond standard browser `localStorage`. Browsers cannot directly spawn MCP server processes (like the Notion or Google Sheets MCPs) or write directly to your file system without complex APIs. 
+
+To achieve this, we will build a lightweight local **Node.js backend** that runs alongside your Vite frontend. This backend will:
+1. Read/Write true `.md` files to a local `contacts/` folder on your hard drive.
+2. Host the AI Agent.
+3. Act as an MCP Client to securely connect to external tools like `mcp-server-notion`.
+
+## User Review Required
+> [!IMPORTANT]
+> **Authentication in a Local-first App:** Since your data lives on your machine, "Authentication" here refers to securely providing and storing the API keys needed by the Agent (e.g., an LLM API key, a Notion Integration Token). Are you okay with adding a **Settings page** where you can paste these keys, which will be stored locally on your machine (e.g., in a `.env` file)?
+
+> [!CAUTION] 
+> **Architectural Shift:** This change requires running both a frontend (`npm run dev`) and a backend server (`node server.js`) locally. Eventually, we can bundle this into a single executable (Electron/Tauri) in Phase 4. Is this two-process development setup acceptable for Phase 3?
+
+## Proposed Changes
+
+### 1. File System & Backend APIs
+We will create a simple Express backend to handle local file operations.
+#### [NEW] `server/index.js`
+- Express server setup.
+- Endpoints: `GET /api/contacts`, `POST /api/contacts`, `PUT /api/contacts/:id`, `DELETE /api/contacts/:id`.
+#### [NEW] `server/fs-storage.js`
+- Logic to read/write Markdown files in a local `./contacts/` directory.
+#### [MODIFY] `src/lib/contacts.js`
+- Update the frontend hooks to swap out `localStorage` calls with `fetch` calls to our new local API.
+
+### 2. Authentication & Settings (API Keys)
+#### [NEW] `src/components/SettingsModal.jsx`
+- A UI modal to input the LLM API Key (e.g., Gemini/OpenAI), Notion Token, and Google Sheets credentials.
+#### [NEW] `server/settings.js`
+- Backend logic to securely save these keys to a local `.env` or config file.
+
+### 3. The Agent & MCP Layer
+#### [NEW] `server/agent.js`
+- The core AI agent logic. It receives plain English commands from the Cmd+K interface.
+- It spins up MCP clients (e.g., connecting to the `@modelcontextprotocol/server-notion` npx package via standard I/O).
+- Exposes an endpoint `POST /api/agent/command` to process user requests (e.g., "Pull leads from my Notion database").
+
+## Verification Plan
+### Automated Tests
+- N/A for MVP.
+### Manual Verification
+1. Verify the frontend app correctly reads/writes `.md` files to the actual `contacts/` folder on the hard drive.
+2. Enter a Notion API key in the settings.
+3. Type a command in Cmd+K like "Find my new leads in Notion", verify the backend Agent invokes the Notion MCP, fetches the rows, and generates local `.md` contacts for them.

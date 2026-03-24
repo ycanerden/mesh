@@ -1,0 +1,6 @@
+# AI PM Bot
+
+node_modules/
+dist/
+.env
+*.log

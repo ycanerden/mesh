@@ -1,0 +1,21 @@
+<current_dom_explanation>
+This is a temporary snapshot of the current page's DOM structure. The DOM will change if you navigate to or interact with another page. Use a tool like browser_get_dom to capture and preserve the DOM in your trajectory if needed for later reference.
+</current_dom_explanation>
+<current_dom>
+[0] (305,37)<a class='flex items-center gap-2' href='/' />
+	[1] (313,37)<span >GYM BUDDY />
+		[2] (342,37)<span >GEMINI />
+[3] (678,37)<a class='text-sm text-slate-300 hover:text-white transition-colors' href='/login'>Log In />
+[4] (723,37)<a class='text-sm px-4 py-2 bg-orange-500 hover:bg-orange-600 text-[#0a0a0f] font-bold rounded-lg transition-colors' href='/signup'>Sign Up />
+Join the Club
+[5] (500,448)<label class='block text-xs uppercase tracking-wider text-slate-400 mb-2'>Full Name />
+[6] (500,496)<input class='w-full bg-[#0a0a0f] border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-orange-500 transition-colors' placeholder='Ronnie Coleman' />
+[7] (500,554)<label class='block text-xs uppercase tracking-wider text-slate-400 mb-2'>Email />
+[8] (500,602)<input class='w-full bg-[#0a0a0f] border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-orange-500 transition-colors' placeholder='lightweight@baby.com' />
+[9] (500,659)<label class='block text-xs uppercase tracking-wider text-slate-400 mb-2'>Password />
+[10] (500,707)<input class='w-full bg-[#0a0a0f] border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-orange-500 transition-colors' placeholder='••••••••' />
+[11] (500,793)<button class='w-full bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold py-3 rounded-xl transition-colors disabled:opacity-50 mt-2'>Sign Up />
+Already have an account?
+[12] (548,860)<a class='text-orange-500 hover:text-orange-400 font-medium' href='/login'>Log in />
+
+</current_dom>

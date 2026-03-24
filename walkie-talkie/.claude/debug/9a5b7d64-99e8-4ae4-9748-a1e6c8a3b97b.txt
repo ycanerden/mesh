@@ -1,0 +1,62 @@
+2026-03-06T12:47:51.807Z [DEBUG] MDM settings load completed in 17ms
+2026-03-06T12:47:51.849Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-06T12:47:51.849Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-06T12:47:51.849Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-06T12:47:51.849Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-06T12:47:51.853Z [DEBUG] Applying permission update: Adding 8 allow rule(s) to destination 'localSettings': ["Bash(python3 -c \" from pptx import Presentation import os files = [f for f in os.listdir\\(''.''\\) if f.endswith\\(''.pptx''\\) or f.endswith\\(''.ppt''\\)] for fname in sorted\\(files\\): print\\(f''\\\\n\\\\n=== FILE: {fname} ===''\\) try: prs = Presentation\\(fname\\) for i, slide in enumerate\\(prs.slides\\): texts = [] for shape in slide.shapes: if hasattr\\(shape, ''text''\\) and shape.text.strip\\(\\): texts.append\\(shape.text.strip\\(\\)\\) if texts: print\\(f''-- Slide {i+1} --''\\) print\\(''\\\\n''.join\\(texts\\)\\) except Exception as e: print\\(f''Error: {e}''\\) \")","Bash(python3 -c \"import pptx; print\\(''pptx ok''\\)\")","Bash(python3 -c \":*)","Bash(git add index.html past-events.html)","Bash(git commit -m \"Add top nav and past events page\")","Bash(git push)","Bash(git add index.html)","Bash(git commit -m \"Add Gerben Fiesack\")"]
+2026-03-06T12:47:51.854Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-06T12:47:51.857Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=false, result=false
+2026-03-06T12:47:51.857Z [DEBUG] [STARTUP] Running setup()...
+2026-03-06T12:47:51.859Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-06T12:47:51.870Z [ERROR] Error: Error: ENOENT: no such file or directory, open '/Library/Application Support/ClaudeCode/managed-settings.json'
+    at openSync (unknown)
+    at readSync (/$bunfs/root/claude:12:1441)
+    at F2 (/$bunfs/root/claude:6412:113)
+    at AO (/$bunfs/root/claude:6414:226)
+    at GP8 (/$bunfs/root/claude:6398:5806)
+    at s90 (/$bunfs/root/claude:6398:5579)
+    at <anonymous> (/$bunfs/root/claude:6398:4272)
+    at async a90 (/$bunfs/root/claude:6398:4654)
+    at async <anonymous> (/$bunfs/root/claude:11966:400)
+    at processTicksAndRejections (native:7:39)
+2026-03-06T12:47:51.870Z [DEBUG] Error log sink initialized
+2026-03-06T12:47:51.874Z [DEBUG] [STARTUP] setup() completed in 17ms
+2026-03-06T12:47:51.874Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-06T12:47:51.875Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-06T12:47:51.875Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-06T12:47:51.875Z [DEBUG] Total plugin skills loaded: 0
+2026-03-06T12:47:51.875Z [DEBUG] Total plugin commands loaded: 0
+2026-03-06T12:47:51.875Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-06T12:47:51.876Z [DEBUG] Total plugin agents loaded: 0
+2026-03-06T12:47:51.879Z [DEBUG] Loaded 25 unique skills (25 unconditional, 0 conditional, managed: 0, user: 25, project: 0, additional: 0, legacy commands: 0)
+2026-03-06T12:47:51.879Z [DEBUG] getSkills returning: 25 skill dir commands, 0 plugin skills, 3 bundled skills
+2026-03-06T12:47:51.880Z [DEBUG] [STARTUP] Commands and agents loaded in 6ms
+2026-03-06T12:47:51.880Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-06T12:47:51.880Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-06T12:47:51.880Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-06T12:47:51.881Z [DEBUG] Total LSP servers loaded: 0
+2026-03-06T12:47:51.881Z [DEBUG] [STARTUP] MCP configs loaded in 27ms
+2026-03-06T12:47:51.883Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-06T12:47:51.883Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-06T12:47:51.885Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-06T12:47:51.885Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-06T12:47:51.885Z [DEBUG] LSP server manager initialized successfully
+2026-03-06T12:47:51.885Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-06T12:47:51.885Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-06T12:47:51.887Z [DEBUG] Watching for changes in setting files /Users/canerden/.claude/settings.json, /Users/canerden/chatting app for habitat/.claude/settings.json, /Users/canerden/chatting app for habitat/.claude/settings.local.json...
+2026-03-06T12:47:51.911Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-06T12:47:51.911Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-03-06T12:47:51.912Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-03-06T12:47:51.914Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-06T12:47:51.914Z [DEBUG] Found 0 hook matchers in settings
+2026-03-06T12:47:51.914Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-03-06T12:47:51.914Z [DEBUG] [FileIndex] getProjectFiles called, respectGitignore=true
+2026-03-06T12:47:51.914Z [DEBUG] [FileIndex] getFilesUsingGit called
+2026-03-06T12:47:51.918Z [DEBUG] installPluginsForHeadless: starting
+2026-03-06T12:47:51.919Z [DEBUG] Found 0 installed plugins (V2 format)
+2026-03-06T12:47:51.919Z [DEBUG] installPluginsForHeadless: no missing plugins or marketplaces configured
+2026-03-06T12:47:51.926Z [DEBUG] Git remote URL: https://github.com/ycanerden/habitat-participants.git
+2026-03-06T12:47:51.926Z [DEBUG] Parsed repository: github.com/ycanerden/habitat-participants from URL: https://github.com/ycanerden/habitat-participants.git
+2026-03-06T12:47:51.926Z [DEBUG] Fetching plugin security messages from https://raw.githubusercontent.com/anthropics/claude-plugins-official/refs/heads/security/security.json
+2026-03-06T12:47:51.931Z [DEBUG] Total plugin output styles loaded: 0
+2026-03-06T12:47:51.931Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK

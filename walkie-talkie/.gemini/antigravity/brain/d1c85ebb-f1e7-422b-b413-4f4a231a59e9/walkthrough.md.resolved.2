@@ -1,0 +1,56 @@
+# IDE-Like UX Overhaul — Walkthrough
+
+VibeMarketer has been transformed from a simple sidebar+form app into an **IDE-like workspace** — designed to feel powerful but never intimidating for non-technical users.
+
+## What Changed
+
+### New Components
+| Component | Purpose |
+|-----------|---------|
+| **Activity Bar** | Narrow icon column (Home, Skills, Settings) with API status dot |
+| **Tab Bar** | Multi-tab skill switching — open, close, and switch between skills |
+| **Status Bar** | Bottom bar: "15 skills available · API connected · Ready" |
+| **Home Dashboard** | Quick-start cards, setup prompt, full skill directory |
+
+### Modified Components
+| Component | Changes |
+|-----------|---------|
+| **App.jsx** | Complete rewrite — tab state, collapsible sidebar, per-skill output tracking |
+| **Sidebar.jsx** | Search filter added, settings/titlebar removed (moved to Activity Bar) |
+| **index.css** | Full CSS rewrite — grid layout for IDE shell, all new component styles |
+
+## Screenshots
+
+### Home Tab
+Activity Bar · Sidebar · Tab Bar · Home dashboard with quick-start cards:
+
+![Home Tab](file:///Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/ide_home_view_1770932387365.png)
+
+### Skill Tab
+Skill form opened in its own tab, with phase badge and API key warning:
+
+![Skill Tab](file:///Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/ide_skill_view_1770932394270.png)
+
+### Multiple Tabs
+Three tabs open simultaneously — Home, Social Content, Competitor Research:
+
+![Multiple Tabs](file:///Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/ide_tabs_view_1770932402304.png)
+
+## Demo Recording
+
+![IDE Layout Demo](file:///Users/canerden/.gemini/antigravity/brain/d1c85ebb-f1e7-422b-b413-4f4a231a59e9/ide_final_check_1770932378385.webp)
+
+## Verification Results
+
+| Check | Status |
+|-------|--------|
+| Activity Bar renders with 3 icons | ✅ |
+| API status dot shows red (no key) | ✅ |
+| Sidebar shows 15 skills by phase | ✅ |
+| Search filter works | ✅ |
+| Tab opens on skill click | ✅ |
+| Multiple tabs open simultaneously | ✅ |
+| Tab switching preserves content | ✅ |
+| Home dashboard shows quick-start cards | ✅ |
+| Status bar shows "15 skills available" | ✅ |
+| Settings opens as a tab | ✅ |

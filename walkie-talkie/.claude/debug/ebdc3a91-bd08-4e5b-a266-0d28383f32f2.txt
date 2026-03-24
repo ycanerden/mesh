@@ -1,0 +1,720 @@
+2026-03-22T20:38:19.842Z [DEBUG] Aborting: tool=ExitPlanMode isAbort=undefined hasFeedback=false isSubagent=false
+2026-03-22T20:38:19.843Z [DEBUG] ExitPlanMode tool permission denied
+2026-03-22T20:38:19.850Z [DEBUG] [useDeferredValue] Messages deferred by 2 (344→346)
+2026-03-22T20:38:19.882Z [DEBUG] Full reset (scrollback changes): scrollbackRows=678, firstChangeY=645
+  prev: "───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
+  next: "───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────"
+2026-03-22T20:38:19.934Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-22T20:38:19.935Z [DEBUG] Getting matching hook commands for SessionEnd with query: clear
+2026-03-22T20:38:19.935Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:19.935Z [DEBUG] Matched 0 unique hooks for query "clear" (0 before deduplication)
+2026-03-22T20:38:19.935Z [DEBUG] Cleared all session hooks for session 97e77fbe-5d53-417d-afce-8a1ba2bfe7fc
+2026-03-22T20:38:19.936Z [DEBUG] Getting matching hook commands for SessionStart with query: clear
+2026-03-22T20:38:19.936Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:19.936Z [DEBUG] Matched 0 unique hooks for query "clear" (0 before deduplication)
+2026-03-22T20:38:19.936Z [DEBUG] Applying permission update: Setting mode to 'acceptEdits'
+2026-03-22T20:38:19.936Z [DEBUG] FileHistory: Added snapshot for cfe4934e-5346-466b-bd6a-e23d4079918d, tracking 0 files
+2026-03-22T20:38:20.130Z [DEBUG] High write ratio: blit=0, write=83665 (100.0% writes), screen=651x239
+2026-03-22T20:38:20.154Z [DEBUG] Started caffeinate to prevent sleep
+2026-03-22T20:38:20.229Z [DEBUG] High write ratio: blit=0, write=83665 (100.0% writes), screen=651x239
+2026-03-22T20:38:20.229Z [DEBUG] Full reset (scrollback changes): scrollbackRows=585, firstChangeY=5
+  prev: "│         ▗ ▗   ▖ ▖         │ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────                                                                                       │"
+  next: "│                           │ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────                                                                                       │"
+2026-03-22T20:38:20.243Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:38:20.243Z [DEBUG] [SystemPrompt] path=simple proactive=false
+2026-03-22T20:38:20.243Z [DEBUG] Loading skills from: managed=/Library/Application Support/ClaudeCode/.claude/skills, user=/Users/canerden/.claude/skills, project=[]
+2026-03-22T20:38:20.266Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-22T20:38:20.266Z [DEBUG] Total plugin skills loaded: 0
+2026-03-22T20:38:20.266Z [DEBUG] Total plugin commands loaded: 0
+2026-03-22T20:38:20.267Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-03-22T20:38:20.267Z [DEBUG] [claudeai-mcp] Gate returned: true
+2026-03-22T20:38:20.267Z [DEBUG] [claudeai-mcp] Fetching from https://api.anthropic.com/v1/mcp_servers?limit=1000
+2026-03-22T20:38:20.269Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:38:20.269Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:38:20.269Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:38:20.270Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:38:20.272Z [DEBUG] Loaded 51 unique skills (managed: 0, user: 51, project: 0, additional: 0, legacy commands: 0)
+2026-03-22T20:38:20.272Z [DEBUG] getSkills returning: 51 skill dir commands, 0 plugin skills, 2 bundled skills
+2026-03-22T20:38:20.304Z [DEBUG] High write ratio: blit=0, write=5305 (100.0% writes), screen=108x239
+2026-03-22T20:38:20.304Z [DEBUG] Full reset (scrollback changes): scrollbackRows=585, firstChangeY=16
+  prev: "│ habitatv5 Framework Quick Fixes + UX Improvements                                                                                                                                                                                           │"
+  next: "│ Migrate habitatv5 off Lovable → Fresh Supabase + Direct Gemini                                                                                                                                                                              │"
+2026-03-22T20:38:20.346Z [DEBUG] autocompact: tokens=881 threshold=167000 effectiveWindow=180000
+2026-03-22T20:38:20.347Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:38:20.347Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:38:20.348Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:38:20.348Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:38:20.353Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:38:20.353Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:38:20.353Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:38:20.489Z [DEBUG] [claudeai-mcp] Fetched 5 servers
+2026-03-22T20:38:20.815Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-22T20:38:20.815Z [DEBUG] AutoUpdater: Using global update method
+2026-03-22T20:38:20.913Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:38:20.927Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-22T20:38:22.299Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:38:23.308Z [DEBUG] [useDeferredValue] Messages deferred by 1 (1→2)
+2026-03-22T20:38:23.772Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:23.773Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:23.773Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:23.773Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:23.774Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:23.774Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:23.774Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:23.775Z [DEBUG] [useDeferredValue] Messages deferred by 1 (2→3)
+2026-03-22T20:38:23.776Z [DEBUG] [useDeferredValue] Messages deferred by 4 (2→6)
+2026-03-22T20:38:23.798Z [DEBUG] High write ratio: blit=0, write=5437 (100.0% writes), screen=112x239
+2026-03-22T20:38:24.285Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:24.285Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:24.285Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:24.285Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:24.287Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:24.287Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:24.287Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:24.287Z [DEBUG] [useDeferredValue] Messages deferred by 1 (6→7)
+2026-03-22T20:38:24.298Z [DEBUG] [useDeferredValue] Messages deferred by 3 (7→10)
+2026-03-22T20:38:24.805Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:24.805Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:24.805Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:24.805Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:24.807Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:24.807Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:24.807Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:24.807Z [DEBUG] [useDeferredValue] Messages deferred by 1 (10→11)
+2026-03-22T20:38:24.809Z [DEBUG] [useDeferredValue] Messages deferred by 3 (11→14)
+2026-03-22T20:38:25.356Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:25.357Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:25.357Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:25.357Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:25.358Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:25.358Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:25.358Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:25.358Z [DEBUG] [useDeferredValue] Messages deferred by 1 (14→15)
+2026-03-22T20:38:25.363Z [DEBUG] [useDeferredValue] Messages deferred by 3 (15→18)
+2026-03-22T20:38:25.629Z [DEBUG] executePreToolHooks called for tool: Glob
+2026-03-22T20:38:25.630Z [DEBUG] Getting matching hook commands for PreToolUse with query: Glob
+2026-03-22T20:38:25.630Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:25.630Z [DEBUG] Matched 0 unique hooks for query "Glob" (0 before deduplication)
+2026-03-22T20:38:25.635Z [DEBUG] [useDeferredValue] Messages deferred by 1 (18→19)
+2026-03-22T20:38:25.638Z [DEBUG] [useDeferredValue] Messages deferred by 1 (18→19)
+2026-03-22T20:38:25.643Z [DEBUG] [useDeferredValue] Messages deferred by 1 (18→19)
+2026-03-22T20:38:25.857Z [DEBUG] Getting matching hook commands for PostToolUse with query: Glob
+2026-03-22T20:38:25.857Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:25.857Z [DEBUG] Matched 1 unique hooks for query "Glob" (1 before deduplication)
+2026-03-22T20:38:25.999Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-03-22T20:38:26.001Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-03-22T20:38:26.002Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-03-22T20:38:26.002Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-03-22T20:38:26.003Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-03-22T20:38:26.003Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-03-22T20:38:26.003Z [DEBUG] [useDeferredValue] Messages deferred by 3 (19→22)
+2026-03-22T20:38:26.004Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:26.004Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:26.004Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:26.004Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:26.006Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:26.006Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:26.006Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:26.006Z [DEBUG] [useDeferredValue] Messages deferred by 4 (19→23)
+2026-03-22T20:38:26.007Z [DEBUG] [useDeferredValue] Messages deferred by 7 (19→26)
+2026-03-22T20:38:26.008Z [DEBUG] [useDeferredValue] Messages deferred by 7 (19→26)
+2026-03-22T20:38:26.010Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:38:26.010Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:38:26.010Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:38:26.010Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:38:26.011Z [DEBUG] Sending 52 skills via attachment (initial, 52 total sent)
+2026-03-22T20:38:26.011Z [DEBUG] autocompact: tokens=35281 threshold=167000 effectiveWindow=180000
+2026-03-22T20:38:26.012Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:38:26.012Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:38:26.013Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:38:26.013Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:38:26.014Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:38:26.014Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:38:26.014Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:38:26.017Z [DEBUG] [useDeferredValue] Messages deferred by 1 (26→27)
+2026-03-22T20:38:27.555Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:38:28.793Z [DEBUG] [useDeferredValue] Messages deferred by 1 (27→28)
+2026-03-22T20:38:28.798Z [DEBUG] [useDeferredValue] Messages deferred by 1 (27→28)
+2026-03-22T20:38:28.803Z [DEBUG] [useDeferredValue] Messages deferred by 1 (27→28)
+2026-03-22T20:38:30.004Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-22T20:38:30.005Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-22T20:38:30.005Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:30.005Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:38:30.011Z [DEBUG] [useDeferredValue] Messages deferred by 1 (28→29)
+2026-03-22T20:38:30.052Z [DEBUG] High write ratio: blit=0, write=5579 (100.0% writes), screen=116x239
+2026-03-22T20:38:30.155Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:38:30.155Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.558; cc_entrypoint=cli;
+2026-03-22T20:38:30.155Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:38:30.155Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:38:30.155Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:38:30.156Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-22T20:38:30.156Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:30.156Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:38:30.157Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:38:30.157Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:38:30.157Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:38:30.157Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:38:30.157Z [DEBUG] autocompact: tokens=37822 threshold=167000 effectiveWindow=180000
+2026-03-22T20:38:30.157Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:38:30.157Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:38:30.158Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:38:30.158Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:38:30.159Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:38:30.159Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:38:30.160Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:38:30.162Z [DEBUG] [useDeferredValue] Messages deferred by 1 (29→30)
+2026-03-22T20:38:30.713Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:38:31.557Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:38:32.978Z [DEBUG] [useDeferredValue] Messages deferred by 1 (30→31)
+2026-03-22T20:38:33.003Z [DEBUG] [useDeferredValue] Messages deferred by 1 (30→31)
+2026-03-22T20:38:33.012Z [DEBUG] [useDeferredValue] Messages deferred by 1 (30→31)
+2026-03-22T20:38:41.508Z [DEBUG] executePreToolHooks called for tool: Task
+2026-03-22T20:38:41.508Z [DEBUG] Getting matching hook commands for PreToolUse with query: Task
+2026-03-22T20:38:41.508Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:41.508Z [DEBUG] Matched 0 unique hooks for query "Task" (0 before deduplication)
+2026-03-22T20:38:41.517Z [DEBUG] Getting matching hook commands for SubagentStart with query: general-purpose
+2026-03-22T20:38:41.517Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:41.517Z [DEBUG] Matched 0 unique hooks for query "general-purpose" (0 before deduplication)
+2026-03-22T20:38:41.517Z [DEBUG] autocompact: tokens=376 threshold=167000 effectiveWindow=180000
+2026-03-22T20:38:41.517Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:38:41.517Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:38:41.518Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:38:41.519Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.e67; cc_entrypoint=cli;
+2026-03-22T20:38:41.520Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:38:41.520Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:38:41.520Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:38:41.523Z [DEBUG] [useDeferredValue] Messages deferred by 1 (31→32)
+2026-03-22T20:38:41.530Z [DEBUG] High write ratio: blit=0, write=5695 (100.0% writes), screen=118x239
+2026-03-22T20:38:41.531Z [DEBUG] [useDeferredValue] Messages deferred by 2 (31→33)
+2026-03-22T20:38:41.533Z [DEBUG] [useDeferredValue] Messages deferred by 2 (31→33)
+2026-03-22T20:38:44.443Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:38:45.585Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:45.600Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:45.600Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:45.600Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:45.625Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:45.625Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:45.625Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:45.630Z [DEBUG] [useDeferredValue] Messages deferred by 1 (33→34)
+2026-03-22T20:38:45.642Z [DEBUG] [useDeferredValue] Messages deferred by 2 (33→35)
+2026-03-22T20:38:46.703Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:46.705Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:46.705Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:46.705Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:46.714Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:46.714Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:46.714Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:46.716Z [DEBUG] [useDeferredValue] Messages deferred by 1 (35→36)
+2026-03-22T20:38:46.733Z [DEBUG] [useDeferredValue] Messages deferred by 1 (36→37)
+2026-03-22T20:38:46.790Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:46.790Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:46.790Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:46.790Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:46.793Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:46.793Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:46.793Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:46.794Z [DEBUG] [useDeferredValue] Messages deferred by 1 (37→38)
+2026-03-22T20:38:46.801Z [DEBUG] [useDeferredValue] Messages deferred by 1 (38→39)
+2026-03-22T20:38:47.408Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:47.409Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:47.409Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:47.409Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:47.415Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:47.415Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:47.415Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:47.416Z [DEBUG] [useDeferredValue] Messages deferred by 1 (39→40)
+2026-03-22T20:38:47.425Z [DEBUG] [useDeferredValue] Messages deferred by 1 (40→41)
+2026-03-22T20:38:48.030Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:48.031Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:48.031Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:48.031Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:48.036Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:48.036Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:48.036Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:48.038Z [DEBUG] [useDeferredValue] Messages deferred by 1 (41→42)
+2026-03-22T20:38:48.055Z [DEBUG] [useDeferredValue] Messages deferred by 2 (41→43)
+2026-03-22T20:38:48.472Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:48.474Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:48.474Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:48.474Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:48.480Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:48.480Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:48.480Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:48.482Z [DEBUG] [useDeferredValue] Messages deferred by 1 (43→44)
+2026-03-22T20:38:48.489Z [DEBUG] [useDeferredValue] Messages deferred by 2 (43→45)
+2026-03-22T20:38:48.950Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:48.951Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:48.951Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:48.951Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:48.957Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:48.957Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:48.957Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:48.959Z [DEBUG] [useDeferredValue] Messages deferred by 1 (45→46)
+2026-03-22T20:38:48.965Z [DEBUG] [useDeferredValue] Messages deferred by 2 (45→47)
+2026-03-22T20:38:49.803Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:49.804Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:49.804Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:49.804Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:49.808Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:49.808Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:49.808Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:49.810Z [DEBUG] [useDeferredValue] Messages deferred by 1 (47→48)
+2026-03-22T20:38:49.814Z [DEBUG] [useDeferredValue] Messages deferred by 2 (47→49)
+2026-03-22T20:38:50.600Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:50.601Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:50.601Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:50.601Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:50.606Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:50.606Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:50.606Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:50.608Z [DEBUG] [useDeferredValue] Messages deferred by 1 (49→50)
+2026-03-22T20:38:50.618Z [DEBUG] [useDeferredValue] Messages deferred by 2 (49→51)
+2026-03-22T20:38:50.846Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:50.847Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:50.847Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:50.847Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:50.851Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:50.851Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:50.851Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:50.853Z [DEBUG] [useDeferredValue] Messages deferred by 1 (51→52)
+2026-03-22T20:38:50.863Z [DEBUG] [useDeferredValue] Messages deferred by 2 (51→53)
+2026-03-22T20:38:51.669Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:51.671Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:51.671Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:51.671Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:51.677Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:51.677Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:51.677Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:51.679Z [DEBUG] [useDeferredValue] Messages deferred by 1 (53→54)
+2026-03-22T20:38:52.097Z [DEBUG] [useDeferredValue] Messages deferred by 1 (54→55)
+2026-03-22T20:38:52.131Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:52.132Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:52.132Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:52.132Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:52.136Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:52.136Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:52.136Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:52.137Z [DEBUG] [useDeferredValue] Messages deferred by 1 (55→56)
+2026-03-22T20:38:52.142Z [DEBUG] [useDeferredValue] Messages deferred by 2 (55→57)
+2026-03-22T20:38:52.585Z [DEBUG] executePreToolHooks called for tool: Read
+2026-03-22T20:38:52.586Z [DEBUG] Getting matching hook commands for PreToolUse with query: Read
+2026-03-22T20:38:52.586Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:38:52.586Z [DEBUG] Matched 0 unique hooks for query "Read" (0 before deduplication)
+2026-03-22T20:38:52.591Z [DEBUG] Getting matching hook commands for PostToolUse with query: Read
+2026-03-22T20:38:52.591Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:38:52.591Z [DEBUG] Matched 1 unique hooks for query "Read" (1 before deduplication)
+2026-03-22T20:38:52.594Z [DEBUG] [useDeferredValue] Messages deferred by 1 (57→58)
+2026-03-22T20:38:52.604Z [DEBUG] [useDeferredValue] Messages deferred by 2 (57→59)
+2026-03-22T20:38:52.611Z [DEBUG] autocompact: tokens=27161 threshold=167000 effectiveWindow=180000
+2026-03-22T20:38:52.611Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:38:52.612Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:38:52.615Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:38:52.616Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.e67; cc_entrypoint=cli;
+2026-03-22T20:38:52.617Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:38:52.617Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:38:52.618Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:38:52.620Z [DEBUG] [useDeferredValue] Messages deferred by 2 (57→59)
+2026-03-22T20:38:54.802Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:40:12.610Z [DEBUG] Getting matching hook commands for SubagentStop with query: general-purpose
+2026-03-22T20:40:12.610Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:40:12.610Z [DEBUG] Matched 0 unique hooks for query "general-purpose" (0 before deduplication)
+2026-03-22T20:40:12.619Z [DEBUG] Getting matching hook commands for PostToolUse with query: Task
+2026-03-22T20:40:12.619Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:40:12.619Z [DEBUG] Matched 0 unique hooks for query "Task" (0 before deduplication)
+2026-03-22T20:40:12.621Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:40:12.621Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:40:12.621Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:40:12.621Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:40:12.622Z [DEBUG] autocompact: tokens=45959 threshold=167000 effectiveWindow=180000
+2026-03-22T20:40:12.622Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:40:12.622Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:40:12.626Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:40:12.629Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:40:12.632Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:40:12.632Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:40:12.632Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:40:12.640Z [DEBUG] [useDeferredValue] Messages deferred by 2 (59→61)
+2026-03-22T20:40:12.654Z [DEBUG] High write ratio: blit=0, write=5756 (100.0% writes), screen=120x239
+2026-03-22T20:40:14.126Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:40:15.156Z [DEBUG] [useDeferredValue] Messages deferred by 1 (61→62)
+2026-03-22T20:40:15.167Z [DEBUG] [useDeferredValue] Messages deferred by 1 (61→62)
+2026-03-22T20:40:15.178Z [DEBUG] [useDeferredValue] Messages deferred by 1 (61→62)
+2026-03-22T20:40:18.775Z [DEBUG] executePreToolHooks called for tool: Edit
+2026-03-22T20:40:18.775Z [DEBUG] Getting matching hook commands for PreToolUse with query: Edit
+2026-03-22T20:40:18.775Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:40:18.775Z [DEBUG] Matched 0 unique hooks for query "Edit" (0 before deduplication)
+2026-03-22T20:40:18.784Z [DEBUG] FileHistory: Tracked file modification for /Users/canerden/habitatv5/vite.config.ts
+2026-03-22T20:40:18.785Z [DEBUG] Writing to temp file: /Users/canerden/habitatv5/vite.config.ts.tmp.46595.1774212018785
+2026-03-22T20:40:18.785Z [DEBUG] Preserving file permissions: 100644
+2026-03-22T20:40:18.785Z [DEBUG] Temp file written successfully, size: 343 bytes
+2026-03-22T20:40:18.785Z [DEBUG] Applied original permissions to temp file
+2026-03-22T20:40:18.785Z [DEBUG] Renaming /Users/canerden/habitatv5/vite.config.ts.tmp.46595.1774212018785 to /Users/canerden/habitatv5/vite.config.ts
+2026-03-22T20:40:18.786Z [DEBUG] File /Users/canerden/habitatv5/vite.config.ts written atomically
+2026-03-22T20:40:18.787Z [DEBUG] Getting matching hook commands for PostToolUse with query: Edit
+2026-03-22T20:40:18.787Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:40:18.787Z [DEBUG] Matched 1 unique hooks for query "Edit" (1 before deduplication)
+2026-03-22T20:40:18.787Z [DEBUG] [useDeferredValue] Messages deferred by 1 (62→63)
+2026-03-22T20:40:18.797Z [DEBUG] High write ratio: blit=0, write=5868 (100.0% writes), screen=123x239
+2026-03-22T20:40:18.797Z [DEBUG] [lspRecommendation] Looking for LSP plugins for .ts
+2026-03-22T20:40:18.798Z [DEBUG] [lspRecommendation] Failed to load marketplace claude-plugins-official: ConfigParseError: Invalid schema: plugins.2.source: Invalid input, plugins.5.source: Invalid input, plugins.12.source: Invalid input, plugins.29.source: Invalid input, plugins.48.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.63.source: Invalid input, plugins.85.source: Invalid input, plugins.95.source: Invalid input, plugins.103.source: Invalid input, plugins.115.source: Invalid input
+2026-03-22T20:40:18.800Z [DEBUG] [useDeferredValue] Messages deferred by 4 (62→66)
+2026-03-22T20:40:18.807Z [DEBUG] [useDeferredValue] Messages deferred by 4 (62→66)
+2026-03-22T20:40:20.075Z [DEBUG] executePreToolHooks called for tool: Edit
+2026-03-22T20:40:20.076Z [DEBUG] Getting matching hook commands for PreToolUse with query: Edit
+2026-03-22T20:40:20.076Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:40:20.076Z [DEBUG] Matched 0 unique hooks for query "Edit" (0 before deduplication)
+2026-03-22T20:40:20.082Z [DEBUG] FileHistory: Tracked file modification for /Users/canerden/habitatv5/package.json
+2026-03-22T20:40:20.082Z [DEBUG] Writing to temp file: /Users/canerden/habitatv5/package.json.tmp.46595.1774212020082
+2026-03-22T20:40:20.082Z [DEBUG] Preserving file permissions: 100644
+2026-03-22T20:40:20.082Z [DEBUG] Temp file written successfully, size: 2824 bytes
+2026-03-22T20:40:20.082Z [DEBUG] Applied original permissions to temp file
+2026-03-22T20:40:20.082Z [DEBUG] Renaming /Users/canerden/habitatv5/package.json.tmp.46595.1774212020082 to /Users/canerden/habitatv5/package.json
+2026-03-22T20:40:20.083Z [DEBUG] File /Users/canerden/habitatv5/package.json written atomically
+2026-03-22T20:40:20.083Z [DEBUG] Getting matching hook commands for PostToolUse with query: Edit
+2026-03-22T20:40:20.083Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:40:20.083Z [DEBUG] Matched 1 unique hooks for query "Edit" (1 before deduplication)
+2026-03-22T20:40:20.086Z [DEBUG] [useDeferredValue] Messages deferred by 1 (66→67)
+2026-03-22T20:40:20.088Z [DEBUG] [lspRecommendation] Looking for LSP plugins for .json
+2026-03-22T20:40:20.088Z [DEBUG] [lspRecommendation] Failed to load marketplace claude-plugins-official: ConfigParseError: Invalid schema: plugins.2.source: Invalid input, plugins.5.source: Invalid input, plugins.12.source: Invalid input, plugins.29.source: Invalid input, plugins.48.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.63.source: Invalid input, plugins.85.source: Invalid input, plugins.95.source: Invalid input, plugins.103.source: Invalid input, plugins.115.source: Invalid input
+2026-03-22T20:40:20.089Z [DEBUG] [useDeferredValue] Messages deferred by 4 (66→70)
+2026-03-22T20:40:20.097Z [DEBUG] High write ratio: blit=0, write=9342 (100.0% writes), screen=142x239
+2026-03-22T20:40:20.098Z [DEBUG] [useDeferredValue] Messages deferred by 4 (66→70)
+2026-03-22T20:40:20.127Z [DEBUG] High write ratio: blit=0, write=10981 (100.0% writes), screen=152x239
+2026-03-22T20:40:25.622Z [DEBUG] executePreToolHooks called for tool: Edit
+2026-03-22T20:40:25.623Z [DEBUG] Getting matching hook commands for PreToolUse with query: Edit
+2026-03-22T20:40:25.623Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:40:25.623Z [DEBUG] Matched 0 unique hooks for query "Edit" (0 before deduplication)
+2026-03-22T20:40:25.630Z [DEBUG] FileHistory: Tracked file modification for /Users/canerden/habitatv5/supabase/functions/generate-startup-content/index.ts
+2026-03-22T20:40:25.630Z [DEBUG] Writing to temp file: /Users/canerden/habitatv5/supabase/functions/generate-startup-content/index.ts.tmp.46595.1774212025630
+2026-03-22T20:40:25.630Z [DEBUG] Preserving file permissions: 100644
+2026-03-22T20:40:25.633Z [DEBUG] Temp file written successfully, size: 20308 bytes
+2026-03-22T20:40:25.633Z [DEBUG] Applied original permissions to temp file
+2026-03-22T20:40:25.633Z [DEBUG] Renaming /Users/canerden/habitatv5/supabase/functions/generate-startup-content/index.ts.tmp.46595.1774212025630 to /Users/canerden/habitatv5/supabase/functions/generate-startup-content/index.ts
+2026-03-22T20:40:25.634Z [DEBUG] File /Users/canerden/habitatv5/supabase/functions/generate-startup-content/index.ts written atomically
+2026-03-22T20:40:25.635Z [DEBUG] Getting matching hook commands for PostToolUse with query: Edit
+2026-03-22T20:40:25.635Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:40:25.635Z [DEBUG] Matched 1 unique hooks for query "Edit" (1 before deduplication)
+2026-03-22T20:40:25.636Z [DEBUG] [useDeferredValue] Messages deferred by 4 (70→74)
+2026-03-22T20:40:25.654Z [DEBUG] High write ratio: blit=0, write=10981 (100.0% writes), screen=152x239
+2026-03-22T20:40:25.655Z [DEBUG] [useDeferredValue] Messages deferred by 4 (70→74)
+2026-03-22T20:40:25.656Z [DEBUG] [useDeferredValue] Messages deferred by 4 (70→74)
+2026-03-22T20:40:25.657Z [DEBUG] [useDeferredValue] Messages deferred by 4 (70→74)
+2026-03-22T20:40:25.657Z [DEBUG] [useDeferredValue] Messages deferred by 4 (70→74)
+2026-03-22T20:40:25.698Z [DEBUG] High write ratio: blit=0, write=17670 (100.0% writes), screen=184x239
+2026-03-22T20:40:32.253Z [DEBUG] executePreToolHooks called for tool: Edit
+2026-03-22T20:40:32.254Z [DEBUG] Getting matching hook commands for PreToolUse with query: Edit
+2026-03-22T20:40:32.254Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:40:32.254Z [DEBUG] Matched 0 unique hooks for query "Edit" (0 before deduplication)
+2026-03-22T20:40:32.260Z [DEBUG] FileHistory: Tracked file modification for /Users/canerden/habitatv5/.env
+2026-03-22T20:40:32.261Z [DEBUG] Writing to temp file: /Users/canerden/habitatv5/.env.tmp.46595.1774212032261
+2026-03-22T20:40:32.261Z [DEBUG] Preserving file permissions: 100644
+2026-03-22T20:40:32.261Z [DEBUG] Temp file written successfully, size: 159 bytes
+2026-03-22T20:40:32.261Z [DEBUG] Applied original permissions to temp file
+2026-03-22T20:40:32.261Z [DEBUG] Renaming /Users/canerden/habitatv5/.env.tmp.46595.1774212032261 to /Users/canerden/habitatv5/.env
+2026-03-22T20:40:32.264Z [DEBUG] File /Users/canerden/habitatv5/.env written atomically
+2026-03-22T20:40:32.265Z [DEBUG] Getting matching hook commands for PostToolUse with query: Edit
+2026-03-22T20:40:32.265Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:40:32.265Z [DEBUG] Matched 1 unique hooks for query "Edit" (1 before deduplication)
+2026-03-22T20:40:32.266Z [DEBUG] [useDeferredValue] Messages deferred by 1 (74→75)
+2026-03-22T20:40:32.293Z [DEBUG] High write ratio: blit=0, write=17671 (100.0% writes), screen=184x239
+2026-03-22T20:40:32.294Z [DEBUG] [lspRecommendation] No file extension found
+2026-03-22T20:40:32.332Z [DEBUG] High write ratio: blit=0, write=17694 (100.0% writes), screen=186x239
+2026-03-22T20:40:32.724Z [DEBUG] [useDeferredValue] Messages deferred by 3 (75→78)
+2026-03-22T20:40:32.763Z [DEBUG] High write ratio: blit=0, write=17694 (100.0% writes), screen=186x239
+2026-03-22T20:40:32.765Z [DEBUG] [useDeferredValue] Messages deferred by 3 (75→78)
+2026-03-22T20:40:32.768Z [DEBUG] [useDeferredValue] Messages deferred by 3 (75→78)
+2026-03-22T20:40:32.769Z [DEBUG] [useDeferredValue] Messages deferred by 3 (75→78)
+2026-03-22T20:40:32.769Z [DEBUG] [useDeferredValue] Messages deferred by 3 (75→78)
+2026-03-22T20:40:32.770Z [DEBUG] [useDeferredValue] Messages deferred by 3 (75→78)
+2026-03-22T20:40:32.814Z [DEBUG] High write ratio: blit=0, write=19318 (100.0% writes), screen=194x239
+2026-03-22T20:40:33.012Z [DEBUG] executePreToolHooks called for tool: Edit
+2026-03-22T20:40:33.013Z [DEBUG] Getting matching hook commands for PreToolUse with query: Edit
+2026-03-22T20:40:33.013Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:40:33.013Z [DEBUG] Matched 0 unique hooks for query "Edit" (0 before deduplication)
+2026-03-22T20:40:33.018Z [DEBUG] FileHistory: Tracked file modification for /Users/canerden/habitatv5/supabase/config.toml
+2026-03-22T20:40:33.018Z [DEBUG] Writing to temp file: /Users/canerden/habitatv5/supabase/config.toml.tmp.46595.1774212033018
+2026-03-22T20:40:33.018Z [DEBUG] Preserving file permissions: 100644
+2026-03-22T20:40:33.018Z [DEBUG] Temp file written successfully, size: 35 bytes
+2026-03-22T20:40:33.018Z [DEBUG] Applied original permissions to temp file
+2026-03-22T20:40:33.018Z [DEBUG] Renaming /Users/canerden/habitatv5/supabase/config.toml.tmp.46595.1774212033018 to /Users/canerden/habitatv5/supabase/config.toml
+2026-03-22T20:40:33.019Z [DEBUG] File /Users/canerden/habitatv5/supabase/config.toml written atomically
+2026-03-22T20:40:33.020Z [DEBUG] Getting matching hook commands for PostToolUse with query: Edit
+2026-03-22T20:40:33.020Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:40:33.020Z [DEBUG] Matched 1 unique hooks for query "Edit" (1 before deduplication)
+2026-03-22T20:40:33.021Z [DEBUG] [useDeferredValue] Messages deferred by 1 (78→79)
+2026-03-22T20:40:33.051Z [DEBUG] High write ratio: blit=0, write=19318 (100.0% writes), screen=194x239
+2026-03-22T20:40:33.052Z [DEBUG] [lspRecommendation] Looking for LSP plugins for .toml
+2026-03-22T20:40:33.052Z [DEBUG] [lspRecommendation] Failed to load marketplace claude-plugins-official: ConfigParseError: Invalid schema: plugins.2.source: Invalid input, plugins.5.source: Invalid input, plugins.12.source: Invalid input, plugins.29.source: Invalid input, plugins.48.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.63.source: Invalid input, plugins.85.source: Invalid input, plugins.95.source: Invalid input, plugins.103.source: Invalid input, plugins.115.source: Invalid input
+2026-03-22T20:40:33.053Z [DEBUG] [useDeferredValue] Messages deferred by 4 (78→82)
+2026-03-22T20:40:33.056Z [DEBUG] [useDeferredValue] Messages deferred by 4 (78→82)
+2026-03-22T20:40:33.063Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:40:33.063Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:40:33.063Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:40:33.063Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:40:33.063Z [DEBUG] autocompact: tokens=47759 threshold=167000 effectiveWindow=180000
+2026-03-22T20:40:33.063Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:40:33.063Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:40:33.064Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:40:33.065Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:40:33.066Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:40:33.066Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:40:33.066Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:40:35.012Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:40:35.883Z [DEBUG] [useDeferredValue] Messages deferred by 1 (82→83)
+2026-03-22T20:41:42.584Z [WARN] Streaming stall detected: 66.2s gap between events (stall #1)
+2026-03-22T20:41:46.703Z [DEBUG] executePreToolHooks called for tool: Write
+2026-03-22T20:41:46.704Z [DEBUG] Getting matching hook commands for PreToolUse with query: Write
+2026-03-22T20:41:46.704Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:41:46.704Z [DEBUG] Matched 0 unique hooks for query "Write" (0 before deduplication)
+2026-03-22T20:41:46.705Z [DEBUG] FileHistory: Tracked file modification for /Users/canerden/habitatv5/supabase/migrations/00000000000000_full_schema.sql
+2026-03-22T20:41:46.705Z [DEBUG] Writing to temp file: /Users/canerden/habitatv5/supabase/migrations/00000000000000_full_schema.sql.tmp.46595.1774212106705
+2026-03-22T20:41:46.706Z [DEBUG] Temp file written successfully, size: 26063 bytes
+2026-03-22T20:41:46.706Z [DEBUG] Renaming /Users/canerden/habitatv5/supabase/migrations/00000000000000_full_schema.sql.tmp.46595.1774212106705 to /Users/canerden/habitatv5/supabase/migrations/00000000000000_full_schema.sql
+2026-03-22T20:41:46.707Z [DEBUG] File /Users/canerden/habitatv5/supabase/migrations/00000000000000_full_schema.sql written atomically
+2026-03-22T20:41:46.709Z [DEBUG] Getting matching hook commands for PostToolUse with query: Write
+2026-03-22T20:41:46.709Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:41:46.709Z [DEBUG] Matched 1 unique hooks for query "Write" (1 before deduplication)
+2026-03-22T20:41:46.710Z [DEBUG] [useDeferredValue] Messages deferred by 1 (83→84)
+2026-03-22T20:41:46.738Z [DEBUG] High write ratio: blit=0, write=20368 (100.0% writes), screen=203x239
+2026-03-22T20:41:46.739Z [DEBUG] [lspRecommendation] Looking for LSP plugins for .sql
+2026-03-22T20:41:46.739Z [DEBUG] [lspRecommendation] Failed to load marketplace claude-plugins-official: ConfigParseError: Invalid schema: plugins.2.source: Invalid input, plugins.5.source: Invalid input, plugins.12.source: Invalid input, plugins.29.source: Invalid input, plugins.48.source: Invalid input, plugins.56.source: Invalid input, plugins.61.source: Invalid input, plugins.63.source: Invalid input, plugins.85.source: Invalid input, plugins.95.source: Invalid input, plugins.103.source: Invalid input, plugins.115.source: Invalid input
+2026-03-22T20:41:46.740Z [DEBUG] [useDeferredValue] Messages deferred by 4 (83→87)
+2026-03-22T20:41:46.743Z [DEBUG] [useDeferredValue] Messages deferred by 4 (83→87)
+2026-03-22T20:41:46.756Z [WARN] Streaming completed with 1 stall(s), total stall time: 66.2s
+2026-03-22T20:41:46.757Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:41:46.757Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:41:46.757Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:41:46.757Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:41:46.757Z [DEBUG] autocompact: tokens=54603 threshold=167000 effectiveWindow=180000
+2026-03-22T20:41:46.757Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:41:46.757Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:41:46.759Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:41:46.759Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:41:46.761Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:41:46.761Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:41:46.761Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:41:46.764Z [DEBUG] [useDeferredValue] Messages deferred by 4 (83→87)
+2026-03-22T20:41:49.231Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:41:49.749Z [DEBUG] [useDeferredValue] Messages deferred by 1 (87→88)
+2026-03-22T20:41:49.757Z [DEBUG] [useDeferredValue] Messages deferred by 1 (87→88)
+2026-03-22T20:41:49.766Z [DEBUG] [useDeferredValue] Messages deferred by 1 (87→88)
+2026-03-22T20:42:06.300Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-22T20:42:06.302Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-22T20:42:06.302Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:42:06.302Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:42:06.318Z [DEBUG] [useDeferredValue] Messages deferred by 1 (88→89)
+2026-03-22T20:42:06.344Z [DEBUG] High write ratio: blit=0, write=21186 (100.0% writes), screen=219x239
+2026-03-22T20:42:06.345Z [DEBUG] [useDeferredValue] Messages deferred by 1 (88→89)
+2026-03-22T20:42:06.386Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:42:06.386Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.558; cc_entrypoint=cli;
+2026-03-22T20:42:06.386Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:42:06.386Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:42:06.387Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:42:06.387Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-22T20:42:06.387Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:42:06.387Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:42:06.388Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:42:06.388Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:42:06.388Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:42:06.388Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:42:06.389Z [DEBUG] autocompact: tokens=55353 threshold=167000 effectiveWindow=180000
+2026-03-22T20:42:06.389Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:42:06.389Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:42:06.393Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:42:06.393Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:42:06.395Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:42:06.395Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:42:06.395Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:42:06.397Z [DEBUG] [useDeferredValue] Messages deferred by 2 (89→91)
+2026-03-22T20:42:07.144Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:42:07.940Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:42:08.889Z [DEBUG] [useDeferredValue] Messages deferred by 1 (91→92)
+2026-03-22T20:42:10.119Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-22T20:42:10.120Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-22T20:42:10.120Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:42:10.120Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:42:10.127Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:42:10.127Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.558; cc_entrypoint=cli;
+2026-03-22T20:42:10.128Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:42:10.128Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:42:10.128Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:42:10.132Z [DEBUG] [useDeferredValue] Messages deferred by 1 (92→93)
+2026-03-22T20:42:10.163Z [DEBUG] High write ratio: blit=0, write=21405 (100.0% writes), screen=224x239
+2026-03-22T20:42:11.318Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:42:11.541Z [DEBUG] Permission suggestions for Bash: [
+  {
+    "type": "addRules",
+    "rules": [
+      {
+        "toolName": "Bash",
+        "ruleContent": "npm install:*"
+      }
+    ],
+    "behavior": "allow",
+    "destination": "localSettings"
+  }
+]
+2026-03-22T20:42:11.542Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-03-22T20:42:11.543Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-03-22T20:42:11.543Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:42:11.543Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:42:11.560Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-03-22T20:42:17.563Z [DEBUG] Getting matching hook commands for Notification with query: permission_prompt
+2026-03-22T20:42:17.563Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:42:17.563Z [DEBUG] Matched 0 unique hooks for query "permission_prompt" (0 before deduplication)
+2026-03-22T20:43:40.633Z [DEBUG] Started caffeinate to prevent sleep
+2026-03-22T20:43:40.634Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-22T20:43:41.123Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-22T20:43:41.123Z [DEBUG] AutoUpdater: Using global update method
+2026-03-22T20:43:41.272Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-22T20:43:42.601Z [DEBUG] [useDeferredValue] Messages deferred by 1 (93→94)
+2026-03-22T20:43:42.940Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:43:42.941Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.558; cc_entrypoint=cli;
+2026-03-22T20:43:42.941Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:43:42.941Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:43:42.942Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:43:42.944Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-22T20:43:42.944Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:43:42.944Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:43:42.947Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:43:42.947Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:43:42.947Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:43:42.947Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:43:42.947Z [DEBUG] autocompact: tokens=55605 threshold=167000 effectiveWindow=180000
+2026-03-22T20:43:42.948Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:43:42.948Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:43:42.950Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:43:42.951Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:43:42.952Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:43:42.952Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:43:42.952Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:43:42.956Z [DEBUG] [useDeferredValue] Messages deferred by 1 (94→95)
+2026-03-22T20:43:42.981Z [DEBUG] High write ratio: blit=0, write=21493 (100.0% writes), screen=227x239
+2026-03-22T20:43:43.953Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:43:44.356Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:43:45.240Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-22T20:43:45.241Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-22T20:43:45.241Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:43:45.241Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:43:45.242Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:43:45.242Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:43:45.242Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.4d1; cc_entrypoint=cli;
+2026-03-22T20:43:45.243Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:43:45.243Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:43:45.243Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.4d1; cc_entrypoint=cli;
+2026-03-22T20:43:45.243Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:43:45.243Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:43:45.243Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:43:45.243Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:43:45.245Z [DEBUG] [useDeferredValue] Messages deferred by 1 (95→96)
+2026-03-22T20:43:45.269Z [DEBUG] High write ratio: blit=0, write=21573 (100.0% writes), screen=231x239
+2026-03-22T20:43:45.270Z [DEBUG] [useDeferredValue] Messages deferred by 1 (95→96)
+2026-03-22T20:43:45.786Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:43:45.891Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:43:45.962Z [DEBUG] Permission suggestions for Bash: [
+  {
+    "type": "addRules",
+    "rules": [
+      {
+        "toolName": "Bash",
+        "ruleContent": "npm run build:*"
+      }
+    ],
+    "behavior": "allow",
+    "destination": "localSettings"
+  }
+]
+2026-03-22T20:43:45.962Z [DEBUG] executePermissionRequestHooks called for tool: Bash
+2026-03-22T20:43:45.964Z [DEBUG] Getting matching hook commands for PermissionRequest with query: Bash
+2026-03-22T20:43:45.964Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:43:45.964Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:43:45.973Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-03-22T20:43:47.472Z [DEBUG] Started caffeinate to prevent sleep
+2026-03-22T20:43:47.475Z [DEBUG] AutoUpdaterWrapper: Installation type: npm-global
+2026-03-22T20:43:47.941Z [DEBUG] AutoUpdater: Detected installation type: npm-global
+2026-03-22T20:43:47.941Z [DEBUG] AutoUpdater: Using global update method
+2026-03-22T20:43:48.101Z [ERROR] WZ6: WZ6: Insufficient permissions for global npm install.
+    at bSA (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3652:1145)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async QU1 (file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:3662:43)
+    at async file:///usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js:6278:16279
+2026-03-22T20:43:49.447Z [DEBUG] [useDeferredValue] Messages deferred by 1 (96→97)
+2026-03-22T20:43:50.459Z [DEBUG] [useDeferredValue] Messages deferred by 1 (97→98)
+2026-03-22T20:43:50.782Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:43:50.783Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.4d1; cc_entrypoint=cli;
+2026-03-22T20:43:50.783Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:43:50.783Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:43:50.783Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:43:50.784Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-22T20:43:50.784Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:43:50.784Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:43:50.787Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:43:50.787Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:43:50.787Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:43:50.787Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:43:50.788Z [DEBUG] autocompact: tokens=55964 threshold=167000 effectiveWindow=180000
+2026-03-22T20:43:50.788Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:43:50.788Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:43:50.790Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:43:50.791Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:43:50.794Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:43:50.794Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:43:50.795Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:43:50.801Z [DEBUG] [useDeferredValue] Messages deferred by 1 (98→99)
+2026-03-22T20:43:50.829Z [DEBUG] High write ratio: blit=0, write=21623 (100.0% writes), screen=234x239
+2026-03-22T20:43:51.530Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:43:52.669Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:43:53.597Z [DEBUG] [useDeferredValue] Messages deferred by 1 (99→100)
+2026-03-22T20:43:53.600Z [DEBUG] [useDeferredValue] Messages deferred by 1 (99→100)
+2026-03-22T20:43:53.606Z [DEBUG] [useDeferredValue] Messages deferred by 1 (99→100)
+2026-03-22T20:43:54.222Z [DEBUG] executePreToolHooks called for tool: Bash
+2026-03-22T20:43:54.223Z [DEBUG] Getting matching hook commands for PreToolUse with query: Bash
+2026-03-22T20:43:54.223Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:43:54.223Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:43:54.226Z [DEBUG] [useDeferredValue] Messages deferred by 1 (100→101)
+2026-03-22T20:43:54.250Z [DEBUG] High write ratio: blit=0, write=21780 (100.0% writes), screen=239x239
+2026-03-22T20:43:54.255Z [DEBUG] [useDeferredValue] Messages deferred by 1 (100→101)
+2026-03-22T20:43:54.256Z [DEBUG] [useDeferredValue] Messages deferred by 1 (100→101)
+2026-03-22T20:43:54.293Z [DEBUG] Tool search disabled for model 'claude-haiku-4-5-20251001': model does not support tool_reference blocks. This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.
+2026-03-22T20:43:54.293Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.558; cc_entrypoint=cli;
+2026-03-22T20:43:54.293Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:43:54.293Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:43:54.294Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:43:54.294Z [DEBUG] Getting matching hook commands for PostToolUse with query: Bash
+2026-03-22T20:43:54.294Z [DEBUG] Found 5 hook matchers in settings
+2026-03-22T20:43:54.294Z [DEBUG] Matched 0 unique hooks for query "Bash" (0 before deduplication)
+2026-03-22T20:43:54.295Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-03-22T20:43:54.295Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-03-22T20:43:54.295Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-03-22T20:43:54.295Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-03-22T20:43:54.295Z [DEBUG] autocompact: tokens=56179 threshold=167000 effectiveWindow=180000
+2026-03-22T20:43:54.295Z [DEBUG] Auto tool search enabled: 34944 tokens (threshold: 20000, 10% of context) [source: query]
+2026-03-22T20:43:54.295Z [DEBUG] Using tool-based global cache marker on ReadMcpResourceTool
+2026-03-22T20:43:54.297Z [DEBUG] Dynamic tool loading: 0/39 deferred tools included
+2026-03-22T20:43:54.297Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.34.c17; cc_entrypoint=cli;
+2026-03-22T20:43:54.299Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-03-22T20:43:54.299Z [DEBUG] [API:auth] OAuth token check starting
+2026-03-22T20:43:54.299Z [DEBUG] [API:auth] OAuth token check complete
+2026-03-22T20:43:54.302Z [DEBUG] [useDeferredValue] Messages deferred by 1 (101→102)
+2026-03-22T20:43:54.840Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:43:56.891Z [DEBUG] Stream started - received first chunk
+2026-03-22T20:44:06.577Z [DEBUG] [useDeferredValue] Messages deferred by 1 (102→103)
+2026-03-22T20:44:06.617Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-03-22T20:44:06.617Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:44:06.617Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-03-22T20:44:06.622Z [DEBUG] [useDeferredValue] Messages deferred by 1 (103→104)
+2026-03-22T20:44:06.625Z [DEBUG] Stopped caffeinate, allowing sleep
+2026-03-22T20:45:06.672Z [DEBUG] Getting matching hook commands for Notification with query: idle_prompt
+2026-03-22T20:45:06.677Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:45:06.678Z [DEBUG] Matched 0 unique hooks for query "idle_prompt" (0 before deduplication)
+2026-03-22T20:45:40.222Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-03-22T20:45:40.225Z [DEBUG] Found 0 hook matchers in settings
+2026-03-22T20:45:40.225Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)

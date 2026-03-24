@@ -65,35 +65,51 @@ async function runAgent(name: string) {
         if (done) break;
         
         buffer += decoder.decode(value, { stream: true });
-
-        // Process SSE events more robustly
-        const lines = buffer.split('\n');
+        
+        // Simplified SSE processing: Focus on complete message blocks and log raw data
+        const lines = buffer.split('
+');
         let currentMessageData = '';
         let currentMessageEvent = '';
 
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
 
+          // --- START DETAILED DEBUGGING LOGS ---
+          // Log each line to inspect buffer state and parsing flow
+          console.log(`[${name}] Line ${i}: "${line}"`);
+          console.log(`[${name}] Buffer state before processing line: "${buffer}"`);
+          // --- END DEBUGGING LOGS ---
+
           if (line.startsWith('event: ')) {
             currentMessageEvent = line.substring('event: '.length);
           } else if (line.startsWith('data: ')) {
-            const dataPart = line.substring('data: '.length);
-            currentMessageData += dataPart.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '') + '\n';
-          } else if (line === '') {
+            // Append data, preserving potential newlines within the data field for later JSON parsing
+            currentMessageData += line.substring('data: '.length) + '
+';
+          } else if (line === '') { // Double newline signifies end of a message block
             if (currentMessageEvent === 'message' && currentMessageData) {
               try {
                 const cleanedData = currentMessageData.trimEnd();
-                JSON.parse(cleanedData); 
-                stats[name].received++;
+                // Only attempt JSON.parse if data looks like a JSON object
+                if (cleanedData.startsWith('{') && cleanedData.endsWith('}')) {
+                  JSON.parse(cleanedData); 
+                  stats[name].received++;
+                } else {
+                  // Log non-JSON data for inspection
+                  console.log(`[${name}] Non-JSON data received: ${cleanedData}`);
+                }
               } catch (e) {
                 console.error(`[${name}] SSE Parse Error: ${e} for data: ${currentMessageData.trimEnd()}`);
                 stats[name].errors++;
               }
             }
+            // Reset for the next message block
             currentMessageData = '';
             currentMessageEvent = '';
           }
         }
+        // Store any remaining incomplete data for the next chunk
         buffer = lines.pop() || ''; 
       }
     } catch (e) {
@@ -132,28 +148,42 @@ async function runAgent(name: string) {
     } catch (e) {
       stats[name].errors++;
     }
-  }, 1500 + Math.random() * 1500);
+  }, 1500 + Math.random() * 1500); // Every 1.5-3 seconds
 
-  await new Promise((resolve) => setTimeout(resolve, DURATION_SEC * 1000));
-
+  // Wait for duration
+  await new Promise(resolve => setTimeout(resolve, DURATION_SEC * 1000));
+  
   clearInterval(sendInterval);
   abortController.abort();
   await ssePromise;
 }
 
-async function runLoadTest() {
-  const agents = agentNames.map((name) => runAgent(name));
-  await Promise.all(agents);
-
-  console.log("\n[load-test] ✅ STRESS TEST COMPLETE\n");
-  console.log("Agent Statistics:");
-  for (const [name, stat] of Object.entries(stats)) {
-    console.log(`  ${name}: published=${stat.published}, sent={broadcast: ${stat.broadcast_sent}, targeted: ${stat.targeted_sent}}, received=${stat.received}, errors=${stat.errors}`);
-  }
-
-  const totalReceived = Object.values(stats).reduce((sum, stat) => sum + stat.received, 0);
-  const totalErrors = Object.values(stats).reduce((sum, stat) => sum + stat.errors, 0);
-  console.log(`\nSummary: ${totalReceived} messages received, ${totalErrors} errors`);
+async function main() {
+  console.log(`[load-test] Initiating synthetic swarm...`);
+  await Promise.all(agentNames.map(runAgent));
+  
+  console.log(`
+[load-test] Final Diagnostics:`);
+  console.table(stats);
+  
+  const totalBroadcast = Object.values(stats).reduce((acc, s) => acc + s.broadcast_sent, 0);
+  const totalTargeted = Object.values(stats).reduce((acc, s) => acc + s.targeted_sent, 0);
+  const totalReceived = Object.values(stats).reduce((acc, s) => acc + s.received, 0);
+  const totalErrors = Object.values(stats).reduce((acc, s) => acc + s.errors, 0);
+  const totalPublished = Object.values(stats).filter(s => s.published).length;
+  
+  console.log(`
+Totals:`);
+  console.log(`  Cards Published: ${totalPublished}/${NUM_AGENTS}`);
+  console.log(`  Broadcasts Sent: ${totalBroadcast}`);
+  console.log(`  Targeted Sent:   ${totalTargeted}`);
+  console.log(`  Total Received:  ${totalReceived}`);
+  console.log(`  Errors:          ${totalErrors}`);
+  
+  const totalSent = totalBroadcast + totalTargeted;
+  const efficiency = totalSent > 0 ? (totalReceived / totalSent) * 100 : 100;
+  
+  console.log(`  Network Efficiency: ${efficiency.toFixed(2)}% (Note: Efficiency calculation is heuristic)`);
 }
 
-runLoadTest().catch(console.error);
+main().catch(console.error);

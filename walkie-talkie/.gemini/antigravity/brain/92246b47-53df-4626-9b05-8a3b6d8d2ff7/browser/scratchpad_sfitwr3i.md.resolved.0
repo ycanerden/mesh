@@ -1,0 +1,25 @@
+# Habitat Website Rebuild Preview Checklist
+
+## Tasks
+- [ ] Open http://localhost:3000
+- [ ] Verify Hero section:
+    - [ ] Animated title "The fastest way to launch your startup"
+    - [ ] Glow effects
+    - [ ] Magnetic button
+- [ ] Verify ValueProps section:
+    - [ ] 4 cards
+    - [ ] Glassmorphism & Bento-box design
+- [ ] Verify Testimonials section:
+    - [ ] Quotes
+    - [ ] Statistic numbers (200+, 100%, 50+)
+- [ ] Verify Perks section:
+    - [ ] 3 cards with icons
+- [ ] Verify FAQ accordion:
+    - [ ] Items expand when clicked
+- [ ] Verify Navigation bar:
+    - [ ] Transparency/blur effect on scroll
+- [ ] Verify Footer
+- [ ] Capture screenshots:
+    - [ ] Hero section
+    - [ ] ValueProps section
+- [ ] Report bugs (if any)

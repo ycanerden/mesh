@@ -1,0 +1,14 @@
+
+## walkie-talkie: Verify Antigravity MCP config format
+**What:** Before writing user-facing setup guides, verify how Antigravity (Google) handles MCP server configuration — specifically: config file path, expected JSON format, and whether Streamable HTTP URLs are supported.
+**Why:** Claude Code uses `.claude/settings.json` with a known MCP format. Antigravity is newer and its MCP config location/format may differ. Wrong setup instructions = users can't pair.
+**How to start:** Ask your friend (who uses Antigravity) to check their settings, or search Antigravity docs for "MCP server configuration". Compare against Claude Code's format.
+**Depends on:** Nothing — can be done before or during build.
+**Context:** Flagged during plan-eng-review 2026-03-24. Both founders use Antigravity as their second AI coding tool.
+
+## gstack-app: Windows/Linux support (v2)
+**What:** Port to Windows and Linux after macOS v1 ships.
+**Why:** Non-technical co-founders exist on all platforms. macOS-first reduces v1 scope.
+**How to start:** Replace `tauri-plugin-keyring` macOS Keychain calls with platform-conditional storage (`windows-credentials` on Windows, `libsecret` on Linux). Test PTY bridge on both platforms — `portable-pty` supports all three, so that part should mostly work.
+**Depends on:** v1 shipped and validated on macOS.
+**Context:** Explicitly out of v1 scope. Flagged during plan-eng-review 2026-03-23.

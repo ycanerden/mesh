@@ -1,0 +1,122 @@
+# Greg CRM — MVP Implementation Plan
+
+A local-first, agent-native CRM where contacts are markdown files. Built for founders, consultants and startup operators who hate Salesforce.
+
+> [!IMPORTANT]
+> **v1 wedge:** Warm intros & follow-ups for founders. Not a full sales CRM. Narrow and opinionated.
+
+## Architecture
+
+| Layer | Choice | Why |
+|-------|--------|-----|
+| **Frontend** | Vite + React | Browser-first MVP, fast iteration |
+| **Styling** | Vanilla CSS (Linear/Notion-inspired) | Clean, spacious, premium feel |
+| **Markdown** | `gray-matter` + `react-markdown` | Parse YAML frontmatter + render body |
+| **Storage** | localStorage (MVP) → filesystem (Electron, Phase 2) | Ship fast, add Electron later |
+| **Command Palette** | Custom component | Cmd+K primary interface |
+| **Fonts** | Inter + JetBrains Mono | Modern, readable |
+
+### Contact File Format (`~/greg/contacts/john-doe.md`)
+
+```markdown
+---
+name: John Doe
+email: john@example.com
+company: Acme Corp
+role: CTO
+tags: [investor, technical]
+phone: "+1-555-0123"
+linkedin: https://linkedin.com/in/johndoe
+status: warm
+last_contacted: 2026-03-01
+created: 2026-02-15
+---
+
+## Notes
+Met at YC Demo Day. Interested in our Series A.
+
+## Activity
+- **2026-03-01** — Sent follow-up email about partnership
+- **2026-02-20** — Coffee meeting, discussed roadmap
+- **2026-02-15** — Initial intro via Sarah
+```
+
+## Proposed Changes
+
+### Design System
+
+#### [NEW] `src/index.css`
+Dark-mode-first, Linear/Notion-inspired design system:
+- Spacious layout, subtle borders, clean typography
+- Soft gradients, glassmorphism accents
+- Smooth micro-animations
+- Premium feel — not a dev tool, a **founder tool**
+
+---
+
+### App Shell & Components
+
+#### [NEW] `src/App.jsx`
+Three-panel layout: sidebar → contact list → detail view. Hosts Cmd+K overlay.
+
+#### [NEW] `src/components/Sidebar.jsx`
+Navigation rail with contact groups, tags, search. Collapsible.
+
+#### [NEW] `src/components/ContactList.jsx`
+Scrollable contact cards with avatar, name, company, last-contacted indicator.
+
+#### [NEW] `src/components/ContactDetail.jsx`
+Full contact view: header with key info, tags, rendered notes, activity timeline. Toggle to edit mode.
+
+#### [NEW] `src/components/CommandPalette.jsx`
+Cmd+K overlay with fuzzy search. Initial commands:
+- "New contact" / "Search contacts" / "Add tag"
+- "Show people I haven't talked to in 30 days"
+- "Draft follow-up to [contact]"
+
+#### [NEW] `src/components/ContactEditor.jsx`
+Create/edit form: frontmatter fields as clean inputs + markdown body editor.
+
+#### [NEW] `src/components/EmptyState.jsx`
+Beautiful welcome state when no contacts exist yet.
+
+---
+
+### Data Layer
+
+#### [NEW] `src/lib/contacts.js`
+CRUD operations on contacts (localStorage for MVP):
+- `listContacts()`, `getContact(id)`, `saveContact(data)`, `deleteContact(id)`
+- `searchContacts(query)`, `filterByTag(tag)`
+
+#### [NEW] `src/lib/markdown.js`
+Parse/serialize markdown with YAML frontmatter using `gray-matter`.
+
+#### [NEW] `src/hooks/useContacts.js`
+React state management for contacts list + selected contact.
+
+#### [NEW] `src/hooks/useCommandPalette.js`
+Command palette state, fuzzy search, command registry.
+
+---
+
+### Sample Data
+
+#### [NEW] `src/data/sampleContacts.js`
+4-5 realistic sample contacts for first-run experience (VC, co-founder, advisor, customer, press).
+
+## Verification Plan
+
+### Build Check
+```bash
+cd /Users/canerden/.gemini/antigravity/scratch/gregg-crm && npm run build
+```
+
+### Functional Verification (browser)
+1. App renders with sample contacts in sidebar
+2. Click contact → see detail view with rendered markdown
+3. Cmd+K opens command palette, fuzzy search works
+4. Create new contact via form → appears in list
+5. Edit existing contact → changes persist
+6. Delete contact → removed from list
+7. Tags filter contacts correctly
