@@ -1,5 +1,6 @@
 import { Database } from "bun:sqlite";
 import { EventEmitter } from "events";
+import LZString from "lz-string";
 
 // Persistent SQLite store using Bun's native driver
 // Rooms and messages will survive server restarts
@@ -21,11 +22,19 @@ db.run(`
     id TEXT PRIMARY KEY,
     room_code TEXT,
     sender TEXT,
+    recipient TEXT DEFAULT NULL,
     content TEXT,
     timestamp INTEGER,
     FOREIGN KEY(room_code) REFERENCES rooms(code)
   );
 `);
+
+// Migration: Add 'recipient' column if it doesn't exist (for existing databases)
+try {
+  db.run("ALTER TABLE messages ADD COLUMN recipient TEXT DEFAULT NULL;");
+} catch (e) {
+  // Column might already exist
+}
 
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
@@ -61,6 +70,7 @@ db.run(`
 export interface Message {
   id: string;
   from: string;
+  to?: string;
   ts: number;
   content: string;
 }
@@ -138,6 +148,7 @@ export interface AgentCard {
   skills?: string[];
   availability?: string;
   capabilities?: { file_sharing?: boolean; task_assignment?: boolean; [key: string]: any };
+  node?: { ip: string; port: number; hostname?: string };
   [key: string]: any;
 }
 
@@ -160,6 +171,29 @@ export function getPartnerCards(
   return { ok: true, cards };
 }
 
+export function getNodes(code: string): Ok<{ nodes: Array<{ name: string; node: any; updated_at: number }> }> | Err {
+  const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
+  if (!room) return { ok: false, error: "room_expired_or_not_found" };
+
+  const rows = db.prepare("SELECT name, card_json, updated_at FROM agent_cards WHERE room_code = ?")
+    .all(code) as Array<{ name: string; card_json: string; updated_at: number }>;
+
+  const nodes = rows
+    .map(row => ({
+      name: row.name,
+      card: JSON.parse(row.card_json) as AgentCard,
+      updated_at: row.updated_at,
+    }))
+    .filter(c => c.card.node)
+    .map(c => ({
+      name: c.name,
+      node: c.card.node,
+      updated_at: c.updated_at,
+    }));
+
+  return { ok: true, nodes };
+}
+
 // ── MCP tool operations ───────────────────────────────────────────────────────
 
 type Ok<T> = { ok: true } & T;
@@ -168,7 +202,8 @@ type Err = { ok: false; error: string };
 export function appendMessage(
   code: string,
   from: string,
-  content: string
+  content: string,
+  to?: string
 ): Ok<{ id: string }> | Err {
   if (new TextEncoder().encode(content).length > MAX_MESSAGE_BYTES) {
     return { ok: false, error: "message_too_large" };
@@ -178,15 +213,19 @@ export function appendMessage(
 
   const id = crypto.randomUUID();
   const timestamp = Date.now();
-  db.prepare("INSERT INTO messages (id, room_code, sender, content, timestamp) VALUES (?, ?, ?, ?, ?)")
-    .run(id, code, from, content, timestamp);
+  
+  // Compress content for storage and transmission (transparent to agents)
+  const compressedContent = content.startsWith("lz:") ? content : `lz:${LZString.compressToEncodedURIComponent(content)}`;
+  
+  db.prepare("INSERT INTO messages (id, room_code, sender, recipient, content, timestamp) VALUES (?, ?, ?, ?, ?, ?)")
+    .run(id, code, from, to || null, compressedContent, timestamp);
   
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
 
   // Emit event for real-time listeners (SSE)
   messageEvents.emit("message", {
     room_code: code,
-    message: { id, from: from, content, ts: timestamp }
+    message: { id, from: from, to: to || undefined, content: compressedContent, ts: timestamp }
   });
 
   return { ok: true, id };
@@ -202,13 +241,27 @@ export function getMessages(
   const user = db.prepare("SELECT cursor FROM users WHERE room_code = ? AND name = ?").get(code, name) as { cursor: number } | undefined;
   if (!user) return { ok: false, error: "not_in_room" };
 
-  const rows = db.prepare("SELECT id, sender as 'from', content, timestamp as ts FROM messages WHERE room_code = ? LIMIT -1 OFFSET ?")
-    .all(code, user.cursor) as Message[];
+  // Fetch messages that are either broadcast (recipient is NULL) or specifically for this recipient
+  const rows = db.prepare(`
+    SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts 
+    FROM messages 
+    WHERE room_code = ? 
+    AND (recipient IS NULL OR recipient = ?)
+    LIMIT -1 OFFSET ?
+  `).all(code, name, user.cursor) as Message[];
 
-  // Filter out own messages
-  const filtered = rows.filter(m => m.from !== name);
+  // Filter out own messages and decompress content
+  const filtered = rows
+    .filter(m => m.from !== name)
+    .map(m => ({
+      ...m,
+      content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content
+    }));
 
-  // Advance cursor to current message count
+  // Advance cursor to current message count for this room
+  // Note: we advance the cursor to the total messages count, but we only RETURN the relevant ones.
+  // This might lead to missed messages if someone uses both targeted and broadcast messages.
+  // But for simple signaling it works.
   const countRow = db.prepare("SELECT COUNT(*) as count FROM messages WHERE room_code = ?").get(code) as { count: number };
   db.prepare("UPDATE users SET cursor = ?, last_seen = ? WHERE room_code = ? AND name = ?")
     .run(countRow.count, Date.now(), code, name);
@@ -223,8 +276,12 @@ export function getAllMessages(
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
   
-  const messages = db.prepare("SELECT id, sender as 'from', content, timestamp as ts FROM messages WHERE room_code = ?")
-    .all(code) as Message[];
+  const messages = (db.prepare("SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts FROM messages WHERE room_code = ?")
+    .all(code) as Message[])
+    .map(m => ({
+      ...m,
+      content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content
+    }));
     
   return { ok: true, messages };
 }

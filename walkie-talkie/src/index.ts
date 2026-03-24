@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
+import { compress } from "hono/compress";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
@@ -20,6 +21,14 @@ import {
 
 const app = new Hono();
 const startTime = Date.now();
+const VERSION = "1.2.0-greg-compression";
+
+// Track active SSE connections
+let activeConnections = 0;
+
+// ── Phase 3: Compression ──────────────────────────────────────────────────────
+// Enable Gzip/Brotli compression for all responses
+app.use("*", compress());
 
 // ── Phase 1 SSE Note ──────────────────────────────────────────────────────────
 // SSE streaming is handled by /api/stream endpoint below.
@@ -84,13 +93,35 @@ app.get("/api/history", (c) => {
   return c.json(result);
 });
 
+app.get("/api/metrics", (c) => {
+  return c.json({
+    active_rooms: getRoomCount(),
+    active_connections: activeConnections,
+    messages_per_minute: 0, // TODO: Implement counter
+    avg_latency_ms: 0, // TODO: Implement tracker
+    error_rate: 0,
+    uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
+    version: VERSION,
+    compression: true,
+  });
+});
+
+app.get("/api/version", (c) => {
+  return c.json({
+    version: VERSION,
+    build_date: new Date(startTime).toISOString(),
+    sse_enabled: SSE_ENABLED,
+    compression: "gzip/brotli",
+  });
+});
+
 app.post("/api/send", async (c) => {
   const room = c.req.query("room");
   const name = c.req.query("name");
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
   joinRoom(room, name);
-  const { message } = await c.req.json();
-  const result = appendMessage(room, name, message);
+  const { message, to } = await c.req.json();
+  const result = appendMessage(room, name, message, to);
   return c.json(result);
 });
 
@@ -129,10 +160,19 @@ app.get("/api/stream", async (c) => {
   }
 
   console.log(`[sse] ${name} connected to room ${room}`);
+  activeConnections++;
 
   return streamSSE(c, async (stream) => {
     const onMessage = (data: any) => {
-      if (data.room_code === room && data.message.from !== name) {
+      // Logic for delivery:
+      // 1. Must be in the same room
+      // 2. Must not be from self
+      // 3. If 'to' is specified, must match 'name'
+      // 4. If 'to' is null/undefined, it's a broadcast
+      const isTargeted = data.message.to !== undefined;
+      const isForMe = isTargeted ? data.message.to === name : true;
+
+      if (data.room_code === room && data.message.from !== name && isForMe) {
         try {
           stream.writeSSE({
             data: JSON.stringify(data.message),
@@ -157,6 +197,7 @@ app.get("/api/stream", async (c) => {
 
     stream.onAbort(() => {
       console.log(`[sse] ${name} disconnected from room ${room}`);
+      activeConnections--;
       messageEvents.off("message", onMessage);
       clearInterval(heartbeat);
     });
@@ -175,6 +216,10 @@ app.get("/health", (c) => {
     status: "ok",
     uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
     room_count: getRoomCount(),
+    active_connections: activeConnections,
+    version: VERSION,
+    sse_enabled: SSE_ENABLED,
+    compression_enabled: true,
   });
 });
 
@@ -229,9 +274,12 @@ app.all("/mcp", async (c) => {
   server.tool(
     "send_to_partner",
     "Send a message to your partner's AI. They will receive it on their next get_partner_messages() call.",
-    { message: z.string().describe("The message to send to your partner's AI") },
-    async ({ message }) => {
-      const result = appendMessage(room, name, message);
+    { 
+      message: z.string().describe("The message to send to your partner's AI"),
+      to: z.string().optional().describe("Optional: specific recipient name for private/targeted messaging")
+    },
+    async ({ message, to }) => {
+      const result = appendMessage(room, name, message, to);
       if (!result.ok) {
         return {
           content: [{ type: "text", text: JSON.stringify({ error: result.error }) }],
@@ -242,7 +290,7 @@ app.all("/mcp", async (c) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify({ status: "sent", message_id: result.id }),
+            text: JSON.stringify({ status: "sent", message_id: result.id, targeted: !!to }),
           },
         ],
       };
