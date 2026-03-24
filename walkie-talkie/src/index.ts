@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
 import { compress } from "hono/compress";
+import { cors } from "hono/cors";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
@@ -29,6 +30,15 @@ let activeConnections = 0;
 // ── Phase 3: Compression ──────────────────────────────────────────────────────
 // Enable Gzip/Brotli compression for all responses
 app.use("*", compress());
+
+// ── CORS Configuration ────────────────────────────────────────────────────────
+// Allow dashboard and frontend to make requests
+app.use("*", cors({
+  origin: "*",
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowHeaders: ["Content-Type", "x-mesh-secret"],
+  exposeHeaders: ["Content-Type"],
+}));
 
 // ── Phase 1 SSE Note ──────────────────────────────────────────────────────────
 // SSE streaming is handled by /api/stream endpoint below.
