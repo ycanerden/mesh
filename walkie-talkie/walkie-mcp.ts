@@ -18,7 +18,7 @@ const NAME = process.env.NAME || "Agent";
 const BASE = `${SERVER_URL}/api`;
 
 // Message buffer for SSE updates
-const messageBuffer: Array<{from: string; content: string; ts: number}> = [];
+const messageBuffer: Array<{from: string; to?: string; content: string; ts: number}> = [];
 
 async function startEventStream() {
   const params = `?room=${ROOM}&name=${NAME}`;
@@ -97,10 +97,13 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: "send_to_partner",
-      description: "Send a message to your partner's AI.",
+      description: "Send a message to your partner's AI. They will receive it on their next get_partner_messages() call.",
       inputSchema: {
         type: "object" as const,
-        properties: { message: { type: "string", description: "The message to send" } },
+        properties: { 
+          message: { type: "string", description: "The message to send" },
+          to: { type: "string", description: "Optional: specific recipient name for private/targeted messaging" }
+        },
         required: ["message"],
       },
     },
@@ -140,6 +143,21 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
       name: "get_partner_cards",
       description: "Get Agent Cards from all partners in the room. Shows their models, skills, and capabilities.",
       inputSchema: { type: "object" as const, properties: {} },
+    },
+    {
+      name: "handoff_to_partner",
+      description: "Securely package and hand off a project, task, or context to a specific partner agent.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          targetAgent: { type: "string", description: "The exact name of the agent to hand off to" },
+          projectId: { type: "string", description: "A unique identifier for the project" },
+          founder: { type: "string", description: "The name of the founder (e.g., Jorel, Simon)" },
+          taskType: { type: "string", description: "The type of task (e.g., build, audit, deploy)" },
+          payload: { type: "string", description: "The actual code, plan, or data being handed off" },
+        },
+        required: ["targetAgent", "projectId", "founder", "taskType", "payload"],
+      },
     },
   ],
 }));
@@ -187,32 +205,48 @@ mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
         const msgs = [...messageBuffer];
         messageBuffer.length = 0;
         const formatted = msgs
-          .map((m) => `[${m.from} @ ${new Date(m.ts).toISOString()}]\n${m.content}`)
+          .map((m) => `[${m.from}${m.to ? ` (to: ${m.to})` : ""} @ ${new Date(m.ts).toISOString()}]\n${m.content}`)
           .join("\n\n---\n\n");
         return { content: [{ type: "text" as const, text: formatted }] };
       }
 
       // Fallback to polling if buffer is empty
       const res = await fetch(`${BASE}/messages${params}`);
-      const data = await res.json() as { ok: boolean; messages?: Array<{from: string; content: string; ts: number}> };
+      const data = await res.json() as { ok: boolean; messages?: Array<{from: string; to?: string; content: string; ts: number}> };
       if (!data.ok || !data.messages?.length) {
         return { content: [{ type: "text" as const, text: "No new messages." }] };
       }
       const formatted = data.messages
-        .map((m) => `[${m.from} @ ${new Date(m.ts).toISOString()}]\n${m.content}`)
+        .map((m) => `[${m.from}${m.to ? ` (to: ${m.to})` : ""} @ ${new Date(m.ts).toISOString()}]\n${m.content}`)
         .join("\n\n---\n\n");
       return { content: [{ type: "text" as const, text: formatted }] };
     }
 
     if (name === "send_to_partner") {
-      const { message } = args as { message: string };
+      const { message, to } = args as { message: string; to?: string };
       const res = await fetch(`${BASE}/send${params}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ message, to }),
       });
       const data = await res.json();
-      return { content: [{ type: "text" as const, text: data.ok ? `Sent ✓ (id: ${data.id})` : `Error: ${data.error}` }] };
+      return { content: [{ type: "text" as const, text: data.ok ? `Sent ✓ (id: ${data.id}${to ? `, to: ${to}` : ""})` : `Error: ${data.error}` }] };
+    }
+
+    if (name === "handoff_to_partner") {
+      const { targetAgent, projectId, founder, taskType, payload } = args as any;
+      const handoffMessage = {
+        type: "COLLABORATIVE_HANDOFF",
+        context: { projectId, founder, taskType, payload }
+      };
+      
+      const res = await fetch(`${BASE}/send${params}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: JSON.stringify(handoffMessage), to: targetAgent }),
+      });
+      const data = await res.json();
+      return { content: [{ type: "text" as const, text: data.ok ? `Successfully passed the baton to ${targetAgent} for project ${projectId}. 🚀` : `Error during handoff: ${data.error}` }] };
     }
 
     return { content: [{ type: "text" as const, text: `Unknown tool: ${name}` }] };
