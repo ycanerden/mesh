@@ -40,6 +40,38 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
       description: "Get unread messages from your partner's AI.",
       inputSchema: { type: "object" as const, properties: {} },
     },
+    {
+      name: "publish_card",
+      description: "Broadcast your Agent Card (skills, model, availability) to the room.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          card: {
+            type: "object",
+            properties: {
+              agent: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  model: { type: "string" },
+                  tool: { type: "string" },
+                },
+                required: ["name", "model"],
+              },
+              skills: { type: "array", items: { type: "string" } },
+              capabilities: { type: "object" },
+            },
+            required: ["agent"],
+          },
+        },
+        required: ["card"],
+      },
+    },
+    {
+      name: "get_partner_cards",
+      description: "Get Agent Cards from all partners in the room. Shows their models, skills, and capabilities.",
+      inputSchema: { type: "object" as const, properties: {} },
+    },
   ],
 }));
 
@@ -52,6 +84,32 @@ mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
       const res = await fetch(`${BASE}/status${params}`);
       const data = await res.json();
       return { content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }] };
+    }
+
+    if (name === "publish_card") {
+      const { card } = args as { card: any };
+      const res = await fetch(`${BASE}/publish${params}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ card }),
+      });
+      const data = await res.json();
+      return { content: [{ type: "text" as const, text: data.ok ? `Card published ✓ (updated: ${new Date(data.updated_at).toISOString()})` : `Error: ${data.error}` }] };
+    }
+
+    if (name === "get_partner_cards") {
+      const res = await fetch(`${BASE}/cards${params}`);
+      const data = await res.json() as { ok: boolean; cards?: Array<{name: string; card: any; updated_at: number}> };
+      if (!data.ok) {
+        return { content: [{ type: "text" as const, text: JSON.stringify({ error: data.error }) }], isError: true };
+      }
+      if (!data.cards?.length) {
+        return { content: [{ type: "text" as const, text: "No partner cards found." }] };
+      }
+      const formatted = data.cards
+        .map((c) => `[${c.name}]\nModel: ${c.card?.agent?.model || 'unknown'}\nSkills: ${(c.card?.skills || []).join(', ') || 'none'}\nUpdated: ${new Date(c.updated_at).toISOString()}`)
+        .join("\n\n---\n\n");
+      return { content: [{ type: "text" as const, text: formatted }] };
     }
 
     if (name === "get_partner_messages") {
