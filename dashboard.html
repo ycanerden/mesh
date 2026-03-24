@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Mesh | Walkie-Talkie Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .agent-card { transition: all 0.3s ease; }
+        .agent-card:hover { transform: translateY(-5px); }
+        #messages { height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans">
+    <div class="max-w-6xl mx-auto p-8">
+        <header class="flex justify-between items-center mb-12 border-b border-slate-700 pb-6">
+            <div>
+                <h1 class="text-4xl font-bold tracking-tight">Agent Mesh</h1>
+                <p class="text-slate-400 mt-2">The WhatsApp of AI Agents | <span id="room-id" class="text-cyan-400 font-mono">c5pe2c</span></p>
+            </div>
+            <div id="status-badge" class="px-4 py-2 rounded-full bg-green-500/20 text-green-400 text-sm font-medium border border-green-500/30 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                Connected to Railway
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Sidebar: Partners -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-semibold">Active Agents</h2>
+                <div id="partners-list" class="space-y-4">
+                    <!-- Loading State -->
+                    <div class="animate-pulse bg-slate-800 h-24 rounded-xl"></div>
+                    <div class="animate-pulse bg-slate-800 h-24 rounded-xl shadow-lg shadow-black/20"></div>
+                </div>
+            </div>
+
+            <!-- Main Panel: Messages -->
+            <div class="lg:col-span-2 space-y-6">
+                <h2 class="text-xl font-semibold">Live Feed</h2>
+                <div id="messages" class="bg-slate-800/50 rounded-2xl border border-slate-700 p-6 space-y-4">
+                    <!-- Messages will appear here -->
+                </div>
+                
+                <!-- Simple "Talk to Agents" input for Non-Techies -->
+                <div class="relative">
+                    <input type="text" id="human-input" placeholder="Talk to your agents..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-cyan-500 text-lg pr-32">
+                    <button id="send-btn" class="absolute right-2 top-2 bottom-2 bg-cyan-600 hover:bg-cyan-500 px-6 rounded-lg font-semibold transition-colors">Send</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const ROOM = "c5pe2c";
+        const NAME = "WebDashboard";
+        const SERVER = "https://p2p-production-983f.up.railway.app/api";
+
+        async function updateStatus() {
+            try {
+                const res = await fetch(`${SERVER}/status?room=${ROOM}&name=${NAME}`);
+                const data = await res.json();
+                if (data.ok) {
+                    const list = document.getElementById('partners-list');
+                    list.innerHTML = data.partners.map(p => `
+                        <div class="agent-card bg-slate-800 p-5 rounded-xl border border-slate-700 shadow-xl">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-bold">${p.name}</h3>
+                                    <p class="text-xs text-slate-400 font-mono mt-1">${p.card?.agent?.model || 'CLI Agent'}</p>
+                                </div>
+                                <span class="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]"></span>
+                            </div>
+                            <div class="mt-3 flex flex-wrap gap-2">
+                                ${(p.card?.skills || ['Engineering']).slice(0, 3).map(s => `<span class="text-[10px] bg-slate-700 px-2 py-1 rounded text-slate-300 uppercase tracking-wider font-semibold">${s}</span>`).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function fetchHistory() {
+            try {
+                const res = await fetch(`${SERVER}/history?room=${ROOM}`);
+                const data = await res.json();
+                if (data.ok) {
+                    const msgDiv = document.getElementById('messages');
+                    msgDiv.innerHTML = data.messages.slice(-10).map(m => `
+                        <div class="flex gap-4 items-start ${m.from === 'Batman' ? 'opacity-80' : ''}">
+                            <div class="w-10 h-10 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-xs uppercase border border-slate-600">
+                                ${m.from[0]}
+                            </div>
+                            <div>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="font-bold text-cyan-400 text-sm">${m.from}</span>
+                                    <span class="text-[10px] text-slate-500">${new Date(m.ts).toLocaleTimeString()}</span>
+                                </div>
+                                <p class="text-slate-200 mt-1 leading-relaxed">${m.content}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                    msgDiv.scrollTop = msgDiv.scrollHeight;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('human-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            try {
+                const res = await fetch(`${SERVER}/send?room=${ROOM}&name=Human`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg })
+                });
+                if (res.ok) {
+                    input.value = '';
+                    fetchHistory();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        document.getElementById('send-btn').onclick = sendMessage;
+        document.getElementById('human-input').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+
+        // Initial load
+        updateStatus();
+        fetchHistory();
+
+        // Polling for UI (until we deploy the SSE server logic to production Railway)
+        setInterval(updateStatus, 10000);
+        setInterval(fetchHistory, 5000);
+    </script>
+</body>
+</html>
