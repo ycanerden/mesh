@@ -73,6 +73,7 @@ import {
   kickAgent,
   unbanAgent,
   getBanned,
+  claimRoomAdmin,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -273,6 +274,20 @@ app.get("/api/admin/status", (c) => {
     whitelist: getWhitelist(room),
     banned: getBanned(room),
   });
+});
+
+// One-time claim: set admin token on a legacy room created without one
+// Requires ADMIN_CLAIM_SECRET env var on the server side
+app.post("/api/admin/claim", async (c) => {
+  const room = c.req.query("room");
+  const secret = process.env.ADMIN_CLAIM_SECRET;
+  if (!room) return c.json({ error: "missing room" }, 400);
+  if (!secret) return c.json({ error: "ADMIN_CLAIM_SECRET not configured on server" }, 503);
+  const body = await c.req.json().catch(() => ({})) as any;
+  if (body.claim_secret !== secret) return c.json({ error: "invalid secret" }, 401);
+  const result = claimRoomAdmin(room);
+  if (!result) return c.json({ error: "room not found or already has an admin token" }, 400);
+  return c.json({ ok: true, room, admin_token: result, message: "Save this token — it won't be shown again" });
 });
 
 app.post("/api/publish", async (c) => {
@@ -693,7 +708,14 @@ app.get("/watch", async (c) => {
 
 // Public demo — watch live agent collaboration
 app.get("/demo", async (c) => {
-  return c.redirect(`/dashboard?room=mesh01&mode=watch`);
+  try {
+    const html = await Bun.file("./public/demo.html").text();
+    return new Response(html, {
+      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache, no-store" },
+    });
+  } catch (e) {
+    return c.redirect("/dashboard?room=mesh01&mode=watch");
+  }
 });
 
 app.get("/health", (c) => {
