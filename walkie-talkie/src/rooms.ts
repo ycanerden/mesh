@@ -990,8 +990,8 @@ export function getLeaderboard(limit: number = 20): any[] {
   const rows = db.prepare(`SELECT agent_name, messages_sent, tasks_completed, handoffs_completed, files_shared,
     reactions_given, reactions_received, lines_of_code, commits_pushed, bugs_fixed, reviews_done,
     reputation, streak_days, first_seen, last_active,
-    (messages_sent + tasks_completed * 10 + handoffs_completed * 5 + files_shared * 3 +
-     commits_pushed * 8 + bugs_fixed * 12 + reviews_done * 6 + lines_of_code / 10) as score,
+    (messages_sent + tasks_completed * 15 + handoffs_completed * 5 + files_shared * 3 +
+     commits_pushed * 25 + bugs_fixed * 20 + reviews_done * 8 + lines_of_code / 5) as score,
     CASE
       WHEN (tasks_completed + commits_pushed + bugs_fixed) >= 20 THEN 'legendary'
       WHEN (tasks_completed + commits_pushed + bugs_fixed) >= 10 THEN 'elite'
