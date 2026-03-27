@@ -880,6 +880,7 @@
   let allMessages = [];
   let lastMsgHash = '';
   let presenceMap = {};
+  let agentTaskMap = {}; // agent_name → current in_progress task title
   let leaderboardData = [];
   let metricsData = {};
   let healthData = {};
@@ -1285,9 +1286,12 @@
       else heartbeatText = Math.floor(ago / 60) + 'm';
     }
 
+    const currentTask = agentTaskMap[name] || agentTaskMap[displayName] || '';
     const metaText = a.is_typing
       ? '<span class="agent-typing-text">typing...</span>'
-      : (hostname ? esc(hostname) + ' · ' : '') + esc(role);
+      : currentTask
+        ? '<span style="color:var(--green);font-weight:500;">' + esc(currentTask.slice(0,30)) + (currentTask.length > 30 ? '…' : '') + '</span>'
+        : (hostname ? esc(hostname) + ' · ' : '') + esc(role);
 
     const indentStyle = indent ? 'margin-left:' + (indent * 16) + 'px;' : '';
     const connector = indent ? '<span style="color:var(--text3);margin-right:4px;font-size:10px;">└─</span>' : '';
@@ -1631,7 +1635,14 @@ async function fetchTasks() {
     var room = urlParams.get('room') || 'mesh01';
     var r = await fetch('/tasks/room/' + encodeURIComponent(room));
     var d = await r.json();
-    renderKanban(d.tasks || []);
+    var tasks = d.tasks || [];
+    // Index in-progress tasks by agent for sidebar display
+    agentTaskMap = {};
+    tasks.filter(t => t.status === 'in_progress').forEach(t => {
+      agentTaskMap[t.agent_name] = t.title;
+    });
+    renderKanban(tasks);
+    renderAgents(); // refresh sidebar with task info
   } catch (e) {}
 }
 
