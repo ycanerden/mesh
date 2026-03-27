@@ -674,6 +674,260 @@ export function getPinnedMessages(roomCode: string): Array<{ message_id: string;
     .all(roomCode) as any[];
 }
 
+// ── File Sharing ─────────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS shared_files (
+    file_id TEXT PRIMARY KEY,
+    room_code TEXT,
+    uploaded_by TEXT,
+    filename TEXT,
+    mime_type TEXT,
+    size_bytes INTEGER,
+    content TEXT,
+    description TEXT,
+    created_at INTEGER
+  );
+`);
+
+try {
+  db.run("CREATE INDEX IF NOT EXISTS idx_files_room ON shared_files(room_code);");
+} catch (e) {}
+
+const MAX_FILE_BYTES = 512 * 1024; // 512KB per file
+
+export function shareFile(
+  roomCode: string, uploadedBy: string, filename: string,
+  content: string, mimeType: string = "text/plain", description: string = ""
+): { ok: boolean; file_id?: string; error?: string } {
+  const sizeBytes = new TextEncoder().encode(content).length;
+  if (sizeBytes > MAX_FILE_BYTES) return { ok: false, error: "file_too_large_max_512kb" };
+
+  const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(roomCode);
+  if (!room) return { ok: false, error: "room_not_found" };
+
+  const fileId = crypto.randomUUID();
+  const compressed = LZString.compressToEncodedURIComponent(content);
+
+  db.prepare(`INSERT INTO shared_files (file_id, room_code, uploaded_by, filename, mime_type, size_bytes, content, description, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(fileId, roomCode, uploadedBy, filename, mimeType, sizeBytes, `lz:${compressed}`, description, Date.now());
+
+  // Announce file share as a system message
+  appendMessage(roomCode, uploadedBy, `Shared file: ${filename} (${(sizeBytes/1024).toFixed(1)}KB) — ${description || 'no description'}`, undefined, "FILE");
+
+  return { ok: true, file_id: fileId };
+}
+
+export function getFile(fileId: string): { ok: boolean; file?: any; error?: string } {
+  const row = db.prepare("SELECT * FROM shared_files WHERE file_id = ?").get(fileId) as any;
+  if (!row) return { ok: false, error: "file_not_found" };
+
+  const content = row.content.startsWith("lz:")
+    ? LZString.decompressFromEncodedURIComponent(row.content.slice(3)) || row.content
+    : row.content;
+
+  return { ok: true, file: { ...row, content } };
+}
+
+export function getRoomFiles(roomCode: string): Array<{ file_id: string; filename: string; uploaded_by: string; mime_type: string; size_bytes: number; description: string; created_at: number }> {
+  return db.prepare("SELECT file_id, filename, uploaded_by, mime_type, size_bytes, description, created_at FROM shared_files WHERE room_code = ? ORDER BY created_at DESC")
+    .all(roomCode) as any[];
+}
+
+// ── Handoff Protocol ─────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS handoffs (
+    handoff_id TEXT PRIMARY KEY,
+    room_code TEXT,
+    from_agent TEXT,
+    to_agent TEXT,
+    summary TEXT,
+    context_json TEXT,
+    files_changed TEXT,
+    decisions_made TEXT,
+    blockers TEXT,
+    status TEXT DEFAULT 'pending',
+    created_at INTEGER,
+    accepted_at INTEGER
+  );
+`);
+
+export interface Handoff {
+  handoff_id: string;
+  room_code: string;
+  from_agent: string;
+  to_agent: string;
+  summary: string;
+  context_json: string;
+  files_changed: string;
+  decisions_made: string;
+  blockers: string;
+  status: string;
+  created_at: number;
+  accepted_at: number | null;
+}
+
+export function createHandoff(
+  roomCode: string, fromAgent: string, toAgent: string,
+  summary: string, context: any, filesChanged: string[] = [],
+  decisionsMade: string[] = [], blockers: string[] = []
+): Handoff {
+  const handoffId = crypto.randomUUID();
+  const now = Date.now();
+
+  db.prepare(`INSERT INTO handoffs (handoff_id, room_code, from_agent, to_agent, summary, context_json, files_changed, decisions_made, blockers, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`)
+    .run(handoffId, roomCode, fromAgent, toAgent, summary, JSON.stringify(context),
+      JSON.stringify(filesChanged), JSON.stringify(decisionsMade), JSON.stringify(blockers), now);
+
+  // Announce handoff
+  appendMessage(roomCode, fromAgent, `HANDOFF to ${toAgent}: ${summary}`, toAgent, "HANDOFF");
+
+  return {
+    handoff_id: handoffId, room_code: roomCode, from_agent: fromAgent, to_agent: toAgent,
+    summary, context_json: JSON.stringify(context), files_changed: JSON.stringify(filesChanged),
+    decisions_made: JSON.stringify(decisionsMade), blockers: JSON.stringify(blockers),
+    status: "pending", created_at: now, accepted_at: null,
+  };
+}
+
+export function acceptHandoff(handoffId: string, agentName: string): { ok: boolean; error?: string } {
+  const h = db.prepare("SELECT * FROM handoffs WHERE handoff_id = ?").get(handoffId) as Handoff | null;
+  if (!h) return { ok: false, error: "handoff_not_found" };
+  if (h.to_agent !== agentName) return { ok: false, error: "not_assigned_to_you" };
+
+  db.prepare("UPDATE handoffs SET status = 'accepted', accepted_at = ? WHERE handoff_id = ?")
+    .run(Date.now(), handoffId);
+
+  appendMessage(h.room_code, agentName, `Accepted handoff from ${h.from_agent}: ${h.summary}`, h.from_agent, "HANDOFF");
+  return { ok: true };
+}
+
+export function getHandoff(handoffId: string): Handoff | null {
+  return db.prepare("SELECT * FROM handoffs WHERE handoff_id = ?").get(handoffId) as Handoff | null;
+}
+
+export function getAgentHandoffs(agentName: string): Handoff[] {
+  return db.prepare("SELECT * FROM handoffs WHERE to_agent = ? ORDER BY created_at DESC")
+    .all(agentName) as Handoff[];
+}
+
+// ── Room Templates ───────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS room_templates (
+    template_id TEXT PRIMARY KEY,
+    name TEXT,
+    description TEXT,
+    roles TEXT,
+    message_types TEXT,
+    welcome_message TEXT,
+    icon TEXT,
+    created_by TEXT,
+    created_at INTEGER
+  );
+`);
+
+// Seed default templates
+const defaultTemplates = [
+  { id: "code-review", name: "Code Review", desc: "Structured code review with reviewer and author roles",
+    roles: "author,reviewer,approver", types: "REVIEW,APPROVE,REQUEST_CHANGES,COMMENT",
+    welcome: "Code Review room active. Author: share your diff. Reviewers: provide feedback.", icon: "🔍" },
+  { id: "sprint-planning", name: "Sprint Planning", desc: "Sprint planning with task breakdown and estimation",
+    roles: "lead,developer,qa,designer", types: "TASK,ESTIMATE,PRIORITY,BLOCKER",
+    welcome: "Sprint Planning room. Lead: share objectives. Team: break down and estimate.", icon: "📋" },
+  { id: "debugging", name: "Debugging", desc: "Collaborative debugging with hypothesis tracking",
+    roles: "investigator,helper,observer", types: "HYPOTHESIS,EVIDENCE,ROOT_CAUSE,FIX",
+    welcome: "Debug room active. State the bug, share logs, form hypotheses.", icon: "🐛" },
+  { id: "brainstorm", name: "Brainstorm", desc: "Open brainstorming with idea voting",
+    roles: "facilitator,contributor", types: "IDEA,VOTE,BUILD_ON,CHALLENGE",
+    welcome: "Brainstorm room. All ideas welcome. No judgment. Build on each other.", icon: "💡" },
+  { id: "deployment", name: "Deployment", desc: "Coordinated deployment with rollback tracking",
+    roles: "deployer,monitor,approver", types: "DEPLOY,VERIFY,ROLLBACK,APPROVE,ALERT",
+    welcome: "Deployment room. Deployer: state the plan. Monitor: watch metrics.", icon: "🚀" },
+  { id: "incident", name: "Incident Response", desc: "Incident management with severity and timeline tracking",
+    roles: "incident_commander,responder,communicator", types: "ALERT,UPDATE,MITIGATION,RESOLVED,POSTMORTEM",
+    welcome: "INCIDENT ROOM. Commander: state severity and impact. Responders: check in.", icon: "🚨" },
+];
+
+for (const t of defaultTemplates) {
+  db.prepare(`INSERT OR IGNORE INTO room_templates (template_id, name, description, roles, message_types, welcome_message, icon, created_by, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 'system', ?)`)
+    .run(t.id, t.name, t.desc, t.roles, t.types, t.welcome, t.icon, Date.now());
+}
+
+export function getTemplates(): Array<{ template_id: string; name: string; description: string; roles: string; icon: string }> {
+  return db.prepare("SELECT template_id, name, description, roles, icon FROM room_templates ORDER BY name").all() as any[];
+}
+
+export function getTemplate(templateId: string): any {
+  return db.prepare("SELECT * FROM room_templates WHERE template_id = ?").get(templateId);
+}
+
+export function createRoomFromTemplate(templateId: string, creatorName: string): { ok: boolean; room_code?: string; template?: any; error?: string } {
+  const template = getTemplate(templateId);
+  if (!template) return { ok: false, error: "template_not_found" };
+
+  const roomCode = createRoom();
+  joinRoom(roomCode, creatorName);
+
+  // Send welcome message
+  appendMessage(roomCode, "system", template.welcome_message, undefined, "SYSTEM");
+
+  return { ok: true, room_code: roomCode, template };
+}
+
+// ── Reputation & Leaderboard ─────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS agent_stats (
+    agent_name TEXT PRIMARY KEY,
+    messages_sent INTEGER DEFAULT 0,
+    tasks_completed INTEGER DEFAULT 0,
+    handoffs_completed INTEGER DEFAULT 0,
+    files_shared INTEGER DEFAULT 0,
+    avg_response_ms REAL DEFAULT 0,
+    uptime_minutes INTEGER DEFAULT 0,
+    reputation REAL DEFAULT 100.0,
+    first_seen INTEGER,
+    last_active INTEGER
+  );
+`);
+
+export function trackAgentActivity(agentName: string, activityType: string) {
+  const now = Date.now();
+  // Upsert agent stats
+  db.prepare(`INSERT INTO agent_stats (agent_name, messages_sent, tasks_completed, handoffs_completed, files_shared, first_seen, last_active)
+    VALUES (?, 0, 0, 0, 0, ?, ?)
+    ON CONFLICT(agent_name) DO UPDATE SET last_active = ?`)
+    .run(agentName, now, now, now);
+
+  switch (activityType) {
+    case "message":
+      db.prepare("UPDATE agent_stats SET messages_sent = messages_sent + 1 WHERE agent_name = ?").run(agentName);
+      break;
+    case "task_complete":
+      db.prepare("UPDATE agent_stats SET tasks_completed = tasks_completed + 1, reputation = MIN(reputation + 2, 200) WHERE agent_name = ?").run(agentName);
+      break;
+    case "handoff":
+      db.prepare("UPDATE agent_stats SET handoffs_completed = handoffs_completed + 1, reputation = MIN(reputation + 1, 200) WHERE agent_name = ?").run(agentName);
+      break;
+    case "file_share":
+      db.prepare("UPDATE agent_stats SET files_shared = files_shared + 1 WHERE agent_name = ?").run(agentName);
+      break;
+  }
+}
+
+export function getLeaderboard(limit: number = 20): any[] {
+  return db.prepare(`SELECT agent_name, messages_sent, tasks_completed, handoffs_completed, files_shared,
+    reputation, first_seen, last_active,
+    (messages_sent + tasks_completed * 10 + handoffs_completed * 5 + files_shared * 3) as score
+    FROM agent_stats ORDER BY score DESC LIMIT ?`)
+    .all(limit) as any[];
+}
+
+export function getAgentStats(agentName: string): any {
+  return db.prepare("SELECT * FROM agent_stats WHERE agent_name = ?").get(agentName);
+}
+
 // ── Persistent Rate Limiting ──────────────────────────────────────────────────
 
 export function checkRateLimitPersistent(key: string, max: number, windowMs: number): boolean {

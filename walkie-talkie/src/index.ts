@@ -42,6 +42,19 @@ import {
   pinMessage,
   unpinMessage,
   getPinnedMessages,
+  shareFile,
+  getFile,
+  getRoomFiles,
+  createHandoff,
+  acceptHandoff,
+  getHandoff,
+  getAgentHandoffs,
+  getTemplates,
+  getTemplate,
+  createRoomFromTemplate,
+  trackAgentActivity,
+  getLeaderboard,
+  getAgentStats,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -182,6 +195,7 @@ app.post("/api/send", async (c) => {
     const reqStart = Date.now();
     const result = appendMessage(room, name, message, to, type || "BROADCAST", reply_to);
     trackMetric("api_request", room!, name!, Date.now() - reqStart);
+    trackAgentActivity(name!, "message");
     return c.json(result);
   } catch (e) {
     return c.json({ error: "invalid_request", detail: String(e) }, 400);
@@ -360,6 +374,87 @@ app.get("/api/thread/:messageId", (c) => {
 
   const thread = (result as any).messages.filter((m: any) => m.id === messageId || m.reply_to === messageId);
   return c.json({ ok: true, thread });
+});
+
+// ── File Sharing ───────────────────────────────────────────────────────────
+app.post("/api/files/upload", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  const { filename, content, mime_type, description } = await c.req.json();
+  if (!filename || !content) return c.json({ error: "missing filename or content" }, 400);
+  const result = shareFile(room, name, filename, content, mime_type, description);
+  if (result.ok) trackAgentActivity(name, "file_share");
+  return c.json(result, result.ok ? 201 : 400);
+});
+
+app.get("/api/files/:fileId", (c) => {
+  return c.json(getFile(c.req.param("fileId")));
+});
+
+app.get("/api/files", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  return c.json({ ok: true, files: getRoomFiles(room) });
+});
+
+// ── Handoff Protocol ───────────────────────────────────────────────────────
+app.post("/api/handoff", async (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  const { from_agent, to_agent, summary, context, files_changed, decisions_made, blockers } = await c.req.json();
+  if (!from_agent || !to_agent || !summary) return c.json({ error: "missing from_agent, to_agent, or summary" }, 400);
+  const handoff = createHandoff(room, from_agent, to_agent, summary, context || {}, files_changed, decisions_made, blockers);
+  trackAgentActivity(from_agent, "handoff");
+  return c.json({ ok: true, handoff }, 201);
+});
+
+app.post("/api/handoff/:handoffId/accept", async (c) => {
+  const name = c.req.query("name");
+  if (!name) return c.json({ error: "missing name" }, 400);
+  const result = acceptHandoff(c.req.param("handoffId"), name);
+  return c.json(result);
+});
+
+app.get("/api/handoff/:handoffId", (c) => {
+  const h = getHandoff(c.req.param("handoffId"));
+  if (!h) return c.json({ error: "not found" }, 404);
+  return c.json({ ok: true, handoff: h });
+});
+
+app.get("/api/handoffs", (c) => {
+  const name = c.req.query("name");
+  if (!name) return c.json({ error: "missing name" }, 400);
+  return c.json({ ok: true, handoffs: getAgentHandoffs(name) });
+});
+
+// ── Room Templates ─────────────────────────────────────────────────────────
+app.get("/api/templates", (c) => {
+  return c.json({ ok: true, templates: getTemplates() });
+});
+
+app.get("/api/templates/:templateId", (c) => {
+  const t = getTemplate(c.req.param("templateId"));
+  if (!t) return c.json({ error: "template not found" }, 404);
+  return c.json({ ok: true, template: t });
+});
+
+app.post("/api/templates/:templateId/create-room", async (c) => {
+  const name = c.req.query("name") || "anonymous";
+  const result = createRoomFromTemplate(c.req.param("templateId"), name);
+  return c.json(result, result.ok ? 201 : 400);
+});
+
+// ── Leaderboard & Stats ────────────────────────────────────────────────────
+app.get("/api/leaderboard", (c) => {
+  const limit = parseInt(c.req.query("limit") || "20");
+  return c.json({ ok: true, leaderboard: getLeaderboard(limit) });
+});
+
+app.get("/api/stats/:agentName", (c) => {
+  const stats = getAgentStats(c.req.param("agentName"));
+  if (!stats) return c.json({ error: "agent not found" }, 404);
+  return c.json({ ok: true, stats });
 });
 
 app.get("/api/stream", async (c) => {
@@ -781,6 +876,79 @@ app.all("/mcp", async (c) => {
       return {
         content: [{ type: "text", text: JSON.stringify(agents) }],
       };
+    }
+  );
+
+  // Tool: share_file
+  server.tool(
+    "share_file",
+    "Share a file (code, data, config) with other agents in the room. Max 512KB.",
+    {
+      filename: z.string().describe("Name of the file, e.g. 'fix.patch' or 'data.json'"),
+      content: z.string().describe("File content as text"),
+      description: z.string().optional().describe("What this file is for"),
+    },
+    async ({ filename, content, description }) => {
+      const result = shareFile(room, name, filename, content, "text/plain", description || "");
+      if (result.ok) trackAgentActivity(name, "file_share");
+      return { content: [{ type: "text", text: JSON.stringify(result) }] };
+    }
+  );
+
+  // Tool: get_room_files
+  server.tool(
+    "get_room_files",
+    "List all files shared in this room.",
+    {},
+    async () => {
+      const files = getRoomFiles(room);
+      return { content: [{ type: "text", text: JSON.stringify({ files, count: files.length }) }] };
+    }
+  );
+
+  // Tool: handoff_to_agent
+  server.tool(
+    "handoff_to_agent",
+    "Hand off your work to another agent with full context — summary, files changed, decisions made, and blockers.",
+    {
+      to_agent: z.string().describe("Name of the agent to hand off to"),
+      summary: z.string().describe("What you worked on and what they need to do next"),
+      files_changed: z.array(z.string()).optional().describe("List of files you modified"),
+      decisions_made: z.array(z.string()).optional().describe("Key decisions you made"),
+      blockers: z.array(z.string()).optional().describe("Any blockers for the next agent"),
+    },
+    async ({ to_agent, summary, files_changed, decisions_made, blockers }) => {
+      const handoff = createHandoff(room, name, to_agent, summary, {}, files_changed || [], decisions_made || [], blockers || []);
+      trackAgentActivity(name, "handoff");
+      return { content: [{ type: "text", text: JSON.stringify({ status: "handed_off", handoff_id: handoff.handoff_id }) }] };
+    }
+  );
+
+  // Tool: accept_handoff
+  server.tool(
+    "accept_handoff",
+    "Accept a handoff assigned to you. Returns the full context from the previous agent.",
+    {
+      handoff_id: z.string().describe("The handoff ID to accept"),
+    },
+    async ({ handoff_id }) => {
+      const result = acceptHandoff(handoff_id, name);
+      if (result.ok) {
+        const h = getHandoff(handoff_id);
+        return { content: [{ type: "text", text: JSON.stringify({ status: "accepted", handoff: h }) }] };
+      }
+      return { content: [{ type: "text", text: JSON.stringify(result) }], isError: true };
+    }
+  );
+
+  // Tool: get_leaderboard
+  server.tool(
+    "get_leaderboard",
+    "See the agent leaderboard — who's shipped the most, highest reputation, most active.",
+    {},
+    async () => {
+      const lb = getLeaderboard(10);
+      return { content: [{ type: "text", text: JSON.stringify(lb) }] };
     }
   );
 
