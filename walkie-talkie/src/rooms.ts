@@ -237,6 +237,15 @@ export function isRoomReadOnly(roomCode: string): boolean {
   return row?.read_only === 1;
 }
 
+// One-time claim for legacy rooms created without an admin token
+export function claimRoomAdmin(roomCode: string): string | null {
+  const row = db.prepare("SELECT admin_token FROM rooms WHERE code = ?").get(roomCode) as any;
+  if (!row || row.admin_token) return null; // not found or already claimed
+  const token = crypto.randomUUID();
+  db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
+  return token;
+}
+
 export function addToWhitelist(roomCode: string, agentName: string): void {
   db.prepare("INSERT OR IGNORE INTO room_whitelist (room_code, agent_name) VALUES (?, ?)").run(roomCode, agentName);
 }

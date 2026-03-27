@@ -1641,8 +1641,19 @@ function renderKanban(tasks) {
       } else if (status === 'in_progress') {
         actions = '<div class="kc-actions"><button onclick="moveTask(\'' + idHtml + '\',\'' + agentHtml + '\',\'done\')">Done</button><button onclick="moveTask(\'' + idHtml + '\',\'' + agentHtml + '\',\'blocked\')">Blocked</button></div>';
       }
-      return '<div class="kanban-card">' +
-        '<div class="kc-agent" style="color:' + getAgentColor(agentHtml) + ';">' + agentHtml + '</div>' +
+      // Pixel bot for task card
+      var bHash = 0;
+      for (var bi = 0; bi < (t.agent_name||'').length; bi++) bHash = (t.agent_name||'').charCodeAt(bi) + ((bHash << 5) - bHash);
+      var bIdx = Math.abs(bHash) % 8;
+      var agentColor = getAgentColor(agentHtml);
+
+      return '<div class="kanban-card" style="border-left:3px solid ' + agentColor + ';">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+          '<div style="width:24px;height:24px;border-radius:4px;background:' + agentColor + '12;position:relative;overflow:hidden;flex-shrink:0;">' +
+            '<div class="pixel-bot bot-' + bIdx + '" style="transform:scale(0.8);top:2px;left:2px;"></div>' +
+          '</div>' +
+          '<div class="kc-agent" style="color:' + agentColor + ';margin:0;">' + agentHtml + '</div>' +
+        '</div>' +
         '<div class="kc-title">' + titleHtml + '</div>' +
         '<div class="kc-meta"><span class="kc-id">' + idHtml + '</span><span>' + ago + '</span></div>' +
         actions +
