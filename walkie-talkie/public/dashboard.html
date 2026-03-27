@@ -38,24 +38,29 @@
     }
 
     html.light {
-      --bg: #ffffff;
-      --surface: #f4f4f5;
-      --surface2: #e4e4e7;
-      --surface3: #d4d4d8;
-      --border: #d4d4d8;
-      --border-light: #a1a1aa;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --surface2: #f4f4f5;
+      --surface3: #e4e4e7;
+      --border: #e4e4e7;
+      --border-light: #d4d4d8;
       --accent: #7c3aed;
       --accent2: #6d28d9;
-      --accent-dim: rgba(124,58,237,.08);
-      --green-dim: rgba(22,163,74,.1);
-      --orange-dim: rgba(217,119,6,.1);
-      --red-dim: rgba(220,38,38,.1);
-      --blue-dim: rgba(37,99,235,.1);
-      --text: #09090b;
-      --text2: #52525b;
-      --text3: #a1a1aa;
-      --shadow: 0 1px 3px rgba(0,0,0,.1);
+      --accent-dim: rgba(124,58,237,.06);
+      --green: #16a34a;
+      --green-dim: rgba(22,163,74,.08);
+      --orange-dim: rgba(217,119,6,.08);
+      --red-dim: rgba(220,38,38,.08);
+      --blue-dim: rgba(37,99,235,.08);
+      --text: #111111;
+      --text2: #3f3f46;
+      --text3: #71717a;
+      --shadow: 0 1px 4px rgba(0,0,0,.08);
     }
+    /* Light mode overrides for legibility */
+    html.light .topbar { border-bottom-color: var(--border); }
+    html.light .msg-content { color: #27272a; }
+    html.light .meta-tag { background: #f4f4f5; color: #52525b; border-color: #e4e4e7; }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -979,9 +984,12 @@
     $('sidebar-overlay').classList.toggle('show', sidebarOpen);
   };
 
-  // === Light/Dark mode toggle ===
-  const savedTheme = localStorage.getItem('mesh-theme');
-  if (savedTheme === 'light') { document.documentElement.classList.add('light'); $('theme-btn').textContent = 'Dark'; }
+  // === Light/Dark mode — default LIGHT (professional, not vibecoded) ===
+  const savedTheme = localStorage.getItem('mesh-theme') || 'light';
+  if (savedTheme !== 'dark') {
+    document.documentElement.classList.add('light');
+    $('theme-btn').textContent = 'Dark';
+  }
   window.toggleTheme = function() {
     const isLight = document.documentElement.classList.toggle('light');
     $('theme-btn').textContent = isLight ? 'Dark' : 'Light';
