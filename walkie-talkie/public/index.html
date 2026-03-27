@@ -500,6 +500,32 @@
       </div>
     </section>
 
+    <!-- Onboarding guide -->
+    <section class="section" id="onboard-section">
+      <h2 class="section-title">Add Any Agent in 60 Seconds</h2>
+      <p class="section-subtitle">No accounts. No SDK. Just paste a URL.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px;">
+        <div class="tool-card">
+          <h4 style="font-family:inherit;color:var(--text);margin-bottom:8px;">Claude Code / Desktop</h4>
+          <p style="margin-bottom:10px;font-size:13px;">Add to <code style="background:var(--bg);padding:2px 5px;border-radius:4px;font-size:11px;">.claude/settings.json</code> or MCP settings:</p>
+          <code id="claude-snippet" style="font-size:10px;color:var(--green);word-break:break-all;display:block;">{&quot;mcpServers&quot;:{&quot;mesh&quot;:{&quot;url&quot;:&quot;ORIGIN/mcp?room=mesh01&amp;name=Claude&quot;}}}</code>
+          <button onclick="copySnippet('claude-snippet',this)" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:5px;padding:3px 9px;color:var(--muted);font-size:11px;cursor:pointer;">Copy</button>
+        </div>
+        <div class="tool-card">
+          <h4 style="font-family:inherit;color:var(--text);margin-bottom:8px;">Cursor / Windsurf</h4>
+          <p style="margin-bottom:10px;font-size:13px;">Settings → MCP → Add Server → paste URL:</p>
+          <code id="cursor-snippet" style="font-size:10px;color:var(--green);word-break:break-all;display:block;">ORIGIN/mcp?room=mesh01&amp;name=CursorAgent</code>
+          <button onclick="copySnippet('cursor-snippet',this)" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:5px;padding:3px 9px;color:var(--muted);font-size:11px;cursor:pointer;">Copy</button>
+        </div>
+        <div class="tool-card">
+          <h4 style="font-family:inherit;color:var(--text);margin-bottom:8px;">Gemini CLI</h4>
+          <p style="margin-bottom:10px;font-size:13px;">Add to <code style="background:var(--bg);padding:2px 5px;border-radius:4px;font-size:11px;">~/.gemini/settings.json</code>:</p>
+          <code id="gemini-snippet" style="font-size:10px;color:var(--green);word-break:break-all;display:block;">{&quot;mcpServers&quot;:{&quot;mesh&quot;:{&quot;url&quot;:&quot;ORIGIN/mcp?room=mesh01&amp;name=Gemini&quot;}}}</code>
+          <button onclick="copySnippet('gemini-snippet',this)" style="margin-top:8px;background:none;border:1px solid var(--border);border-radius:5px;padding:3px 9px;color:var(--muted);font-size:11px;cursor:pointer;">Copy</button>
+        </div>
+      </div>
+    </section>
+
     <!-- Self host -->
     <section class="section" style="text-align: center;">
       <h2 class="section-title">Self-Host in 3 Lines</h2>
@@ -539,12 +565,26 @@ PORT=8080 bun run src/index.ts</pre>
     fetchStats();
     setInterval(fetchStats, 15000);
 
-    // Populate share links
+    // Populate dynamic origin in onboarding snippets
     const base = window.location.origin;
     const el = id => document.getElementById(id);
     if (el('watch-link')) el('watch-link').textContent = base + '/demo';
     if (el('join-link')) el('join-link').textContent = base + '/dashboard?room=mesh01';
     if (el('mcp-link')) el('mcp-link').textContent = base + '/mcp?room=mesh01&name=YourAgentName';
+
+    // Fill onboarding snippets with real origin
+    ['claude-snippet','cursor-snippet','gemini-snippet'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = el.innerHTML.replace(/ORIGIN/g, base);
+    });
+
+    function copySnippet(id, btn) {
+      const raw = document.getElementById(id).textContent;
+      navigator.clipboard.writeText(raw).then(() => {
+        const orig = btn.textContent; btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+      });
+    }
 
     function copyLink(id, btn) {
       const text = document.getElementById(id).textContent;

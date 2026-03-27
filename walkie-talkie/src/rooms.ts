@@ -187,9 +187,13 @@ db.run(`CREATE TABLE IF NOT EXISTS agent_personalities (
   personality TEXT DEFAULT '',
   system_prompt TEXT DEFAULT '',
   skills TEXT DEFAULT '',
+  model TEXT DEFAULT '',
+  tool TEXT DEFAULT '',
   created_at INTEGER,
   updated_at INTEGER
 );`);
+try { db.run("ALTER TABLE agent_personalities ADD COLUMN model TEXT DEFAULT '';"); } catch(e) {}
+try { db.run("ALTER TABLE agent_personalities ADD COLUMN tool TEXT DEFAULT '';"); } catch(e) {}
 
 // ── Message reactions ─────────────────────────────────────────────────────────
 db.run(`
@@ -1254,31 +1258,35 @@ export function cancelScheduledMessage(scheduleId: string): boolean {
 
 // ── Agent personality persistence ────────────────────────────────────────────
 
-export function savePersonality(name: string, personality: string, systemPrompt: string, skills: string): void {
+export function savePersonality(name: string, personality: string, systemPrompt: string, skills: string, model?: string, tool?: string): void {
   const now = Date.now();
-  db.prepare(`INSERT INTO agent_personalities (name, personality, system_prompt, skills, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?)
+  db.prepare(`INSERT INTO agent_personalities (name, personality, system_prompt, skills, model, tool, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(name) DO UPDATE SET
       personality = excluded.personality,
       system_prompt = excluded.system_prompt,
       skills = excluded.skills,
+      model = COALESCE(excluded.model, model),
+      tool = COALESCE(excluded.tool, tool),
       updated_at = excluded.updated_at`)
-    .run(name, personality, systemPrompt, skills, now, now);
+    .run(name, personality, systemPrompt, skills, model || "", tool || "", now, now);
 }
 
-export function getPersonality(name: string): { name: string; personality: string; system_prompt: string; skills: string; updated_at: number } | null {
+export function getPersonality(name: string): { name: string; personality: string; system_prompt: string; skills: string; model: string; tool: string; updated_at: number } | null {
   return db.prepare("SELECT * FROM agent_personalities WHERE name = ?").get(name) as any || null;
 }
 
 export function getAllPersonalities(): any[] {
-  return db.prepare("SELECT name, personality, skills, updated_at FROM agent_personalities ORDER BY updated_at DESC").all() as any[];
+  return db.prepare("SELECT name, personality, skills, model, tool, updated_at FROM agent_personalities ORDER BY updated_at DESC").all() as any[];
 }
 
 // Generate a CLAUDE.md-compatible identity block for an agent
 export function generateIdentityBlock(name: string): string {
   const p = getPersonality(name);
   if (!p) return `# ${name}\nNo saved personality. Use /api/personality to save one.`;
-  return `# Agent Identity: ${name}\n\n${p.personality}\n\nSkills: ${p.skills}\n\n## System Prompt\n${p.system_prompt}\n\n---\nSaved at: ${new Date(p.updated_at).toISOString()}`;
+  const modelLine = p.model ? `\nModel: ${p.model}` : "";
+  const toolLine = p.tool ? `\nTool: ${p.tool}` : "";
+  return `# Agent Identity: ${name}${modelLine}${toolLine}\n\n${p.personality}\n\nSkills: ${p.skills}\n\n## System Prompt\n${p.system_prompt}\n\n---\nSaved at: ${new Date(p.updated_at).toISOString()}`;
 }
 
 // ── Run seeds after all tables are created ───────────────────────────────────

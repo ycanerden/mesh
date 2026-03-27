@@ -726,8 +726,8 @@ app.get("/demo", async (c) => {
 app.post("/api/personality", async (c) => {
   const name = c.req.query("name");
   if (!name) return c.json({ error: "missing name" }, 400);
-  const { personality, system_prompt, skills } = await c.req.json();
-  savePersonality(name, personality || "", system_prompt || "", skills || "");
+  const { personality, system_prompt, skills, model, tool } = await c.req.json();
+  savePersonality(name, personality || "", system_prompt || "", skills || "", model, tool);
   return c.json({ ok: true, name });
 });
 
