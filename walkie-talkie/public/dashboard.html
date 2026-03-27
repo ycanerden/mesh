@@ -984,9 +984,9 @@
     $('sidebar-overlay').classList.toggle('show', sidebarOpen);
   };
 
-  // === Light/Dark mode — default LIGHT (professional, not vibecoded) ===
-  const savedTheme = localStorage.getItem('mesh-theme') || 'light';
-  if (savedTheme !== 'dark') {
+  // === Light/Dark mode — default DARK ===
+  const savedTheme = localStorage.getItem('mesh-theme');
+  if (savedTheme === 'light') {
     document.documentElement.classList.add('light');
     $('theme-btn').textContent = 'Dark';
   }

@@ -48,12 +48,13 @@
     .speech.empty{opacity:.4;font-style:italic;}
 
     /* The agent character */
-    .char{font-size:28px;line-height:1;margin-bottom:2px;display:block;text-align:center;}
-    .char.active{animation:bounce .7s ease-in-out infinite;}
-    .char.idle{animation:sway 2.5s ease-in-out infinite;}
-    .char.offline{filter:grayscale(1);opacity:.3;}
-    @keyframes bounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.05)}}
-    @keyframes sway{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+    /* CSS pixel art character */
+    .pxart{display:block;position:relative;image-rendering:pixelated;margin:0 auto 4px;flex-shrink:0;}
+    .pxart.active{animation:px-bounce .6s ease-in-out infinite;}
+    .pxart:not(.active):not(.off){animation:px-sway 2.5s ease-in-out infinite;}
+    .pxart.off{opacity:.25;filter:grayscale(1);}
+    @keyframes px-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    @keyframes px-sway{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 
     /* Pixel desk */
     .desk{width:130px;position:relative;margin-top:2px;}
@@ -110,14 +111,102 @@
 </div>
 
 <script>
-const EMOJIS=['🤖','👻','💀','🧙','🐲','👁','💎','🐦'];
 const P=new URLSearchParams(location.search);
 const ROOM=P.get('room')||'mesh01';
 let agentMap={}, msgMap={}, persMap={}, taskMap={};
 
 function hash(s){let h=0;for(let c of s)h=c.charCodeAt(0)+((h<<5)-h);return Math.abs(h);}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function emoji(name){return EMOJIS[hash(name)%8];}
+
+// CSS box-shadow pixel art — 100% license-free, unique per agent
+// Grid is 8x8 pixels rendered at 3px each = 24px total
+// Each character template is a flat array [row0col0, row0col1, ...] 0=transparent, 1=body, 2=accent, 3=dark
+const CHAR_TEMPLATES = [
+  // Robot
+  [0,1,1,1,1,1,1,0,
+   1,2,1,1,1,1,2,1,
+   1,1,2,1,1,2,1,1,
+   1,1,1,1,1,1,1,1,
+   0,1,3,1,1,3,1,0,
+   0,1,1,1,1,1,1,0,
+   0,1,0,1,1,0,1,0,
+   0,1,1,0,0,1,1,0],
+  // Ghost
+  [0,0,1,1,1,1,0,0,
+   0,1,1,1,1,1,1,0,
+   1,1,2,1,1,2,1,1,
+   1,1,1,1,1,1,1,1,
+   1,1,1,1,1,1,1,1,
+   1,1,3,1,1,3,1,1,
+   1,0,1,1,1,1,0,1,
+   0,0,0,0,0,0,0,0],
+  // Wizard
+  [0,0,0,1,1,0,0,0,
+   0,0,1,1,1,0,0,0,
+   0,1,1,1,1,1,0,0,
+   1,1,2,1,1,2,1,0,
+   1,1,1,1,1,1,1,0,
+   0,1,3,1,1,3,1,0,
+   0,1,1,1,1,1,1,0,
+   0,0,1,1,1,1,0,0],
+  // Knight
+  [0,1,1,1,1,1,1,0,
+   1,2,2,1,1,2,2,1,
+   1,1,1,1,1,1,1,1,
+   0,1,1,1,1,1,1,0,
+   0,1,3,1,1,3,1,0,
+   0,1,1,3,3,1,1,0,
+   0,0,1,1,1,1,0,0,
+   0,1,1,0,0,1,1,0],
+  // Mage
+  [0,0,1,1,1,0,0,0,
+   0,1,2,1,2,1,0,0,
+   0,1,1,1,1,1,0,0,
+   0,1,2,1,2,1,0,0,
+   0,1,1,1,1,1,0,0,
+   1,1,3,1,1,3,1,0,
+   0,1,1,0,0,1,1,0,
+   0,0,1,1,1,1,0,0],
+];
+
+// Color palettes — each agent gets unique colors based on name hash
+const PALETTES = [
+  ['#8b5cf6','#c4b5fd','#4c1d95'], // purple
+  ['#22c55e','#86efac','#14532d'], // green
+  ['#3b82f6','#93c5fd','#1e3a8a'], // blue
+  ['#f59e0b','#fcd34d','#78350f'], // amber
+  ['#ec4899','#f9a8d4','#831843'], // pink
+  ['#14b8a6','#5eead4','#134e4a'], // teal
+  ['#f97316','#fdba74','#7c2d12'], // orange
+  ['#a855f7','#d8b4fe','#581c87'], // violet
+];
+
+function pixelArt(name, active, offline) {
+  const h = hash(name);
+  const template = CHAR_TEMPLATES[h % CHAR_TEMPLATES.length];
+  const palette = PALETTES[Math.floor(h / CHAR_TEMPLATES.length) % PALETTES.length];
+  const [body, accent, dark] = palette;
+  const SIZE = 3; // px per pixel
+
+  const colorMap = {0: null, 1: body, 2: accent, 3: dark};
+  const shadows = [];
+
+  for(let row=0; row<8; row++) {
+    for(let col=0; col<8; col++) {
+      const v = template[row*8+col];
+      if(v === 0) continue;
+      const c = offline ? '#3f3f46' : colorMap[v];
+      shadows.push(`${col*SIZE}px ${row*SIZE}px 0 ${c}`);
+    }
+  }
+
+  // Add animated "glow" shadow when active
+  if(active && !offline) {
+    shadows.push(`4px 4px 8px ${body}40`);
+  }
+
+  return `<div class="pxart${active?' active':''}${offline?' off':''}" style="width:${8*SIZE}px;height:${8*SIZE}px;box-shadow:${shadows.join(',')};"></div>`;
+}
 
 function recentMsg(name){
   const now=Date.now();
@@ -159,7 +248,7 @@ function render(){
       <div class="bubble-wrap">
         ${bubbleTxt?`<div class="${bubbleClass}">${esc(bubbleTxt)}</div>`:''}
       </div>
-      <span class="char ${charClass}">${emoji(a.agent_name)}</span>
+      ${pixelArt(a.agent_name, isTyping || (isOnline && !isTyping && !!recentMsg(a.agent_name)), !isOnline)}
       <div class="desk">
         <div class="monitor-wrap">
           <div class="monitor-frame"><div class="m-line"></div><div class="m-line"></div><div class="m-line"></div></div>
