@@ -162,7 +162,7 @@ function drawDesk(dx, dy, pal, agentName, hasAgent) {
 
 // ── Agent character (top-down, 8px sprite) ────────────────────────────────────
 function drawAgent(ax, ay, pal, frame, isTyping, isOnline) {
-  const alpha = isOnline ? 1 : 0.3;
+  const alpha = isOnline ? 1 : 0.55;
   ctx.globalAlpha = alpha;
 
   // Shadow beneath agent
@@ -238,7 +238,7 @@ function drawBubble(x, y, text, isTyping, accentColor) {
 }
 
 // ── Name tag ─────────────────────────────────────────────────────────────────
-function drawNameTag(x, y, name, pal, model) {
+function drawNameTag(x, y, name, pal, model, isOnline) {
   const short = name.slice(0,10);
   const W = short.length*4+6;
   const bx = x-W/2+4, by=y-33;
@@ -247,8 +247,8 @@ function drawNameTag(x, y, name, pal, model) {
   ctx.font='4px monospace';
   ctx.fillText(short, bx+3, by+6);
 
-  // Online dot
-  ctx.fillStyle = '#22c55e';
+  // Status dot — green if online, grey if offline
+  ctx.fillStyle = isOnline ? '#22c55e' : '#52525b';
   ctx.beginPath();
   ctx.arc(bx-3, by+4, 2, 0, Math.PI*2);
   ctx.fill();
@@ -288,8 +288,7 @@ function agentActivity(agent) {
   if(task) return {text: task.title.slice(0,24), color:'#22c55e'};
   const msg = recentMsg(name);
   if(msg) return {text: msg.content.slice(0,24), color:'#a1a1aa'};
-  if(agent.status==='online') return {text:'online', color:'#52525b'};
-  return null;
+  return {text:'idle', color:'#52525b'};
 }
 
 // ── Render loop ───────────────────────────────────────────────────────────────
@@ -318,13 +317,14 @@ function draw() {
     drawAgent(ax, ay, pal, frame, isTyping, isOnline);
 
     const activity = agentActivity(agent);
-    if(isOnline && activity) {
-      drawBubble(ax, ay, activity.text, isTyping, activity.color);
+    if(activity) {
+      const bubbleText = isOnline ? activity.text : 'offline';
+      drawBubble(ax, ay, bubbleText, isTyping, isOnline ? activity.color : '#52525b');
     }
 
     const name = agent.display_name||agent.agent_name;
     const p = pers[agent.agent_name]||{};
-    drawNameTag(ax, ay, name, pal, p.model);
+    drawNameTag(ax, ay, name, pal, p.model, isOnline);
   });
 
   // Empty desk slots (ghosted)
@@ -360,9 +360,10 @@ async function fetchAll() {
       tasks[t.agent_name||t.assigned_to] = t;
     });
 
+    const visible = agents.filter(a=>a.agent_name!=='demo-viewer'&&a.agent_name!=='office-viewer').length;
     const online = agents.filter(a=>a.status==='online'||a.is_typing).length;
-    document.getElementById('hsub').textContent = `${ROOM} · ${online} online`;
-    document.getElementById('footer-l').textContent = `${online} agent${online!==1?'s':''} online`;
+    document.getElementById('hsub').textContent = `${ROOM} · ${online} online · ${visible} total`;
+    document.getElementById('footer-l').textContent = `${visible} agent${visible!==1?'s':''} · ${online} online`;
   } catch(e){}
 }
 
