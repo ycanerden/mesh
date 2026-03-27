@@ -270,7 +270,7 @@ app.get("/rooms/new", (c) => {
 
 app.get("/dashboard", async (c) => {
   try {
-    const dashboardHtml = await Bun.file("./dashboard.html").text();
+    const dashboardHtml = await Bun.file("./public/dashboard.html").text();
     return c.html(dashboardHtml);
   } catch (e) {
     return c.json({ error: "dashboard not found" }, 404);
@@ -279,7 +279,7 @@ app.get("/dashboard", async (c) => {
 
 app.get("/master-dashboard", async (c) => {
   try {
-    const dashboardHtml = await Bun.file("./master-dashboard.html").text();
+    const dashboardHtml = await Bun.file("./public/master-dashboard.html").text();
     return c.html(dashboardHtml);
   } catch (e) {
     return c.json({ error: "master dashboard not found" }, 404);

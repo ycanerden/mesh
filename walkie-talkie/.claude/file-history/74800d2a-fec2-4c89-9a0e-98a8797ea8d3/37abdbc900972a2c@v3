@@ -1,9 +1,0 @@
-# --- BUDGET TESTING CONFIG (~$0.02-0.05 per query) ---
-
-ANTHROPIC_API_KEY=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
-GOOGLE_AI_API_KEY=AIzaSyDuA6f81ngoTJ5H4s1G9ep5iSAyRahXUgU
-DEEPSEEK_API_KEY=         # get at platform.deepseek.com — very cheap (~$0.001/query)
-OLLAMA_ENABLED=false      # set to true if you have Ollama running locally (free)
-
-# --- FULL POWER (uncomment when ready to spend more) ---
-# OPENAI_API_KEY=         # gpt-4o ~$0.05/query

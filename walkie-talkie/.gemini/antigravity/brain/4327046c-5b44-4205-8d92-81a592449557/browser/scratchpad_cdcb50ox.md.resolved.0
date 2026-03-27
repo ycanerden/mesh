@@ -1,7 +1,0 @@
-# Debugging "Invalid API key" Error
-
-## Findings
-- Error appears in the UI as a red alert box with "Invalid API key" text on the `/signup` page.
-- Browser console shows: `Failed to load resource: the server responded with a status of 401 ()` for `https://oockmljkfentafukonlr.supabase.co/auth/v1/signup`.
-- The error is triggered when clicking the "Sign Up" button.
-- Root cause: The `NEXT_PUBLIC_SUPABASE_ANON_KEY` is likely invalid (user provided 'oockmljkfentafukonlr' which looks like a project ID, not a key).

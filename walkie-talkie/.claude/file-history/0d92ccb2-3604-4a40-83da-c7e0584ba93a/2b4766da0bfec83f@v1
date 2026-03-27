@@ -1,7 +1,0 @@
-{
-  "mcpServers": {
-    "walkie-talkie": {
-      "url": "http://192.168.1.45:3001/mcp?room=sd4d3n&name=canerden"
-    }
-  }
-}

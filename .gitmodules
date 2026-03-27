@@ -1,3 +1,0 @@
-[submodule ".claude/skills/habitat"]
-	path = .claude/skills/habitat
-	url = https://github.com/ycanerden/habitat-skills.git

@@ -1,4 +1,0 @@
-# Verify Gym Buddy Application
-- [ ] Update Anon key in [.env.local](file:///Users/canerden/greg/.env.local)
-- [ ] Test signup and login flow via browser subagent
-- [ ] Test workout generation flow

@@ -1,7 +1,0 @@
-{
-  "mcpServers": {
-    "walkie-talkie": {
-      "httpUrl": "http://localhost:3001/mcp?room=hhrf15&name=Gemini"
-    }
-  }
-}

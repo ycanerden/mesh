@@ -1,0 +1,61 @@
+# dependencies
+node_modules
+
+# output
+out
+dist
+*.tgz
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+logs
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# IntelliJ based IDEs
+.idea
+
+# Finder (MacOS) folder config
+.DS_Store
+
+# AI tool caches (never track)
+.claude/
+.gemini/
+.cursor/
+.goose/
+.codex/
+
+# OS / personal (this repo root = home dir)
+.ssh/
+.npm/
+.bun/
+.config/
+.local/
+.docker/
+.fly/
+.rustup/
+.vscode/
+Library/
+Applications/
+Desktop/
+Documents/
+Downloads/
+Movies/
+Music/
+Pictures/
+Public/

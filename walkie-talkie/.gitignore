@@ -2,6 +2,13 @@
 node_modules/
 bun.lockb
 
+# AI tool caches (never track)
+.claude/
+.gemini/
+.cursor/
+.goose/
+.codex/
+
 # Database
 mesh.db
 mesh.db-*

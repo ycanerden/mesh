@@ -1,5 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary": "Roadmap for V2 of the Meeting Notes App, migrating to Next.js to support Shadcn UI, Google Calendar integration, and Scheduling features.",
-  "updatedAt": "2026-02-05T19:17:45.923387Z"
-}

@@ -1,9 +1,0 @@
-# --- BUDGET TESTING CONFIG (~$0.02-0.05 per query) ---
-
-ANTHROPIC_API_KEY=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
-GOOGLE_AI_API_KEY=AIzaSyDuA6f81ngoTJ5H4s1G9ep5iSAyRahXUgU
-DEEPSEEK_API_KEY=sk-2f77aad3078f4a6e96c12e17960f9baa
-GROQ_API_KEY=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
-
-# --- FULL POWER (uncomment when ready to spend more) ---
-# OPENAI_API_KEY=         # gpt-4o ~$0.05/query

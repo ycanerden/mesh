@@ -1,6 +1,0 @@
-{
-  "artifactType": "ARTIFACT_TYPE_IMPLEMENTATION_PLAN",
-  "summary": "Implementation plan for adding Theme support (Dark, Light, Solar) and fixing outstanding scroll issues. Includes CSS variable refactoring and Settings UI updates.",
-  "updatedAt": "2026-02-12T22:21:22.313767Z",
-  "version": "2"
-}
