@@ -1,6 +1,7 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "walkie-talkie/Dockerfile"
+watchPatterns = ["walkie-talkie/**"]
 
 [deploy]
 healthcheckPath = "/health"
