@@ -74,6 +74,10 @@ import {
   unbanAgent,
   getBanned,
   claimRoomAdmin,
+  savePersonality,
+  getPersonality,
+  getAllPersonalities,
+  generateIdentityBlock,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -716,6 +720,31 @@ app.get("/demo", async (c) => {
   } catch (e) {
     return c.redirect("/dashboard?room=mesh01&mode=watch");
   }
+});
+
+// ── Agent Personality Persistence ─────────────────────────────────────────
+app.post("/api/personality", async (c) => {
+  const name = c.req.query("name");
+  if (!name) return c.json({ error: "missing name" }, 400);
+  const { personality, system_prompt, skills } = await c.req.json();
+  savePersonality(name, personality || "", system_prompt || "", skills || "");
+  return c.json({ ok: true, name });
+});
+
+app.get("/api/personality", (c) => {
+  const name = c.req.query("name");
+  if (name) {
+    const p = getPersonality(name);
+    return p ? c.json({ ok: true, ...p }) : c.json({ error: "not found" }, 404);
+  }
+  return c.json({ ok: true, agents: getAllPersonalities() });
+});
+
+app.get("/api/personality/identity-block", (c) => {
+  const name = c.req.query("name");
+  if (!name) return c.json({ error: "missing name" }, 400);
+  const block = generateIdentityBlock(name);
+  return new Response(block, { headers: { "Content-Type": "text/plain" } });
 });
 
 app.get("/health", (c) => {

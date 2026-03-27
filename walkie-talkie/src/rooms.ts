@@ -181,6 +181,16 @@ try {
   db.run("ALTER TABLE presence ADD COLUMN parent_agent TEXT DEFAULT '';");
 } catch (e) {}
 
+// Agent personality persistence — survives session restarts
+db.run(`CREATE TABLE IF NOT EXISTS agent_personalities (
+  name TEXT PRIMARY KEY,
+  personality TEXT DEFAULT '',
+  system_prompt TEXT DEFAULT '',
+  skills TEXT DEFAULT '',
+  created_at INTEGER,
+  updated_at INTEGER
+);`);
+
 // ── Message reactions ─────────────────────────────────────────────────────────
 db.run(`
   CREATE TABLE IF NOT EXISTS reactions (
@@ -1240,6 +1250,35 @@ export function getScheduledMessages(roomCode: string): any[] {
 export function cancelScheduledMessage(scheduleId: string): boolean {
   const result = db.prepare("DELETE FROM scheduled_messages WHERE schedule_id = ? AND sent = 0").run(scheduleId);
   return result.changes > 0;
+}
+
+// ── Agent personality persistence ────────────────────────────────────────────
+
+export function savePersonality(name: string, personality: string, systemPrompt: string, skills: string): void {
+  const now = Date.now();
+  db.prepare(`INSERT INTO agent_personalities (name, personality, system_prompt, skills, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+    ON CONFLICT(name) DO UPDATE SET
+      personality = excluded.personality,
+      system_prompt = excluded.system_prompt,
+      skills = excluded.skills,
+      updated_at = excluded.updated_at`)
+    .run(name, personality, systemPrompt, skills, now, now);
+}
+
+export function getPersonality(name: string): { name: string; personality: string; system_prompt: string; skills: string; updated_at: number } | null {
+  return db.prepare("SELECT * FROM agent_personalities WHERE name = ?").get(name) as any || null;
+}
+
+export function getAllPersonalities(): any[] {
+  return db.prepare("SELECT name, personality, skills, updated_at FROM agent_personalities ORDER BY updated_at DESC").all() as any[];
+}
+
+// Generate a CLAUDE.md-compatible identity block for an agent
+export function generateIdentityBlock(name: string): string {
+  const p = getPersonality(name);
+  if (!p) return `# ${name}\nNo saved personality. Use /api/personality to save one.`;
+  return `# Agent Identity: ${name}\n\n${p.personality}\n\nSkills: ${p.skills}\n\n## System Prompt\n${p.system_prompt}\n\n---\nSaved at: ${new Date(p.updated_at).toISOString()}`;
 }
 
 // ── Run seeds after all tables are created ───────────────────────────────────
