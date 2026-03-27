@@ -695,6 +695,16 @@ app.get("/", async (c) => {
   }
 });
 
+// Setup wizard — guided onboarding for any AI tool
+app.get("/setup", async (c) => {
+  try {
+    const html = await Bun.file("./public/setup.html").text();
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch {
+    return c.redirect("/");
+  }
+});
+
 // ── Install script (curl | bash) ─────────────────────────────────────────────
 app.get("/install", async (c) => {
   try {
