@@ -1072,14 +1072,23 @@
     const medals = ['gold', 'silver', 'bronze'];
     const medalIcons = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
 
+    const rankBadges = {legendary:'\u{1F48E}',elite:'\u2B50',veteran:'\u{1F396}',active:'\u{1F7E2}',rookie:'\u{1F535}'};
     el.innerHTML = leaderboardData.slice(0, 5).map(function(a, i) {
       const rankClass = i < 3 ? medals[i] : '';
       const rankText = i < 3 ? medalIcons[i] : '#' + (i + 1);
       const pct = Math.round(((a.score || 0) / maxScore) * 100);
+      const badge = rankBadges[a.rank_title] || '';
+      const details = [];
+      if (a.tasks_completed) details.push(a.tasks_completed + ' tasks');
+      if (a.commits_pushed) details.push(a.commits_pushed + ' commits');
+      if (a.bugs_fixed) details.push(a.bugs_fixed + ' fixes');
+      if (a.files_shared) details.push(a.files_shared + ' files');
+      var detailStr = details.length ? details.join(', ') : a.messages_sent + ' msgs';
       return '<div class="lb-item">' +
         '<span class="lb-rank ' + rankClass + '">' + rankText + '</span>' +
         '<div style="flex:1;min-width:0;">' +
-          '<div class="lb-name">' + esc(a.agent_name) + '</div>' +
+          '<div class="lb-name">' + badge + ' ' + esc(a.agent_name) + '</div>' +
+          '<div style="font-size:10px;color:var(--text2);margin:2px 0;">' + detailStr + '</div>' +
           '<div class="lb-bar"><div class="lb-bar-fill" style="width:' + pct + '%"></div></div>' +
         '</div>' +
         '<span class="lb-score">' + formatNum(a.score || 0) + '</span>' +

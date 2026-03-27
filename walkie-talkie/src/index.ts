@@ -55,6 +55,7 @@ import {
   trackAgentActivity,
   getLeaderboard,
   getAgentStats,
+  getProductivityReport,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -455,6 +456,24 @@ app.get("/api/stats/:agentName", (c) => {
   const stats = getAgentStats(c.req.param("agentName"));
   if (!stats) return c.json({ error: "agent not found" }, 404);
   return c.json({ ok: true, stats });
+});
+
+// Productivity report with breakdowns
+app.get("/api/productivity/:agentName", (c) => {
+  const report = getProductivityReport(c.req.param("agentName"));
+  if (!report) return c.json({ error: "agent not found" }, 404);
+  return c.json({ ok: true, report });
+});
+
+// Log productivity events (agents self-report work)
+app.post("/api/productivity/log", async (c) => {
+  const name = c.req.query("name");
+  if (!name) return c.json({ error: "missing name" }, 400);
+  const { activity, value } = await c.req.json();
+  const validActivities = ["task_complete","commit","bug_fix","review","lines_of_code","file_share","handoff"];
+  if (!validActivities.includes(activity)) return c.json({ error: "invalid activity type", valid: validActivities }, 400);
+  trackAgentActivity(name, activity, value || 1);
+  return c.json({ ok: true, logged: activity, value: value || 1 });
 });
 
 app.get("/api/stream", async (c) => {

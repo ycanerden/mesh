@@ -891,7 +891,7 @@ export function createRoomFromTemplate(templateId: string, creatorName: string):
   return { ok: true, room_code: roomCode, template };
 }
 
-// ── Reputation & Leaderboard ─────────────────────────────────────────────────
+// ── Reputation & Productivity Leaderboard ────────────────────────────────────
 db.run(`
   CREATE TABLE IF NOT EXISTS agent_stats (
     agent_name TEXT PRIMARY KEY,
@@ -899,48 +899,109 @@ db.run(`
     tasks_completed INTEGER DEFAULT 0,
     handoffs_completed INTEGER DEFAULT 0,
     files_shared INTEGER DEFAULT 0,
+    reactions_given INTEGER DEFAULT 0,
+    reactions_received INTEGER DEFAULT 0,
+    lines_of_code INTEGER DEFAULT 0,
+    commits_pushed INTEGER DEFAULT 0,
+    bugs_fixed INTEGER DEFAULT 0,
+    reviews_done INTEGER DEFAULT 0,
     avg_response_ms REAL DEFAULT 0,
     uptime_minutes INTEGER DEFAULT 0,
     reputation REAL DEFAULT 100.0,
+    streak_days INTEGER DEFAULT 0,
     first_seen INTEGER,
     last_active INTEGER
   );
 `);
 
-export function trackAgentActivity(agentName: string, activityType: string) {
+// Migration for new columns
+const newStatCols = [
+  "reactions_given INTEGER DEFAULT 0",
+  "reactions_received INTEGER DEFAULT 0",
+  "lines_of_code INTEGER DEFAULT 0",
+  "commits_pushed INTEGER DEFAULT 0",
+  "bugs_fixed INTEGER DEFAULT 0",
+  "reviews_done INTEGER DEFAULT 0",
+  "streak_days INTEGER DEFAULT 0",
+];
+for (const col of newStatCols) {
+  try { db.run(`ALTER TABLE agent_stats ADD COLUMN ${col};`); } catch (e) {}
+}
+
+export function trackAgentActivity(agentName: string, activityType: string, value: number = 1) {
   const now = Date.now();
   // Upsert agent stats
-  db.prepare(`INSERT INTO agent_stats (agent_name, messages_sent, tasks_completed, handoffs_completed, files_shared, first_seen, last_active)
-    VALUES (?, 0, 0, 0, 0, ?, ?)
+  db.prepare(`INSERT INTO agent_stats (agent_name, messages_sent, tasks_completed, handoffs_completed, files_shared, reactions_given, reactions_received, lines_of_code, commits_pushed, bugs_fixed, reviews_done, first_seen, last_active)
+    VALUES (?, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ?, ?)
     ON CONFLICT(agent_name) DO UPDATE SET last_active = ?`)
     .run(agentName, now, now, now);
 
-  switch (activityType) {
-    case "message":
-      db.prepare("UPDATE agent_stats SET messages_sent = messages_sent + 1 WHERE agent_name = ?").run(agentName);
-      break;
-    case "task_complete":
-      db.prepare("UPDATE agent_stats SET tasks_completed = tasks_completed + 1, reputation = MIN(reputation + 2, 200) WHERE agent_name = ?").run(agentName);
-      break;
-    case "handoff":
-      db.prepare("UPDATE agent_stats SET handoffs_completed = handoffs_completed + 1, reputation = MIN(reputation + 1, 200) WHERE agent_name = ?").run(agentName);
-      break;
-    case "file_share":
-      db.prepare("UPDATE agent_stats SET files_shared = files_shared + 1 WHERE agent_name = ?").run(agentName);
-      break;
+  const colMap: Record<string, string> = {
+    message: "messages_sent",
+    task_complete: "tasks_completed",
+    handoff: "handoffs_completed",
+    file_share: "files_shared",
+    reaction_given: "reactions_given",
+    reaction_received: "reactions_received",
+    lines_of_code: "lines_of_code",
+    commit: "commits_pushed",
+    bug_fix: "bugs_fixed",
+    review: "reviews_done",
+  };
+
+  const col = colMap[activityType];
+  if (col) {
+    db.prepare(`UPDATE agent_stats SET ${col} = ${col} + ? WHERE agent_name = ?`).run(value, agentName);
+  }
+
+  // Reputation boosts for productive work
+  const repBoosts: Record<string, number> = {
+    task_complete: 5, handoff: 3, file_share: 2, commit: 4, bug_fix: 6, review: 3
+  };
+  if (repBoosts[activityType]) {
+    db.prepare("UPDATE agent_stats SET reputation = MIN(reputation + ?, 500) WHERE agent_name = ?")
+      .run(repBoosts[activityType], agentName);
   }
 }
 
 export function getLeaderboard(limit: number = 20): any[] {
   return db.prepare(`SELECT agent_name, messages_sent, tasks_completed, handoffs_completed, files_shared,
-    reputation, first_seen, last_active,
-    (messages_sent + tasks_completed * 10 + handoffs_completed * 5 + files_shared * 3) as score
+    reactions_given, reactions_received, lines_of_code, commits_pushed, bugs_fixed, reviews_done,
+    reputation, streak_days, first_seen, last_active,
+    (messages_sent + tasks_completed * 10 + handoffs_completed * 5 + files_shared * 3 +
+     commits_pushed * 8 + bugs_fixed * 12 + reviews_done * 6 + lines_of_code / 10) as score,
+    CASE
+      WHEN (tasks_completed + commits_pushed + bugs_fixed) >= 20 THEN 'legendary'
+      WHEN (tasks_completed + commits_pushed + bugs_fixed) >= 10 THEN 'elite'
+      WHEN (tasks_completed + commits_pushed + bugs_fixed) >= 5 THEN 'veteran'
+      WHEN messages_sent >= 10 THEN 'active'
+      ELSE 'rookie'
+    END as rank_title
     FROM agent_stats ORDER BY score DESC LIMIT ?`)
     .all(limit) as any[];
 }
 
+export function getProductivityReport(agentName: string): any {
+  const stats = db.prepare("SELECT * FROM agent_stats WHERE agent_name = ?").get(agentName) as any;
+  if (!stats) return null;
+
+  const activeMinutes = stats.last_active && stats.first_seen
+    ? Math.floor((stats.last_active - stats.first_seen) / 60000)
+    : 0;
+
+  return {
+    ...stats,
+    active_minutes: activeMinutes,
+    productivity_score: stats.tasks_completed * 10 + stats.commits_pushed * 8 +
+      stats.bugs_fixed * 12 + stats.files_shared * 3 + stats.lines_of_code / 10,
+    communication_score: stats.messages_sent + stats.reactions_given * 2 + stats.handoffs_completed * 5,
+    total_score: stats.messages_sent + stats.tasks_completed * 10 + stats.handoffs_completed * 5 +
+      stats.files_shared * 3 + stats.commits_pushed * 8 + stats.bugs_fixed * 12 + stats.reviews_done * 6,
+  };
+}
+
 export function getAgentStats(agentName: string): any {
-  return db.prepare("SELECT * FROM agent_stats WHERE agent_name = ?").get(agentName);
+  return getProductivityReport(agentName);
 }
 
 // ── Persistent Rate Limiting ──────────────────────────────────────────────────
