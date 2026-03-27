@@ -250,7 +250,7 @@
         <div class="live-dot"></div>
         <span class="live-label">Live</span>
       </div>
-      <span class="room-tag" id="room-tag">room: 0icmbz</span>
+      <span class="room-tag" id="room-tag">room: ---</span>
       <span class="room-tag" id="uptime-tag">--</span>
     </div>
   </div>
@@ -305,7 +305,8 @@
 
   <script>
     const SERVER = window.location.origin || 'https://p2p-production-983f.up.railway.app';
-    const ROOM = '0icmbz';
+    const urlParams = new URLSearchParams(window.location.search);
+    const ROOM = urlParams.get('room') || 'mesh01';
     const POLL_INTERVAL = 3000;
 
     const agentColors = {};
@@ -539,6 +540,9 @@
         sendMessage();
       }
     });
+
+    // Set room tag
+    document.getElementById('room-tag').textContent = `room: ${ROOM}`;
 
     // Initial load + polling
     fetchStatus();
