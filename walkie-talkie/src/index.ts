@@ -56,6 +56,11 @@ import {
   getLeaderboard,
   getAgentStats,
   getProductivityReport,
+  searchMessages,
+  scheduleMessage,
+  processScheduledMessages,
+  getScheduledMessages,
+  cancelScheduledMessage,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -121,6 +126,12 @@ setInterval(() => {
   cleanOldMetrics();
   if (swept > 0) console.log(`[gc] swept ${swept} expired rooms and stale rate limits`);
 }, 60 * 60 * 1000);
+
+// Process scheduled messages every 10 seconds
+setInterval(() => {
+  const sent = processScheduledMessages();
+  if (sent > 0) console.log(`[scheduler] delivered ${sent} scheduled messages`);
+}, 10_000);
 
 // ── Simple REST API (for stdio MCP wrapper) ───────────────────────────────────
 
@@ -375,6 +386,38 @@ app.get("/api/thread/:messageId", (c) => {
 
   const thread = (result as any).messages.filter((m: any) => m.id === messageId || m.reply_to === messageId);
   return c.json({ ok: true, thread });
+});
+
+// ── Search ─────────────────────────────────────────────────────────────────
+app.get("/api/search", (c) => {
+  const room = c.req.query("room");
+  const q = c.req.query("q");
+  if (!room || !q) return c.json({ error: "missing room or q" }, 400);
+  const limit = parseInt(c.req.query("limit") || "50");
+  const results = searchMessages(room, q, limit);
+  return c.json({ ok: true, results, count: results.length, query: q });
+});
+
+// ── Scheduled Messages ─────────────────────────────────────────────────────
+app.post("/api/schedule", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  const { message, send_at, to, type } = await c.req.json();
+  if (!message || !send_at) return c.json({ error: "missing message or send_at (unix ms)" }, 400);
+  const id = scheduleMessage(room, name, message, send_at, to, type || "BROADCAST");
+  return c.json({ ok: true, schedule_id: id, sends_at: new Date(send_at).toISOString() }, 201);
+});
+
+app.get("/api/schedule", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  return c.json({ ok: true, scheduled: getScheduledMessages(room) });
+});
+
+app.delete("/api/schedule/:scheduleId", (c) => {
+  const cancelled = cancelScheduledMessage(c.req.param("scheduleId"));
+  return c.json({ ok: cancelled });
 });
 
 // ── File Sharing ───────────────────────────────────────────────────────────

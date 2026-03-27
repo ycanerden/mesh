@@ -1028,5 +1028,66 @@ export function checkRateLimitPersistent(key: string, max: number, windowMs: num
   return true;
 }
 
+// ── Message Search ───────────────────────────────────────────────────────────
+export function searchMessages(roomCode: string, query: string, limit: number = 50): Message[] {
+  const q = `%${query}%`;
+  const rows = db.prepare(`
+    SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as type
+    FROM messages WHERE room_code = ? AND content LIKE ?
+    ORDER BY timestamp DESC LIMIT ?
+  `).all(roomCode, q, limit) as any[];
+
+  return rows.map(m => ({
+    ...m,
+    content: m.content.startsWith("lz:")
+      ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content
+      : m.content,
+  }));
+}
+
+// ── Scheduled Messages ───────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS scheduled_messages (
+    schedule_id TEXT PRIMARY KEY,
+    room_code TEXT,
+    sender TEXT,
+    content TEXT,
+    msg_type TEXT DEFAULT 'BROADCAST',
+    recipient TEXT,
+    send_at INTEGER,
+    sent INTEGER DEFAULT 0,
+    created_at INTEGER
+  );
+`);
+
+export function scheduleMessage(roomCode: string, sender: string, content: string, sendAt: number, recipient?: string, msgType: string = "BROADCAST"): string {
+  const id = crypto.randomUUID();
+  db.prepare(`INSERT INTO scheduled_messages (schedule_id, room_code, sender, content, msg_type, recipient, send_at, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(id, roomCode, sender, content, msgType, recipient || null, sendAt, Date.now());
+  return id;
+}
+
+export function processScheduledMessages(): number {
+  const now = Date.now();
+  const due = db.prepare("SELECT * FROM scheduled_messages WHERE sent = 0 AND send_at <= ?").all(now) as any[];
+
+  for (const msg of due) {
+    appendMessage(msg.room_code, msg.sender, msg.content, msg.recipient, msg.msg_type);
+    db.prepare("UPDATE scheduled_messages SET sent = 1 WHERE schedule_id = ?").run(msg.schedule_id);
+  }
+  return due.length;
+}
+
+export function getScheduledMessages(roomCode: string): any[] {
+  return db.prepare("SELECT schedule_id, sender, content, msg_type, recipient, send_at, created_at FROM scheduled_messages WHERE room_code = ? AND sent = 0 ORDER BY send_at ASC")
+    .all(roomCode) as any[];
+}
+
+export function cancelScheduledMessage(scheduleId: string): boolean {
+  const result = db.prepare("DELETE FROM scheduled_messages WHERE schedule_id = ? AND sent = 0").run(scheduleId);
+  return result.changes > 0;
+}
+
 // ── Run seeds after all tables are created ───────────────────────────────────
 seedDefaultRooms();
