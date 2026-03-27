@@ -9,26 +9,26 @@
   <style>
     :root {
       --bg: #09090b;
-      --surface: #0f0f12;
-      --surface2: #18181b;
-      --surface3: #1f1f23;
-      --border: #27272a;
-      --border-light: #3f3f46;
-      --accent: #8b5cf6;
-      --accent2: #a78bfa;
-      --accent-dim: rgba(139,92,246,.08);
-      --green: #22c55e;
-      --green-dim: rgba(34,197,94,.1);
-      --orange: #f59e0b;
-      --orange-dim: rgba(245,158,11,.1);
-      --red: #ef4444;
-      --red-dim: rgba(239,68,68,.1);
-      --blue: #3b82f6;
-      --blue-dim: rgba(59,130,246,.1);
-      --pink: #ec4899;
-      --text: #fafafa;
-      --text2: #a1a1aa;
-      --text3: #52525b;
+      --surface: #111113;
+      --surface2: #19191d;
+      --surface3: #222228;
+      --border: #2e2e35;
+      --border-light: #3e3e48;
+      --accent: #5b6af0;
+      --accent2: #7b87f5;
+      --accent-dim: rgba(91,106,240,.06);
+      --green: #34d399;
+      --green-dim: rgba(52,211,153,.08);
+      --orange: #fb923c;
+      --orange-dim: rgba(251,146,60,.08);
+      --red: #f87171;
+      --red-dim: rgba(248,113,113,.08);
+      --blue: #60a5fa;
+      --blue-dim: rgba(96,165,250,.08);
+      --pink: #f472b6;
+      --text: #e4e4e7;
+      --text2: #8b8b96;
+      --text3: #55555e;
       --radius: 8px;
       --radius-sm: 6px;
       --radius-xs: 4px;
@@ -377,7 +377,7 @@
     .messages-list { display: flex; flex-direction: column; gap: 4px; }
 
     .msg {
-      max-width: 72%; padding: 10px 14px; border-radius: 16px;
+      max-width: 72%; padding: 10px 14px; border-radius: 8px;
       font-size: 14px; line-height: 1.5; word-wrap: break-word;
       animation: msg-in .3s ease; position: relative;
     }
@@ -392,8 +392,8 @@
     }
     .msg.self {
       align-self: flex-end;
-      background: var(--accent);
-      color: #fff; border-bottom-right-radius: 4px;
+      background: var(--surface3);
+      color: var(--text); border-bottom-right-radius: 2px;
     }
     .msg.system {
       align-self: center; max-width: 85%;
