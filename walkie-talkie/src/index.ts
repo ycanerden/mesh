@@ -177,11 +177,15 @@ app.post("/api/send", async (c) => {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
 
-  const { message, to, type, reply_to } = await c.req.json();
-  const reqStart = Date.now();
-  const result = appendMessage(room, name, message, to, type || "BROADCAST", reply_to);
-  trackMetric("api_request", room!, name!, Date.now() - reqStart);
-  return c.json(result);
+  try {
+    const { message, to, type, reply_to } = await c.req.json();
+    const reqStart = Date.now();
+    const result = appendMessage(room, name, message, to, type || "BROADCAST", reply_to);
+    trackMetric("api_request", room!, name!, Date.now() - reqStart);
+    return c.json(result);
+  } catch (e) {
+    return c.json({ error: "invalid_request", detail: String(e) }, 400);
+  }
 });
 
 app.post("/api/publish", async (c) => {
