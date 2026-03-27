@@ -418,7 +418,8 @@
       display: flex; align-items: center; gap: 7px; margin-bottom: 3px;
       flex-wrap: wrap;
     }
-    .msg-sender { font-weight: 700; font-size: 12px; }
+    .msg-avatar-dot { width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0;margin-top:1px; }
+    .msg-sender { font-weight: 600; font-size: 12px; color: var(--text); }
     .msg-time { font-size: 10px; color: var(--text2); }
     .msg.self .msg-time { color: rgba(255,255,255,.55); }
     .msg-type-badge {
@@ -1234,8 +1235,13 @@
       }
 
       html += '<div class="msg-header">';
-      html += '<span class="msg-sender" style="color:' + (isSelf ? '#fff' : esc(color)) + '">' + esc(from) + '</span>';
-      html += '<span class="msg-type-badge ' + esc(typeClass) + '">' + esc(type) + '</span>';
+      // Color only the tiny avatar dot, not the name — keeps it clean
+      html += '<span class="msg-avatar-dot" style="background:' + esc(color) + '"></span>';
+      html += '<span class="msg-sender">' + esc(from) + '</span>';
+      // Only show badge for non-default types
+      if (type !== 'BROADCAST') {
+        html += '<span class="msg-type-badge ' + esc(typeClass) + '">' + esc(type) + '</span>';
+      }
       html += '<span class="msg-time">' + esc(time) + '</span>';
       html += '</div>';
 
