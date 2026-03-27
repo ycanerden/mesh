@@ -18,6 +18,30 @@ import {
   publishCard,
   getPartnerCards,
   messageEvents,
+  trackMetric,
+  getMessagesPerMinute,
+  getAvgLatencyMs,
+  getTotalMessagesSent,
+  getActiveAgentsCount,
+  cleanOldMetrics,
+  updatePresence,
+  setTyping,
+  getRoomPresence,
+  addReaction,
+  removeReaction,
+  getMessageReactions,
+  registerWebhook,
+  removeWebhook,
+  registerAgent,
+  searchAgents,
+  getAvailableAgents,
+  getAllAgents,
+  getAgentProfile,
+  updateAgentStatus,
+  incrementAgentTasks,
+  pinMessage,
+  unpinMessage,
+  getPinnedMessages,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -32,7 +56,7 @@ import {
 
 const app = new Hono();
 const startTime = Date.now();
-const VERSION = "1.2.0-greg-compression";
+const VERSION = "1.3.0-thanos";
 
 // Track active SSE connections
 let activeConnections = 0;
@@ -80,6 +104,7 @@ function checkRateLimit(key: string, max: number, windowMs: number): boolean {
 // ── GC sweep every hour ───────────────────────────────────────────────────────
 setInterval(() => {
   const swept = sweepExpiredRooms();
+  cleanOldMetrics();
   if (swept > 0) console.log(`[gc] swept ${swept} expired rooms and stale rate limits`);
 }, 60 * 60 * 1000);
 
@@ -115,16 +140,21 @@ app.get("/api/history", (c) => {
 });
 
 app.get("/api/metrics", (c) => {
-  return c.json({
+  const reqStart = Date.now();
+  const metrics = {
     active_rooms: getRoomCount(),
     active_connections: activeConnections,
-    messages_per_minute: 0, // TODO: Implement counter
-    avg_latency_ms: 0, // TODO: Implement tracker
+    active_agents: getActiveAgentsCount(),
+    messages_per_minute: getMessagesPerMinute(),
+    total_messages_sent: getTotalMessagesSent(),
+    avg_latency_ms: getAvgLatencyMs(),
     error_rate: 0,
     uptime_seconds: Math.floor((Date.now() - startTime) / 1000),
     version: VERSION,
     compression: true,
-  });
+  };
+  trackMetric("api_request", "system", "metrics", Date.now() - reqStart);
+  return c.json(metrics);
 });
 
 app.get("/api/version", (c) => {
@@ -147,8 +177,10 @@ app.post("/api/send", async (c) => {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
 
-  const { message, to, type } = await c.req.json();
-  const result = appendMessage(room, name, message, to, type || "BROADCAST");
+  const { message, to, type, reply_to } = await c.req.json();
+  const reqStart = Date.now();
+  const result = appendMessage(room, name, message, to, type || "BROADCAST", reply_to);
+  trackMetric("api_request", room!, name!, Date.now() - reqStart);
   return c.json(result);
 });
 
@@ -169,6 +201,161 @@ app.get("/api/cards", (c) => {
   joinRoom(room, name);
   const result = getPartnerCards(room, name);
   return c.json(result);
+});
+
+// ── Presence & Typing ──────────────────────────────────────────────────────
+app.post("/api/heartbeat", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  joinRoom(room, name);
+  updatePresence(room, name, "online");
+  return c.json({ ok: true, status: "online" });
+});
+
+app.post("/api/typing", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  const { is_typing } = await c.req.json();
+  setTyping(room, name, is_typing !== false);
+  return c.json({ ok: true });
+});
+
+app.get("/api/presence", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  const agents = getRoomPresence(room);
+  return c.json({ ok: true, agents });
+});
+
+// ── Reactions ──────────────────────────────────────────────────────────────
+app.post("/api/react", async (c) => {
+  const { message_id, emoji } = await c.req.json();
+  const name = c.req.query("name");
+  if (!name || !message_id || !emoji) return c.json({ error: "missing name, message_id, or emoji" }, 400);
+  addReaction(message_id, name, emoji);
+
+  // Emit reaction event for SSE
+  const room = c.req.query("room");
+  if (room) {
+    messageEvents.emit("message", {
+      room_code: room,
+      message: { id: crypto.randomUUID(), from: name, content: `reacted ${emoji} to message`, ts: Date.now(), type: "REACTION", reply_to: message_id }
+    });
+  }
+  return c.json({ ok: true });
+});
+
+app.delete("/api/react", async (c) => {
+  const { message_id } = await c.req.json();
+  const name = c.req.query("name");
+  if (!name || !message_id) return c.json({ error: "missing name or message_id" }, 400);
+  removeReaction(message_id, name);
+  return c.json({ ok: true });
+});
+
+app.get("/api/reactions/:messageId", (c) => {
+  const messageId = c.req.param("messageId");
+  const reactions = getMessageReactions(messageId);
+  return c.json({ ok: true, reactions });
+});
+
+// ── Webhooks ───────────────────────────────────────────────────────────────
+app.post("/api/webhooks/register", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  const { webhook_url, events } = await c.req.json();
+  if (!webhook_url) return c.json({ error: "missing webhook_url" }, 400);
+  registerWebhook(room, name, webhook_url, events || "message");
+  return c.json({ ok: true, message: "Webhook registered. You will receive POST requests on new messages." });
+});
+
+app.delete("/api/webhooks", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  removeWebhook(room, name);
+  return c.json({ ok: true });
+});
+
+// ── Global Agent Directory ─────────────────────────────────────────────────
+app.post("/api/directory/register", async (c) => {
+  const body = await c.req.json();
+  if (!body.agent_name || !body.model) return c.json({ error: "missing agent_name or model" }, 400);
+  const profile = registerAgent({
+    agent_id: body.agent_id || crypto.randomUUID(),
+    agent_name: body.agent_name,
+    model: body.model,
+    skills: Array.isArray(body.skills) ? body.skills.join(",") : (body.skills || ""),
+    description: body.description || "",
+    contact_room: body.contact_room || "",
+    status: body.status || "available",
+  });
+  return c.json({ ok: true, profile }, 201);
+});
+
+app.get("/api/directory", (c) => {
+  const q = c.req.query("q");
+  const agents = q ? searchAgents(q) : getAllAgents();
+  return c.json({ ok: true, agents, count: agents.length });
+});
+
+app.get("/api/directory/available", (c) => {
+  const agents = getAvailableAgents();
+  return c.json({ ok: true, agents, count: agents.length });
+});
+
+app.get("/api/directory/:agentId", (c) => {
+  const profile = getAgentProfile(c.req.param("agentId"));
+  if (!profile) return c.json({ error: "agent not found" }, 404);
+  return c.json({ ok: true, profile });
+});
+
+app.put("/api/directory/:agentId/status", async (c) => {
+  const { status } = await c.req.json();
+  updateAgentStatus(c.req.param("agentId"), status);
+  return c.json({ ok: true });
+});
+
+// ── Pinned Messages ────────────────────────────────────────────────────────
+app.post("/api/pin", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  const { message_id } = await c.req.json();
+  if (!message_id) return c.json({ error: "missing message_id" }, 400);
+  pinMessage(room, message_id, name);
+  return c.json({ ok: true });
+});
+
+app.delete("/api/pin", async (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  const { message_id } = await c.req.json();
+  unpinMessage(room, message_id);
+  return c.json({ ok: true });
+});
+
+app.get("/api/pins", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  const pins = getPinnedMessages(room);
+  return c.json({ ok: true, pins });
+});
+
+// ── Threads (reply to specific messages) ────────────────────────────────────
+app.get("/api/thread/:messageId", (c) => {
+  const room = c.req.query("room");
+  const messageId = c.req.param("messageId");
+  if (!room) return c.json({ error: "missing room" }, 400);
+
+  const result = getAllMessages(room);
+  if (!result.ok) return c.json({ error: "room not found" }, 404);
+
+  const thread = (result as any).messages.filter((m: any) => m.id === messageId || m.reply_to === messageId);
+  return c.json({ ok: true, thread });
 });
 
 app.get("/api/stream", async (c) => {
@@ -539,6 +726,110 @@ app.all("/mcp", async (c) => {
           },
         ],
       };
+    }
+  );
+
+  // Tool: react_to_message
+  server.tool(
+    "react_to_message",
+    "React to a message with an emoji. Like WhatsApp reactions.",
+    {
+      message_id: z.string().describe("The ID of the message to react to"),
+      emoji: z.string().describe("The emoji to react with (e.g. '👍', '🔥', '✅')")
+    },
+    async ({ message_id, emoji }) => {
+      addReaction(message_id, name, emoji);
+      return {
+        content: [{ type: "text", text: JSON.stringify({ status: "reacted", emoji }) }],
+      };
+    }
+  );
+
+  // Tool: send_heartbeat
+  server.tool(
+    "send_heartbeat",
+    "Send a presence heartbeat to show you are online. Call this periodically to stay visible.",
+    {},
+    async () => {
+      updatePresence(room, name, "online");
+      return {
+        content: [{ type: "text", text: JSON.stringify({ status: "online", agent: name }) }],
+      };
+    }
+  );
+
+  // Tool: get_presence
+  server.tool(
+    "get_presence",
+    "Check which agents are currently online, offline, or typing in this room.",
+    {},
+    async () => {
+      const agents = getRoomPresence(room);
+      return {
+        content: [{ type: "text", text: JSON.stringify(agents) }],
+      };
+    }
+  );
+
+  // Tool: register_in_directory
+  server.tool(
+    "register_in_directory",
+    "Register yourself in the global agent directory so other agents across all rooms can find and contact you.",
+    {
+      skills: z.array(z.string()).describe("Your skills/capabilities, e.g. ['coding','research','testing']"),
+      description: z.string().describe("Short description of what you do"),
+    },
+    async ({ skills, description }) => {
+      const profile = registerAgent({
+        agent_id: `${name}-${room}`,
+        agent_name: name,
+        model: "unknown",
+        skills: skills.join(","),
+        description,
+        contact_room: room,
+        status: "available",
+      });
+      return { content: [{ type: "text", text: JSON.stringify({ status: "registered", profile }) }] };
+    }
+  );
+
+  // Tool: find_agents
+  server.tool(
+    "find_agents",
+    "Search the global agent directory to find agents with specific skills or capabilities.",
+    {
+      query: z.string().describe("Search query — skill name, agent name, or description keyword"),
+    },
+    async ({ query }) => {
+      const agents = searchAgents(query);
+      return { content: [{ type: "text", text: JSON.stringify({ found: agents.length, agents }) }] };
+    }
+  );
+
+  // Tool: pin_message
+  server.tool(
+    "pin_message",
+    "Pin an important message in the room so it stays visible and searchable.",
+    {
+      message_id: z.string().describe("The ID of the message to pin"),
+    },
+    async ({ message_id }) => {
+      pinMessage(room, message_id, name);
+      return { content: [{ type: "text", text: JSON.stringify({ status: "pinned", message_id }) }] };
+    }
+  );
+
+  // Tool: register_webhook
+  server.tool(
+    "register_webhook",
+    "Register a webhook URL to receive push notifications when messages arrive — no more polling.",
+    {
+      webhook_url: z.string().describe("The URL to POST messages to"),
+      events: z.string().optional().describe("Comma-separated events to listen for (default: 'message')"),
+    },
+    async ({ webhook_url, events }) => {
+      registerWebhook(room, name, webhook_url, events || "message");
+      return { content: [{ type: "text", text: JSON.stringify({ status: "webhook_registered", url: webhook_url }) }] };
     }
   );
 

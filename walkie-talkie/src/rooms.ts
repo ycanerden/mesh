@@ -44,6 +44,13 @@ try {
   // Column might already exist
 }
 
+// Migration: Add 'reply_to' column for message threading
+try {
+  db.run("ALTER TABLE messages ADD COLUMN reply_to TEXT DEFAULT NULL;");
+} catch (e) {
+  // Column might already exist
+}
+
 // Add index for fast room_code lookups (rowid is implicit in SQLite)
 try {
   db.run("CREATE INDEX IF NOT EXISTS idx_messages_room ON messages(room_code);");
@@ -87,6 +94,47 @@ db.run(`
     count INTEGER DEFAULT 0,
     window_start INTEGER,
     updated_at INTEGER
+  );
+`);
+
+// ── Metrics tracking ──────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_type TEXT,
+    room_code TEXT,
+    agent_name TEXT,
+    latency_ms REAL DEFAULT 0,
+    timestamp INTEGER
+  );
+`);
+
+try {
+  db.run("CREATE INDEX IF NOT EXISTS idx_metrics_ts ON metrics(timestamp);");
+  db.run("CREATE INDEX IF NOT EXISTS idx_metrics_type ON metrics(event_type);");
+} catch (e) {}
+
+// ── Presence tracking ─────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS presence (
+    room_code TEXT,
+    agent_name TEXT,
+    status TEXT DEFAULT 'online',
+    last_heartbeat INTEGER,
+    is_typing INTEGER DEFAULT 0,
+    typing_since INTEGER DEFAULT 0,
+    PRIMARY KEY(room_code, agent_name)
+  );
+`);
+
+// ── Message reactions ─────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS reactions (
+    message_id TEXT,
+    agent_name TEXT,
+    emoji TEXT,
+    created_at INTEGER,
+    PRIMARY KEY(message_id, agent_name)
   );
 `);
 
@@ -228,7 +276,8 @@ export function appendMessage(
   from: string,
   content: string,
   to?: string,
-  msgType: string = "BROADCAST"
+  msgType: string = "BROADCAST",
+  replyTo?: string
 ): Ok<{ id: string }> | Err {
   if (new TextEncoder().encode(content).length > MAX_MESSAGE_BYTES) {
     return { ok: false, error: "message_too_large" };
@@ -239,19 +288,34 @@ export function appendMessage(
   const id = crypto.randomUUID();
   const timestamp = Date.now();
 
-  // Compress content for storage and transmission (transparent to agents)
-  const compressedContent = content.startsWith("lz:") ? content : `lz:${LZString.compressToEncodedURIComponent(content)}`;
+  // Compress content for storage (transparent to agents). Fall back to raw if compression fails.
+  let compressedContent: string;
+  try {
+    if (content.startsWith("lz:")) {
+      compressedContent = content;
+    } else {
+      const compressed = LZString.compressToEncodedURIComponent(content);
+      const verified = LZString.decompressFromEncodedURIComponent(compressed);
+      compressedContent = verified === content ? `lz:${compressed}` : content;
+    }
+  } catch {
+    compressedContent = content;
+  }
 
-  db.prepare("INSERT INTO messages (id, room_code, sender, recipient, content, timestamp, msg_type) VALUES (?, ?, ?, ?, ?, ?, ?)")
-    .run(id, code, from, to || null, compressedContent, timestamp, msgType);
+  db.prepare("INSERT INTO messages (id, room_code, sender, recipient, content, timestamp, msg_type, reply_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+    .run(id, code, from, to || null, compressedContent, timestamp, msgType, replyTo || null);
 
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
 
+  // Track metric
+  trackMetric("message_sent", code, from);
+
   // Emit event for real-time listeners (SSE) with decompressed content (transparent compression)
-  messageEvents.emit("message", {
-    room_code: code,
-    message: { id, from: from, to: to || undefined, content, ts: timestamp, type: msgType }
-  });
+  const messagePayload = { id, from: from, to: to || undefined, content, ts: timestamp, type: msgType, reply_to: replyTo || undefined };
+  messageEvents.emit("message", { room_code: code, message: messagePayload });
+
+  // Fire webhooks (async, non-blocking)
+  fireWebhooks(code, "message", { message: messagePayload });
 
   return { ok: true, id };
 }
@@ -372,6 +436,242 @@ export function sweepExpiredRooms(): number {
   db.prepare("DELETE FROM rate_limits WHERE window_start < ?").run(rateLimitThreshold);
 
   return expired.length;
+}
+
+// ── Metrics ──────────────────────────────────────────────────────────────────
+
+export function trackMetric(eventType: string, roomCode: string, agentName: string, latencyMs: number = 0) {
+  db.prepare("INSERT INTO metrics (event_type, room_code, agent_name, latency_ms, timestamp) VALUES (?, ?, ?, ?, ?)")
+    .run(eventType, roomCode, agentName, latencyMs, Date.now());
+}
+
+export function getMessagesPerMinute(): number {
+  const oneMinuteAgo = Date.now() - 60_000;
+  const row = db.prepare("SELECT COUNT(*) as count FROM metrics WHERE event_type = 'message_sent' AND timestamp > ?")
+    .get(oneMinuteAgo) as { count: number };
+  return row.count;
+}
+
+export function getAvgLatencyMs(): number {
+  const fiveMinutesAgo = Date.now() - 300_000;
+  const row = db.prepare("SELECT AVG(latency_ms) as avg FROM metrics WHERE event_type = 'api_request' AND timestamp > ? AND latency_ms > 0")
+    .get(fiveMinutesAgo) as { avg: number | null };
+  return Math.round((row.avg || 0) * 100) / 100;
+}
+
+export function getTotalMessagesSent(): number {
+  const row = db.prepare("SELECT COUNT(*) as count FROM metrics WHERE event_type = 'message_sent'")
+    .get() as { count: number };
+  return row.count;
+}
+
+export function getActiveAgentsCount(): number {
+  const fiveMinutesAgo = Date.now() - 300_000;
+  const row = db.prepare("SELECT COUNT(DISTINCT agent_name) as count FROM presence WHERE last_heartbeat > ?")
+    .get(fiveMinutesAgo) as { count: number };
+  return row.count;
+}
+
+export function cleanOldMetrics() {
+  const oneDayAgo = Date.now() - 86_400_000;
+  db.prepare("DELETE FROM metrics WHERE timestamp < ?").run(oneDayAgo);
+}
+
+// ── Presence & Typing ────────────────────────────────────────────────────────
+
+export function updatePresence(roomCode: string, agentName: string, status: string = "online") {
+  const now = Date.now();
+  db.prepare(`INSERT OR REPLACE INTO presence (room_code, agent_name, status, last_heartbeat, is_typing, typing_since)
+    VALUES (?, ?, ?, ?, COALESCE((SELECT is_typing FROM presence WHERE room_code = ? AND agent_name = ?), 0),
+    COALESCE((SELECT typing_since FROM presence WHERE room_code = ? AND agent_name = ?), 0))`)
+    .run(roomCode, agentName, status, now, roomCode, agentName, roomCode, agentName);
+}
+
+export function setTyping(roomCode: string, agentName: string, isTyping: boolean) {
+  const now = Date.now();
+  db.prepare(`INSERT OR REPLACE INTO presence (room_code, agent_name, status, last_heartbeat, is_typing, typing_since)
+    VALUES (?, ?, 'online', ?, ?, ?)`)
+    .run(roomCode, agentName, now, isTyping ? 1 : 0, isTyping ? now : 0);
+}
+
+export function getRoomPresence(roomCode: string): Array<{ agent_name: string; status: string; is_typing: boolean; last_heartbeat: number }> {
+  const fiveMinutesAgo = Date.now() - 300_000;
+  const rows = db.prepare(`SELECT agent_name, status, is_typing, last_heartbeat FROM presence
+    WHERE room_code = ? AND last_heartbeat > ?`).all(roomCode, fiveMinutesAgo) as any[];
+
+  // Auto-expire typing after 10 seconds
+  const now = Date.now();
+  return rows.map(r => ({
+    agent_name: r.agent_name,
+    status: r.last_heartbeat > now - 60_000 ? r.status : "offline",
+    is_typing: r.is_typing === 1 && r.last_heartbeat > now - 10_000,
+    last_heartbeat: r.last_heartbeat,
+  }));
+}
+
+// ── Reactions ────────────────────────────────────────────────────────────────
+
+export function addReaction(messageId: string, agentName: string, emoji: string): { ok: boolean } {
+  db.prepare("INSERT OR REPLACE INTO reactions (message_id, agent_name, emoji, created_at) VALUES (?, ?, ?, ?)")
+    .run(messageId, agentName, emoji, Date.now());
+  return { ok: true };
+}
+
+export function removeReaction(messageId: string, agentName: string): { ok: boolean } {
+  db.prepare("DELETE FROM reactions WHERE message_id = ? AND agent_name = ?")
+    .run(messageId, agentName);
+  return { ok: true };
+}
+
+export function getMessageReactions(messageId: string): Array<{ agent_name: string; emoji: string; created_at: number }> {
+  return db.prepare("SELECT agent_name, emoji, created_at FROM reactions WHERE message_id = ?")
+    .all(messageId) as any[];
+}
+
+// ── Webhooks ─────────────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS webhooks (
+    room_code TEXT,
+    agent_name TEXT,
+    webhook_url TEXT,
+    events TEXT DEFAULT 'message',
+    created_at INTEGER,
+    PRIMARY KEY(room_code, agent_name)
+  );
+`);
+
+export function registerWebhook(roomCode: string, agentName: string, webhookUrl: string, events: string = "message") {
+  db.prepare("INSERT OR REPLACE INTO webhooks (room_code, agent_name, webhook_url, events, created_at) VALUES (?, ?, ?, ?, ?)")
+    .run(roomCode, agentName, webhookUrl, events, Date.now());
+}
+
+export function removeWebhook(roomCode: string, agentName: string) {
+  db.prepare("DELETE FROM webhooks WHERE room_code = ? AND agent_name = ?")
+    .run(roomCode, agentName);
+}
+
+export function getRoomWebhooks(roomCode: string): Array<{ agent_name: string; webhook_url: string; events: string }> {
+  return db.prepare("SELECT agent_name, webhook_url, events FROM webhooks WHERE room_code = ?")
+    .all(roomCode) as any[];
+}
+
+export async function fireWebhooks(roomCode: string, event: string, payload: any) {
+  const hooks = getRoomWebhooks(roomCode);
+  for (const hook of hooks) {
+    if (hook.events.includes(event) || hook.events === "*") {
+      try {
+        fetch(hook.webhook_url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ event, room: roomCode, ...payload, ts: Date.now() }),
+        }).catch(() => {}); // fire and forget
+      } catch (e) {}
+    }
+  }
+}
+
+// ── Global Agent Directory ───────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS agent_directory (
+    agent_id TEXT PRIMARY KEY,
+    agent_name TEXT,
+    model TEXT,
+    skills TEXT,
+    description TEXT,
+    contact_room TEXT,
+    status TEXT DEFAULT 'available',
+    reputation_score REAL DEFAULT 100.0,
+    tasks_completed INTEGER DEFAULT 0,
+    last_seen INTEGER,
+    registered_at INTEGER
+  );
+`);
+
+try {
+  db.run("CREATE INDEX IF NOT EXISTS idx_agent_dir_skills ON agent_directory(skills);");
+  db.run("CREATE INDEX IF NOT EXISTS idx_agent_dir_status ON agent_directory(status);");
+} catch (e) {}
+
+export interface AgentProfile {
+  agent_id: string;
+  agent_name: string;
+  model: string;
+  skills: string;
+  description: string;
+  contact_room: string;
+  status: string;
+  reputation_score: number;
+  tasks_completed: number;
+  last_seen: number;
+  registered_at: number;
+}
+
+export function registerAgent(profile: Omit<AgentProfile, "registered_at" | "last_seen" | "reputation_score" | "tasks_completed">): AgentProfile {
+  const now = Date.now();
+  const full: AgentProfile = { ...profile, reputation_score: 100.0, tasks_completed: 0, last_seen: now, registered_at: now };
+  db.prepare(`INSERT OR REPLACE INTO agent_directory
+    (agent_id, agent_name, model, skills, description, contact_room, status, reputation_score, tasks_completed, last_seen, registered_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(full.agent_id, full.agent_name, full.model, full.skills, full.description, full.contact_room, full.status, full.reputation_score, full.tasks_completed, full.last_seen, full.registered_at);
+  return full;
+}
+
+export function searchAgents(query: string): AgentProfile[] {
+  const q = `%${query.toLowerCase()}%`;
+  return db.prepare(`SELECT * FROM agent_directory WHERE
+    LOWER(agent_name) LIKE ? OR LOWER(skills) LIKE ? OR LOWER(description) LIKE ? OR LOWER(model) LIKE ?
+    ORDER BY reputation_score DESC, tasks_completed DESC LIMIT 20`)
+    .all(q, q, q, q) as AgentProfile[];
+}
+
+export function getAvailableAgents(): AgentProfile[] {
+  const fiveMinutesAgo = Date.now() - 300_000;
+  return db.prepare("SELECT * FROM agent_directory WHERE status = 'available' AND last_seen > ? ORDER BY reputation_score DESC")
+    .all(fiveMinutesAgo) as AgentProfile[];
+}
+
+export function updateAgentStatus(agentId: string, status: string) {
+  db.prepare("UPDATE agent_directory SET status = ?, last_seen = ? WHERE agent_id = ?")
+    .run(status, Date.now(), agentId);
+}
+
+export function incrementAgentTasks(agentId: string) {
+  db.prepare("UPDATE agent_directory SET tasks_completed = tasks_completed + 1, last_seen = ? WHERE agent_id = ?")
+    .run(Date.now(), agentId);
+}
+
+export function getAgentProfile(agentId: string): AgentProfile | null {
+  return db.prepare("SELECT * FROM agent_directory WHERE agent_id = ?").get(agentId) as AgentProfile | null;
+}
+
+export function getAllAgents(): AgentProfile[] {
+  return db.prepare("SELECT * FROM agent_directory ORDER BY reputation_score DESC, last_seen DESC LIMIT 100").all() as AgentProfile[];
+}
+
+// ── Pinned Messages ──────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS pinned_messages (
+    room_code TEXT,
+    message_id TEXT,
+    pinned_by TEXT,
+    pinned_at INTEGER,
+    PRIMARY KEY(room_code, message_id)
+  );
+`);
+
+export function pinMessage(roomCode: string, messageId: string, pinnedBy: string) {
+  db.prepare("INSERT OR REPLACE INTO pinned_messages (room_code, message_id, pinned_by, pinned_at) VALUES (?, ?, ?, ?)")
+    .run(roomCode, messageId, pinnedBy, Date.now());
+}
+
+export function unpinMessage(roomCode: string, messageId: string) {
+  db.prepare("DELETE FROM pinned_messages WHERE room_code = ? AND message_id = ?")
+    .run(roomCode, messageId);
+}
+
+export function getPinnedMessages(roomCode: string): Array<{ message_id: string; pinned_by: string; pinned_at: number }> {
+  return db.prepare("SELECT message_id, pinned_by, pinned_at FROM pinned_messages WHERE room_code = ? ORDER BY pinned_at DESC")
+    .all(roomCode) as any[];
 }
 
 // ── Persistent Rate Limiting ──────────────────────────────────────────────────

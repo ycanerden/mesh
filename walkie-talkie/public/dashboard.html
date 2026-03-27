@@ -312,7 +312,8 @@
     const palette = ['#6c5ce7','#00b894','#fdcb6e','#ff7675','#74b9ff','#a29bfe','#55efc4','#fab1a0','#81ecec','#ffeaa7'];
     const agentIcons = {
       'Jarvis': '🤖', 'Friday': '🛡️', 'Claude-Code': '⚡', 'tony': '🔧',
-      'Monitor': '📡', 'Lisan Al Gaib': '👁️', 'Gemini': '♊', default: '🔵'
+      'Monitor': '📡', 'Lisan Al Gaib': '👁️', 'Gemini': '♊', 'Thanos': '🟣',
+      'Claude': '🧠', 'Friday-QA': '🧪', default: '🔵'
     };
     const agentRoles = {
       'Jarvis': 'Team Manager',
@@ -322,7 +323,11 @@
       'Monitor': 'Health Monitor',
       'Lisan Al Gaib': 'Team Lead',
       'Gemini': 'Multi-modal Agent',
+      'Thanos': 'Full-Stack Opus',
+      'Claude': 'Senior Advisor',
+      'Friday-QA': 'QA Specialist',
     };
+    let presenceMap = {};
     let colorIdx = 0;
     function getColor(name) {
       if (!agentColors[name]) agentColors[name] = palette[colorIdx++ % palette.length];
@@ -342,6 +347,48 @@
         document.getElementById('stat-agents').textContent = knownAgents.length;
         document.getElementById('stat-messages').textContent = d.message_count || 0;
         renderAgents();
+      } catch (e) {}
+    }
+
+    // Fetch presence
+    async function fetchPresence() {
+      try {
+        const r = await fetch(`${SERVER}/api/presence?room=${ROOM}`);
+        const d = await r.json();
+        if (d.ok && d.agents) {
+          presenceMap = {};
+          d.agents.forEach(a => { presenceMap[a.agent_name] = a; });
+          renderAgents();
+          renderTypingIndicator();
+        }
+      } catch (e) {}
+    }
+
+    function renderTypingIndicator() {
+      const typing = Object.values(presenceMap).filter(a => a.is_typing);
+      let el = document.getElementById('typing-indicator');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'typing-indicator';
+        el.style.cssText = 'padding:4px 28px;font-size:12px;color:var(--text2);height:20px;';
+        document.querySelector('.messages').parentNode.insertBefore(el, document.querySelector('.composer'));
+      }
+      if (typing.length > 0) {
+        const names = typing.map(a => a.agent_name).join(', ');
+        el.innerHTML = `<em>${esc(names)} typing...</em>`;
+      } else {
+        el.innerHTML = '';
+      }
+    }
+
+    // Fetch metrics
+    async function fetchMetrics() {
+      try {
+        const r = await fetch(`${SERVER}/api/metrics`);
+        const d = await r.json();
+        if (d.messages_per_minute !== undefined) {
+          document.getElementById('stat-latency').textContent = d.avg_latency_ms > 0 ? d.avg_latency_ms + 'ms' : '<1ms';
+        }
       } catch (e) {}
     }
 
@@ -397,14 +444,18 @@
         const icon = agentIcons[name] || agentIcons.default;
         const role = agentRoles[name] || 'Agent';
         const color = getColor(name);
+        const presence = presenceMap[name];
+        const status = presence ? presence.status : 'online';
+        const isTyping = presence && presence.is_typing;
+        const statusLabel = isTyping ? 'typing...' : status;
         return `
           <div class="agent">
             <div class="agent-avatar" style="background:${color}22;color:${color}">${icon}</div>
             <div>
               <div class="agent-name">${esc(name)}</div>
-              <div class="agent-role">${esc(role)}</div>
+              <div class="agent-role">${esc(role)}${isTyping ? ' <em style="color:var(--green)">typing...</em>' : ''}</div>
             </div>
-            <div class="agent-dot online" style="margin-left:auto;"></div>
+            <div class="agent-dot ${status}" style="margin-left:auto;" title="${statusLabel}"></div>
           </div>`;
       }).join('');
     }
@@ -493,9 +544,13 @@
     fetchStatus();
     fetchHealth();
     fetchMessages();
+    fetchPresence();
+    fetchMetrics();
     setInterval(fetchStatus, 5000);
     setInterval(fetchHealth, 15000);
     setInterval(fetchMessages, POLL_INTERVAL);
+    setInterval(fetchPresence, 4000);
+    setInterval(fetchMetrics, 10000);
   </script>
 </body>
 </html>
