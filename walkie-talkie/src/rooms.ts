@@ -150,6 +150,11 @@ try {
   db.run("ALTER TABLE presence ADD COLUMN hostname TEXT DEFAULT '';");
 } catch (e) {}
 
+// Migration: Add display_name field to presence
+try {
+  db.run("ALTER TABLE presence ADD COLUMN display_name TEXT DEFAULT '';");
+} catch (e) {}
+
 // ── Message reactions ─────────────────────────────────────────────────────────
 db.run(`
   CREATE TABLE IF NOT EXISTS reactions (
@@ -518,20 +523,27 @@ export function setTyping(roomCode: string, agentName: string, isTyping: boolean
     .run(roomCode, agentName, now, isTyping ? 1 : 0, isTyping ? now : 0);
 }
 
-export function getRoomPresence(roomCode: string): Array<{ agent_name: string; status: string; is_typing: boolean; last_heartbeat: number; hostname: string }> {
+export function getRoomPresence(roomCode: string): Array<{ agent_name: string; display_name: string; status: string; is_typing: boolean; last_heartbeat: number; hostname: string }> {
   const fiveMinutesAgo = Date.now() - 300_000;
-  const rows = db.prepare(`SELECT agent_name, status, is_typing, last_heartbeat, hostname FROM presence
+  const rows = db.prepare(`SELECT agent_name, status, is_typing, last_heartbeat, hostname, display_name FROM presence
     WHERE room_code = ? AND last_heartbeat > ?`).all(roomCode, fiveMinutesAgo) as any[];
 
-  // Auto-expire typing after 10 seconds
   const now = Date.now();
   return rows.map(r => ({
     agent_name: r.agent_name,
+    display_name: r.display_name || r.agent_name,
     status: r.last_heartbeat > now - 60_000 ? r.status : "offline",
     is_typing: r.is_typing === 1 && r.last_heartbeat > now - 10_000,
     last_heartbeat: r.last_heartbeat,
     hostname: r.hostname || "",
   }));
+}
+
+export function setDisplayName(roomCode: string, agentName: string, displayName: string): boolean {
+  const result = db.prepare(
+    `UPDATE presence SET display_name = ? WHERE room_code = ? AND agent_name = ?`
+  ).run(displayName, roomCode, agentName);
+  return result.changes > 0;
 }
 
 // ── Reactions ────────────────────────────────────────────────────────────────

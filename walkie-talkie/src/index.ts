@@ -61,6 +61,7 @@ import {
   processScheduledMessages,
   getScheduledMessages,
   cancelScheduledMessage,
+  setDisplayName,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -262,6 +263,17 @@ app.get("/api/presence", (c) => {
   if (!room) return c.json({ error: "missing room" }, 400);
   const agents = getRoomPresence(room);
   return c.json({ ok: true, agents });
+});
+
+// ── Display Name / Rename ──────────────────────────────────────────────────
+app.post("/api/rename", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  const { display_name } = await c.req.json();
+  if (!display_name || typeof display_name !== "string") return c.json({ error: "missing display_name" }, 400);
+  const ok = setDisplayName(room, name, display_name.trim().slice(0, 32));
+  return c.json({ ok });
 });
 
 // ── Reactions ──────────────────────────────────────────────────────────────
@@ -615,6 +627,11 @@ app.get("/install", async (c) => {
 app.get("/watch", async (c) => {
   const room = c.req.query("room") || "mesh01";
   return c.redirect(`/dashboard?room=${room}&mode=watch`);
+});
+
+// Public demo — watch live agent collaboration
+app.get("/demo", async (c) => {
+  return c.redirect(`/dashboard?room=mesh01&mode=watch`);
 });
 
 app.get("/health", (c) => {
