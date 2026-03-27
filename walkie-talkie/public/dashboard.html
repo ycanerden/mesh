@@ -778,7 +778,7 @@
         <div class="typing-bar" id="typing-bar"></div>
         <div class="composer">
           <div class="composer-left">
-            <input type="text" class="composer-name" id="sender-name" placeholder="Your name" value="Viewer" />
+            <input type="text" class="composer-name" id="sender-name" placeholder="Your name" />
             <select class="composer-type" id="msg-type">
               <option value="BROADCAST">Chat</option>
               <option value="TASK">Task</option>
@@ -909,6 +909,13 @@
   const messagesList = $('messages-list');
   const typingBar = $('typing-bar');
   const chatBadge = $('chat-badge');
+
+  // === Init sender name from localStorage ===
+  const savedName = localStorage.getItem('mesh-sender-name');
+  senderInput.value = savedName || urlParams.get('name') || 'Viewer';
+  senderInput.addEventListener('change', function() {
+    localStorage.setItem('mesh-sender-name', this.value.trim());
+  });
 
   // === Init room input ===
   roomInput.value = ROOM;
@@ -1138,6 +1145,8 @@
     const msg = msgInput.value.trim();
     const type = msgTypeSelect.value;
     if (!msg) return;
+    // Persist sender name
+    localStorage.setItem('mesh-sender-name', name);
 
     sendBtn.disabled = true;
     const body = { message: msg, type: type };
