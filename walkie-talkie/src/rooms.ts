@@ -9,6 +9,21 @@ const db = new Database("mesh.db", { create: true });
 // Event emitter for real-time updates (SSE)
 export const messageEvents = new EventEmitter();
 
+// ── Auto-seed default rooms on startup ──────────────────────────────────────
+// These rooms persist across deploys even without a volume mount
+const DEFAULT_ROOMS = (process.env.DEFAULT_ROOMS || "mesh01").split(",").map(s => s.trim()).filter(Boolean);
+
+function seedDefaultRooms() {
+  for (const code of DEFAULT_ROOMS) {
+    const exists = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
+    if (!exists) {
+      db.prepare("INSERT INTO rooms (code, last_activity) VALUES (?, ?)").run(code, Date.now());
+      console.log(`[seed] Created default room: ${code}`);
+    }
+  }
+}
+// Run after tables are created (deferred to end of module init)
+
 // Initialize tables
 db.run(`
   CREATE TABLE IF NOT EXISTS rooms (
@@ -951,3 +966,6 @@ export function checkRateLimitPersistent(key: string, max: number, windowMs: num
     .run(now, key);
   return true;
 }
+
+// ── Run seeds after all tables are created ───────────────────────────────────
+seedDefaultRooms();
