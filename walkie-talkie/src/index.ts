@@ -57,8 +57,8 @@ app.use("*", cors({
 
 // ── Secret token auth ─────────────────────────────────────────────────────────
 // ── Feature flags ─────────────────────────────────────────────────────────────
-const SSE_ENABLED = process.env.SSE_ENABLED === "true";
-if (SSE_ENABLED) console.log("[init] SSE streaming enabled");
+const SSE_ENABLED = process.env.SSE_DISABLED !== "true";
+if (SSE_ENABLED) console.log("[init] SSE streaming enabled (default)");
 
 const SECRET = process.env.MESH_SECRET;
 if (SECRET) {
@@ -97,12 +97,13 @@ app.get("/api/status", (c) => {
 app.get("/api/messages", (c) => {
   const room = c.req.query("room");
   const name = c.req.query("name");
+  const msgType = c.req.query("type");
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
   joinRoom(room, name);
   if (!checkRateLimit(`get_msgs:${room}:${name}`, 10, 60 * 1000)) {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
-  const result = getMessages(room, name);
+  const result = getMessages(room, name, msgType);
   return c.json(result);
 });
 
@@ -140,8 +141,14 @@ app.post("/api/send", async (c) => {
   const name = c.req.query("name");
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
   joinRoom(room, name);
-  const { message, to } = await c.req.json();
-  const result = appendMessage(room, name, message, to);
+
+  // Rate limit sends: 30 messages/min per agent
+  if (!checkRateLimit(`send:${room}:${name}`, 30, 60 * 1000)) {
+    return c.json({ error: "rate_limit_exceeded" }, 429);
+  }
+
+  const { message, to, type } = await c.req.json();
+  const result = appendMessage(room, name, message, to, type || "BROADCAST");
   return c.json(result);
 });
 
@@ -402,12 +409,26 @@ app.all("/mcp", async (c) => {
   server.tool(
     "send_to_partner",
     "Send a message to your partner's AI. They will receive it on their next get_partner_messages() call.",
-    { 
+    {
       message: z.string().describe("The message to send to your partner's AI"),
-      to: z.string().optional().describe("Optional: specific recipient name for private/targeted messaging")
+      to: z.string().optional().describe("Optional: specific recipient name for private/targeted messaging"),
+      type: z.string().optional().describe("Optional: message type (BROADCAST, TASK, HANDOFF, DIRECT, SYSTEM)")
     },
-    async ({ message, to }) => {
-      const result = appendMessage(room, name, message, to);
+    async ({ message, to, type }) => {
+      // Rate limit sends: 30 messages/min per agent
+      if (!checkRateLimit(`send:${room}:${name}`, 30, 60 * 1000)) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({ error: "rate_limit_exceeded_please_wait" }),
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      const result = appendMessage(room, name, message, to, type || "BROADCAST");
       if (!result.ok) {
         return {
           content: [{ type: "text", text: JSON.stringify({ error: result.error }) }],

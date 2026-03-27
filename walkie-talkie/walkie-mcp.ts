@@ -268,36 +268,6 @@ mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
         const fs = await import("fs/promises");
         const path = await import("path");
         // Try reading from parent directory or local based on setup
-        const dashboardPath = path.resolve(process.cwd(), "trust-dashboard.html"); // Assuming trust-dashboard.html is in the root of walkie-talkie
-        const html = await fs.readFile(dashboardPath, "utf-8");
-        return { content: [{ type: "text" as const, text: html }] };
-      } catch (e) {
-        // Fallback mock if file isn't physically present on this specific agent's node yet
-        const mockHtml = `<html><body><h1>Tokora Trust Dashboard</h1><p>Status: ENFORCED</p><button style="background:red;color:white;padding:20px;font-size:24px;border-radius:8px;">KILL-SWITCH: SEVER MESH</button></body></html>`;
-        return { content: [{ type: "text" as const, text: mockHtml }] };
-      }
-    }
-
-    if (name === "view_trust_dashboard") {
-      try {
-        const fs = await import("fs/promises");
-        const path = await import("path");
-        // Try reading from parent directory or local based on setup
-        const dashboardPath = path.resolve(process.cwd(), "trust-dashboard.html"); // Assuming trust-dashboard.html is in the root of walkie-talkie
-        const html = await fs.readFile(dashboardPath, "utf-8");
-        return { content: [{ type: "text" as const, text: html }] };
-      } catch (e) {
-        // Fallback mock if file isn't physically present on this specific agent's node yet
-        const mockHtml = `<html><body><h1>Tokora Trust Dashboard</h1><p>Status: ENFORCED</p><button style="background:red;color:white;padding:20px;font-size:24px;border-radius:8px;">KILL-SWITCH: SEVER MESH</button></body></html>`;
-        return { content: [{ type: "text" as const, text: mockHtml }] };
-      }
-    }
-
-    if (name === "view_trust_dashboard") {
-      try {
-        const fs = await import("fs/promises");
-        const path = await import("path");
-        // Try reading from parent directory or local based on setup
         const dashboardPath = path.resolve(process.cwd(), "trust-dashboard.html");
         const html = await fs.readFile(dashboardPath, "utf-8");
         return { content: [{ type: "text" as const, text: html }] };
@@ -306,6 +276,50 @@ mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
         const mockHtml = `<html><body><h1>Tokora Trust Dashboard</h1><p>Status: ENFORCED</p><button style="background:red;color:white;padding:20px;font-size:24px;border-radius:8px;">KILL-SWITCH: SEVER MESH</button></body></html>`;
         return { content: [{ type: "text" as const, text: mockHtml }] };
       }
+    }
+
+    if (name === "handoff_to_partner") {
+      const { targetAgent, projectId, founder, taskType, payload } = args as {
+        targetAgent: string;
+        projectId: string;
+        founder: string;
+        taskType: string;
+        payload: string;
+      };
+
+      const handoffMsg = {
+        type: "HANDOFF",
+        projectId,
+        founder,
+        taskType,
+        payload,
+        handoffFrom: NAME,
+        timestamp: Date.now()
+      };
+
+      const res = await fetch(`${BASE}/send${params}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: JSON.stringify(handoffMsg),
+          to: targetAgent,
+          type: "HANDOFF"
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.ok) {
+        return { content: [{ type: "text" as const, text: `Error: ${data.error}` }], isError: true };
+      }
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `✓ Handoff sent to ${targetAgent}\nProject: ${projectId}\nTask Type: ${taskType}\nMessage ID: ${data.id}`
+          }
+        ]
+      };
     }
 
     if (name === "broadcast_code_update") {

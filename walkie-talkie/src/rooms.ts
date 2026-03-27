@@ -25,6 +25,7 @@ db.run(`
     recipient TEXT DEFAULT NULL,
     content TEXT,
     timestamp INTEGER,
+    msg_type TEXT DEFAULT 'BROADCAST',
     FOREIGN KEY(room_code) REFERENCES rooms(code)
   );
 `);
@@ -36,16 +37,38 @@ try {
   // Column might already exist
 }
 
+// Migration: Add 'msg_type' column for structured AI messaging
+try {
+  db.run("ALTER TABLE messages ADD COLUMN msg_type TEXT DEFAULT 'BROADCAST';");
+} catch (e) {
+  // Column might already exist
+}
+
+// Add index for fast room_code lookups (rowid is implicit in SQLite)
+try {
+  db.run("CREATE INDEX IF NOT EXISTS idx_messages_room ON messages(room_code);");
+} catch (e) {
+  // Index might already exist
+}
+
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
     room_code TEXT,
     name TEXT,
     cursor INTEGER DEFAULT 0,
+    last_rowid INTEGER DEFAULT 0,
     last_seen INTEGER,
     PRIMARY KEY(room_code, name),
     FOREIGN KEY(room_code) REFERENCES rooms(code)
   );
 `);
+
+// Migration: Add 'last_rowid' column for cursor-free message delivery
+try {
+  db.run("ALTER TABLE users ADD COLUMN last_rowid INTEGER DEFAULT 0;");
+} catch (e) {
+  // Column might already exist
+}
 
 db.run(`
   CREATE TABLE IF NOT EXISTS agent_cards (
@@ -73,6 +96,7 @@ export interface Message {
   to?: string;
   ts: number;
   content: string;
+  type?: string;
 }
 
 const MAX_MESSAGE_BYTES = 10 * 1024; // 10KB
@@ -203,7 +227,8 @@ export function appendMessage(
   code: string,
   from: string,
   content: string,
-  to?: string
+  to?: string,
+  msgType: string = "BROADCAST"
 ): Ok<{ id: string }> | Err {
   if (new TextEncoder().encode(content).length > MAX_MESSAGE_BYTES) {
     return { ok: false, error: "message_too_large" };
@@ -213,19 +238,19 @@ export function appendMessage(
 
   const id = crypto.randomUUID();
   const timestamp = Date.now();
-  
+
   // Compress content for storage and transmission (transparent to agents)
   const compressedContent = content.startsWith("lz:") ? content : `lz:${LZString.compressToEncodedURIComponent(content)}`;
-  
-  db.prepare("INSERT INTO messages (id, room_code, sender, recipient, content, timestamp) VALUES (?, ?, ?, ?, ?, ?)")
-    .run(id, code, from, to || null, compressedContent, timestamp);
-  
+
+  db.prepare("INSERT INTO messages (id, room_code, sender, recipient, content, timestamp, msg_type) VALUES (?, ?, ?, ?, ?, ?, ?)")
+    .run(id, code, from, to || null, compressedContent, timestamp, msgType);
+
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
 
-  // Emit event for real-time listeners (SSE)
+  // Emit event for real-time listeners (SSE) with decompressed content (transparent compression)
   messageEvents.emit("message", {
     room_code: code,
-    message: { id, from: from, to: to || undefined, content: compressedContent, ts: timestamp }
+    message: { id, from: from, to: to || undefined, content, ts: timestamp, type: msgType }
   });
 
   return { ok: true, id };
@@ -233,38 +258,51 @@ export function appendMessage(
 
 export function getMessages(
   code: string,
-  name: string
+  name: string,
+  msgType?: string
 ): Ok<{ messages: Message[] }> | Err {
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
-  const user = db.prepare("SELECT cursor FROM users WHERE room_code = ? AND name = ?").get(code, name) as { cursor: number } | undefined;
+  const user = db.prepare("SELECT last_rowid FROM users WHERE room_code = ? AND name = ?").get(code, name) as { last_rowid: number } | undefined;
   if (!user) return { ok: false, error: "not_in_room" };
 
-  // Fetch messages that are either broadcast (recipient is NULL) or specifically for this recipient
-  const rows = db.prepare(`
-    SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts 
-    FROM messages 
-    WHERE room_code = ? 
+  // Fetch messages using rowid cursor (avoids skips on mixed broadcast+DM)
+  let query = `
+    SELECT rowid, id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type'
+    FROM messages
+    WHERE room_code = ?
+    AND rowid > ?
     AND (recipient IS NULL OR recipient = ?)
-    LIMIT -1 OFFSET ?
-  `).all(code, name, user.cursor) as Message[];
+  `;
+  const params: any[] = [code, user.last_rowid, name];
+
+  // Filter by message type if requested
+  if (msgType) {
+    query += " AND msg_type = ?";
+    params.push(msgType);
+  }
+
+  query += " ORDER BY rowid ASC";
+
+  const rows = db.prepare(query).all(...params) as any[];
 
   // Filter out own messages and decompress content
   const filtered = rows
     .filter(m => m.from !== name)
     .map(m => ({
-      ...m,
-      content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content
+      id: m.id,
+      from: m.from,
+      to: m.to,
+      ts: m.ts,
+      content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content,
+      type: m.type
     }));
 
-  // Advance cursor to current message count for this room
-  // Note: we advance the cursor to the total messages count, but we only RETURN the relevant ones.
-  // This might lead to missed messages if someone uses both targeted and broadcast messages.
-  // But for simple signaling it works.
-  const countRow = db.prepare("SELECT COUNT(*) as count FROM messages WHERE room_code = ?").get(code) as { count: number };
-  db.prepare("UPDATE users SET cursor = ?, last_seen = ? WHERE room_code = ? AND name = ?")
-    .run(countRow.count, Date.now(), code, name);
+  // Advance cursor to max rowid seen (eliminates skips)
+  const maxRowid = rows.length > 0 ? rows[rows.length - 1].rowid : user.last_rowid;
+  db.prepare("UPDATE users SET last_rowid = ?, last_seen = ? WHERE room_code = ? AND name = ?")
+    .run(maxRowid, Date.now(), code, name);
 
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
   return { ok: true, messages: filtered };
@@ -275,14 +313,14 @@ export function getAllMessages(
 ): Ok<{ messages: Message[] }> | Err {
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
-  
-  const messages = (db.prepare("SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts FROM messages WHERE room_code = ?")
+
+  const messages = (db.prepare("SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ?")
     .all(code) as Message[])
     .map(m => ({
       ...m,
       content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content
     }));
-    
+
   return { ok: true, messages };
 }
 
