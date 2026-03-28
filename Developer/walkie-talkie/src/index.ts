@@ -164,7 +164,7 @@ function isDuplicateMessage(room: string, name: string, content: string): boolea
   const key = `${room}:${name}`;
   const now = Date.now();
   const windowMs = 60_000;
-  const maxDupes = 2; // allow up to 2 identical messages within window (retries ok)
+  const maxDupes = 1; // Block identical messages within window (immediate double-posts)
   // simple hash: first 80 chars normalized
   const hash = content.trim().slice(0, 80).toLowerCase().replace(/\s+/g, ' ');
   const history = (recentMsgHashes.get(key) || []).filter(e => now - e.ts < windowMs);
