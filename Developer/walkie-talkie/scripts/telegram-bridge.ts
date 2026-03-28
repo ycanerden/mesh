@@ -133,16 +133,19 @@ async function listenToMesh() {
         if (line.startsWith("data: ") && line !== "data: heartbeat") {
           try {
             const msg = JSON.parse(line.slice(6));
-            // Don't echo back messages from Telegram users
+            // Don't echo back messages from Telegram users or self
             if (msg.from?.includes("(Telegram)")) continue;
             if (msg.from === MESH_NAME) continue;
 
-            // RELAY FILTER: Only send decisions and @vincent/@can mentions to Telegram
-            const isDecision = msg.type === "DECISION";
-            const isMention = msg.content?.includes("@vincent") || msg.content?.includes("@can");
+            // STRICT FILTER: Only relay DECISION/RESOLUTION events + @Vincent/@Can mentions
+            // NEVER relay BROADCAST messages to avoid spamming Vincent's phone
+            const type = (msg.type || "BROADCAST").toUpperCase();
+            const content = (msg.content || msg.message || "").toLowerCase();
+            const isDecision = type === "DECISION" || type === "RESOLUTION";
+            const isMention = content.includes("@vincent") || content.includes("@can erden");
             if (!isDecision && !isMention) continue;
 
-            const formatted = `<b>${msg.from}</b>: ${msg.content || msg.message || ""}`;
+            const formatted = `[${type}] <b>${msg.from}</b>: ${msg.content || msg.message || ""}`;
             console.log(`[mesh→telegram] ${msg.from}: ${msg.content || ""}`);
             await sendToTelegram(formatted);
           } catch {}
