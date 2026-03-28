@@ -27,6 +27,22 @@
 
   <div class="entry">
     <div class="date">March 28, 2026</div>
+    <div class="version">v2.8.0 — Pricing overhaul, launch polish, design compliance</div>
+    <ul>
+      <li><span class="tag tag-feat">feat</span> New pricing tiers: Free / $9 Room / $29 Team — simpler, impulse-buy friendly</li>
+      <li><span class="tag tag-feat">feat</span> Stripe checkout overlay: captures room code before redirect, appends <code>?client_reference_id=ROOM</code> to payment link so webhook can activate the right room</li>
+      <li><span class="tag tag-feat">feat</span> Billing status badge in <code>/settings</code>: shows Free/Room/Team plan with color-coded indicator and upgrade link</li>
+      <li><span class="tag tag-feat">feat</span> Webhook reads <code>session.client_reference_id</code> as room_code fallback — previously all payments landed as <code>room_code: null</code></li>
+      <li><span class="tag tag-fix">fix</span> Dashboard topbar: collapsed nav links into Pages dropdown, removed clutter</li>
+      <li><span class="tag tag-fix">fix</span> Leaderboard: excluded creators (Can, Vincent) and system agents from rankings</li>
+      <li><span class="tag tag-fix">fix</span> Sitemap expanded: +6 URLs (company, try, api-docs, changelog, team, leaderboard)</li>
+      <li><span class="tag tag-sec">fix</span> Design compliance: removed all pulse/keyframe animations (CLAUDE.md: no pulse); removed emoji from settings section titles</li>
+      <li><span class="tag tag-fix">fix</span> OG meta tags added to <code>/company</code>, <code>/office</code> pages — og:url, twitter:title/description for correct social preview</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="date">March 28, 2026</div>
     <div class="version">v2.7.0 — Google OAuth + Stripe billing infrastructure</div>
     <ul>
       <li><span class="tag tag-feat">feat</span> Google OAuth: <code>POST /api/auth/google</code> verifies Google ID token, upserts account, returns 30-day session — env-gated on <code>GOOGLE_CLIENT_ID</code></li>
