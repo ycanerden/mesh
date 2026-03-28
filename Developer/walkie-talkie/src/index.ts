@@ -272,6 +272,21 @@ app.post("/api/send", async (c) => {
 });
 
 // ── Telegram Decision Bot: Create Decision ─────────────────────────────────
+// Helper: send a Telegram message to a room's configured chat
+async function sendTelegramMessage(roomCode: string, text: string): Promise<void> {
+  const { token, chatId } = getTelegramConfig(roomCode);
+  if (!token || !chatId) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "Markdown" }),
+    });
+  } catch (e) {
+    console.error("[telegram] Failed to send message:", e);
+  }
+}
+
 app.post("/api/decisions", async (c) => {
   const room = c.req.query("room");
   const name = c.req.query("name");
@@ -289,6 +304,10 @@ app.post("/api/decisions", async (c) => {
     const mentions = notifyList.map(u => `@${u}`).join(" ");
     const decisionMsg = `🚨 DECISION REQUIRED: ${description}\n\nNotified: ${mentions}\nID: ${decision.id}`;
     appendMessage(room, name, decisionMsg, null, "DECISION");
+
+    // Notify via Telegram if configured
+    const tgText = `🚨 *DECISION NEEDED* — ${room}\n\n${description}\n\nReply with:\n/approve ${decision.id}\n/reject ${decision.id}\n/hold ${decision.id}`;
+    await sendTelegramMessage(room, tgText);
 
     return c.json({ ok: true, decision });
   } catch (e) {
@@ -687,9 +706,27 @@ app.post("/api/webhook/telegram/:code", async (c) => {
   if (body.message && body.message.text) {
     const msg = body.message;
     const from = msg.from?.first_name || msg.from?.username || "Unknown";
-    const text = msg.text;
+    const text = msg.text.trim();
 
-    // Append to Mesh
+    // Decision commands: /approve <id>, /reject <id>, /hold <id>
+    const cmdMatch = text.match(/^\/(approve|reject|hold)\s+(\S+)/i);
+    if (cmdMatch) {
+      const [, action, decisionId] = cmdMatch;
+      const status = action.toLowerCase() as "approved" | "rejected" | "hold";
+      const decision = getDecision(decisionId);
+      if (decision && decision.status === "pending") {
+        resolveDecision(decisionId, status, `Via Telegram by ${from}`, from);
+        const emoji = { approved: "✅", rejected: "❌", hold: "⏸️" }[status];
+        const roomMsg = `${emoji} DECISION ${status.toUpperCase()} by ${from} (via Telegram):\n${decision.description}`;
+        appendMessage(code, `${from} (Telegram)`, roomMsg, undefined, "RESOLUTION");
+        await sendTelegramMessage(code, `${emoji} Got it — decision *${status}*.\n${decision.description}`);
+      } else {
+        await sendTelegramMessage(code, `⚠️ Decision \`${decisionId}\` not found or already resolved.`);
+      }
+      return c.json({ ok: true });
+    }
+
+    // Regular message → post to Mesh room
     appendMessage(code, `${from} (Telegram)`, text, undefined, "BROADCAST");
   }
 
