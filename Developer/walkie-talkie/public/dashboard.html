@@ -23,7 +23,7 @@
       --orange: #fb923c;
       --orange-dim: rgba(251,146,60,.08);
       --red: #f87171;
-      --red-dim: rgba(248,113,113,.08);
+      --red-dim: rgba(248,113,113,.15);
       --blue: #60a5fa;
       --blue-dim: rgba(96,165,250,.08);
       --pink: #f472b6;
@@ -452,6 +452,18 @@
     .msg-type-badge.direct { background: var(--red-dim); color: var(--red); }
     .msg-type-badge.status { background: var(--blue-dim); color: var(--blue); }
     .msg-type-badge.system { background: var(--surface3); color: var(--text2); }
+    .msg-type-badge.help { background: var(--red-dim); color: var(--red); box-shadow: 0 0 8px var(--red-dim); }
+
+    .msg.help {
+      border: 2px solid var(--red) !important;
+      background: rgba(248,113,113,.05) !important;
+      animation: msg-help-flash 2s infinite !important;
+    }
+    @keyframes msg-help-flash {
+      0%, 100% { border-color: var(--red); box-shadow: 0 0 0px var(--red); }
+      50% { border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.3); }
+    }
+
     .msg-body { font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
     .msg-reply-ref {
       font-size: 11px; color: var(--text2); border-left: 2px solid var(--accent);
@@ -863,6 +875,7 @@
               <option value="TASK">Task</option>
               <option value="DIRECT">DM</option>
               <option value="HANDOFF">Handoff</option>
+              <option value="HELP">🆘 Help</option>
             </select>
           </div>
           <div class="composer-body">
@@ -1552,29 +1565,31 @@
     const type = msgTypeSelect.value;
     if (!msg) return;
 
-    // Soft gate: first-time senders who haven't identified themselves
-    const isViewer = name === VIEWER_DEFAULT || name === 'Viewer';
-    const hasSeen = localStorage.getItem('mesh-user-seen');
-    if (isViewer && !hasSeen) {
-      if (googleAuthEnabled && !currentGoogleUser) {
-        // Prefer Google sign-in when OAuth is enabled
-        window.__pendingGoogleSend = true;
-        window.google?.accounts.id.prompt();
-        return;
-      }
-      showFirstSendGate(function(confirmedName) {
-        // Re-invoke sendMessage now that name is set
-        sendMessage();
-      });
+    // Hard gate: must sign in with Google to send messages
+    if (googleAuthEnabled && !currentGoogleUser) {
+      window.__pendingGoogleSend = true;
+      window.google?.accounts.id.prompt();
       return;
     }
+    // Fallback for when Google OAuth is not configured
+    if (!googleAuthEnabled) {
+      const isViewer = name === VIEWER_DEFAULT || name === 'Viewer';
+      const hasSeen = localStorage.getItem('mesh-user-seen');
+      if (isViewer && !hasSeen) {
+        showFirstSendGate(function(confirmedName) {
+          sendMessage();
+        });
+        return;
+      }
+    }
 
-    // Persist sender name
-    localStorage.setItem('mesh-sender-name', name);
+    // Use Google-verified name when signed in (prevent impersonation)
+    const verifiedName = currentGoogleUser ? currentGoogleUser.name : name;
+    localStorage.setItem('mesh-sender-name', verifiedName);
 
     sendBtn.disabled = true;
     const body = { message: msg, type: type };
-    await api('/api/send?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), {
+    await api('/api/send?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(verifiedName), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -1613,11 +1628,11 @@
       const content = m.content || m.message || '';
       const color = getColor(from);
       const isSystem = type === 'SYSTEM';
+      const isHelp = type === 'HELP';
       const isDM = !!m.to;
       const isDMToMe = isDM && (m.to || '').toLowerCase() === viewerName.toLowerCase();
-      const cssClass = isSystem ? 'system' : (isSelf ? 'self' : 'other');
+      const cssClass = isSystem ? 'system' : (isHelp ? 'help' : (isSelf ? 'self' : 'other'));
       const dmClass = isDM ? ' dm' + (isDMToMe ? ' dm-to-me' : '') : '';
-
       html += '<div class="msg ' + cssClass + dmClass + '">';
 
       // Reply reference
