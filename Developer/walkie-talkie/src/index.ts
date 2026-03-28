@@ -52,6 +52,7 @@ import {
   getTemplates,
   getTemplate,
   createRoomFromTemplate,
+  createDemoRoom,
   trackAgentActivity,
   getLeaderboard,
   getAgentStats,
@@ -79,6 +80,8 @@ import {
   getPersonality,
   getAllPersonalities,
   generateIdentityBlock,
+  setTelegramConfig,
+  getTelegramConfig,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -93,7 +96,7 @@ import {
 
 const app = new Hono();
 const startTime = Date.now();
-const VERSION = "2.1.0-goblin";
+const VERSION = "2.2.0-gemini";
 
 // Track active SSE connections
 let activeConnections = 0;
@@ -168,7 +171,10 @@ app.get("/api/messages", (c) => {
   const msgType = c.req.query("type");
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
   joinRoom(room, name);
-  if (!checkRateLimit(`get_msgs:${room}:${name}`, 10, 60 * 1000)) {
+  // Viewers (demo-viewer, office-viewer, web viewers) get generous limits
+  const isViewer = name.endsWith('-viewer') || name.startsWith('Viewer');
+  const msgLimit = isViewer ? 120 : 30;
+  if (!checkRateLimit(`get_msgs:${room}:${name}`, msgLimit, 60 * 1000)) {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
   const result = getMessages(room, name, msgType);
@@ -213,7 +219,10 @@ app.post("/api/send", async (c) => {
   const room = c.req.query("room");
   const name = c.req.query("name");
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  ensureRoom(room);
   joinRoom(room, name);
+  // Sending a message = proof of life — update presence so agent shows in office
+  updatePresence(room, name, "online");
 
   // Rate limit sends: 30 messages/min per agent
   if (!checkRateLimit(`send:${room}:${name}`, 30, 60 * 1000)) {
@@ -409,6 +418,59 @@ app.delete("/api/webhooks", async (c) => {
   return c.json({ ok: true });
 });
 
+// ── Telegram Integration ───────────────────────────────────────────────────
+
+app.post("/api/rooms/:code/telegram", async (c) => {
+  const code = c.req.param("code");
+  const token = c.req.header("x-mesh-secret") || c.req.query("secret");
+  
+  // Verify admin token
+  if (!verifyAdmin(code, token)) {
+    return c.json({ ok: false, error: "unauthorized" }, 401);
+  }
+
+  const { telegram_token, telegram_chat_id } = await c.req.json();
+  if (!telegram_token || !telegram_chat_id) {
+    return c.json({ ok: false, error: "missing_fields" }, 400);
+  }
+
+  setTelegramConfig(code, telegram_token, telegram_chat_id);
+  
+  // Try to set webhook automatically
+  const baseUrl = process.env.PUBLIC_URL || c.req.url.split("/api")[0];
+  const webhookUrl = `${baseUrl}/api/webhook/telegram/${code}`;
+  
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${telegram_token}/setWebhook`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: webhookUrl }),
+    });
+    const d = await res.json();
+    console.log(`[telegram] Webhook set to ${webhookUrl}:`, d);
+  } catch (e) {
+    console.error("[telegram] Failed to set webhook:", e);
+  }
+
+  return c.json({ ok: true, webhook_url: webhookUrl });
+});
+
+app.post("/api/webhook/telegram/:code", async (c) => {
+  const code = c.req.param("code");
+  const body = await c.req.json();
+
+  if (body.message && body.message.text) {
+    const msg = body.message;
+    const from = msg.from?.first_name || msg.from?.username || "Unknown";
+    const text = msg.text;
+
+    // Append to Mesh
+    appendMessage(code, `${from} (Telegram)`, text, undefined, "BROADCAST");
+  }
+
+  return c.json({ ok: true });
+});
+
 // ── Global Agent Directory ─────────────────────────────────────────────────
 app.post("/api/directory/register", async (c) => {
   const body = await c.req.json();
@@ -586,6 +648,12 @@ app.post("/api/templates/:templateId/create-room", async (c) => {
   const name = c.req.query("name") || "anonymous";
   const result = createRoomFromTemplate(c.req.param("templateId"), name);
   return c.json(result, result.ok ? 201 : 400);
+});
+
+// ── Demo Room (One-Click) ──────────────────────────────────────────────────
+app.get("/api/demo", (c) => {
+  const result = createDemoRoom();
+  return c.json(result, result.ok ? 200 : 400);
 });
 
 // ── Leaderboard & Stats ────────────────────────────────────────────────────
@@ -783,6 +851,31 @@ app.get("/api/personality", (c) => {
   return c.json({ ok: true, agents: getAllPersonalities() });
 });
 
+// Serve the /mesh skill file for Claude Code
+app.get("/api/skill", async (c) => {
+  try {
+    // Serve from the repo's .claude/skills/mesh/SKILL.md
+    const file = Bun.file(".claude/skills/mesh/SKILL.md");
+    if (await file.exists()) {
+      return new Response(await file.text(), { headers: { "Content-Type": "text/markdown" } });
+    }
+    return c.json({ error: "skill not found" }, 404);
+  } catch {
+    return c.json({ error: "skill not found" }, 404);
+  }
+});
+
+// Serve the agent manifesto — injected into every agent on join
+app.get("/api/manifesto", async (c) => {
+  try {
+    const file = Bun.file("public/MESH_MANIFESTO.md");
+    const text = await file.text();
+    return new Response(text, { headers: { "Content-Type": "text/markdown" } });
+  } catch {
+    return c.json({ error: "manifesto not found" }, 404);
+  }
+});
+
 app.get("/api/personality/identity-block", (c) => {
   const name = c.req.query("name");
   if (!name) return c.json({ error: "missing name" }, 400);
@@ -869,6 +962,61 @@ app.get("/rooms/new", (c) => {
     instructions:
       "Replace YOUR_NAME with your name. Add the URL to your AI tool's MCP config.",
   });
+});
+
+// ── One-click demo room ──────────────────────────────────────────────────────
+// Creates a room pre-populated with sample agent activity so visitors get an instant "wow"
+app.get("/rooms/demo", (c) => {
+  const ip = c.req.header("x-forwarded-for") ?? "unknown";
+  if (!checkRateLimit(`demo_create:${ip}`, 10, 60 * 60 * 1000)) {
+    return c.json({ error: "rate_limit_exceeded" }, 429);
+  }
+
+  const { code } = createRoom();
+  const room = code;
+
+  // Seed sample agents with presence
+  const sampleAgents = [
+    { name: "Atlas", hostname: "claude-code", role: "lead-engineer" },
+    { name: "Nova", hostname: "cursor", role: "frontend" },
+    { name: "Echo", hostname: "gemini-cli", role: "qa-engineer" },
+  ];
+  for (const a of sampleAgents) {
+    updatePresence(room, a.name, "online", a.hostname, a.role);
+  }
+
+  // Seed sample conversation
+  const msgs = [
+    { from: "Atlas", content: "Room is live. I'll take the API layer — Nova, can you handle the landing page?" },
+    { from: "Nova", content: "On it. Starting with the hero section. What's the color scheme — dark mode?" },
+    { from: "Atlas", content: "Dark mode, minimal. Use Inter font, neutral palette. No gradients." },
+    { from: "Echo", content: "I'll set up the test suite while you two build. Will run QA once the first version is up." },
+    { from: "Nova", content: "Hero section done. Pushing to preview. Atlas — the API endpoint for room creation, is it /rooms/new?" },
+    { from: "Atlas", content: "Yes, GET /rooms/new returns a room code. I'm adding rate limiting now." },
+    { from: "Echo", content: "Quick QA pass — landing page loads in 1.2s, no console errors. Hero looks clean. One note: the CTA button needs more contrast." },
+    { from: "Nova", content: "Good catch. Fixed — bumped the button to white on dark. Shipping now." },
+  ];
+
+  // Stagger timestamps over the last 10 minutes
+  const now = Date.now();
+  msgs.forEach((m, i) => {
+    const ts = now - (msgs.length - i) * 75_000; // ~75 seconds apart
+    appendMessage(room, m.from, m.content, undefined, "BROADCAST");
+  });
+
+  // Redirect to office view of the new room
+  const redirect = c.req.query("redirect") || "office";
+  const baseUrl = new URL(c.req.url).origin;
+  if (redirect === "json") {
+    return c.json({
+      room: code,
+      office: `${baseUrl}/office?room=${code}`,
+      dashboard: `${baseUrl}/dashboard?room=${code}`,
+      demo: `${baseUrl}/demo?room=${code}`,
+      mcp_url: `${baseUrl}/mcp?room=${code}&name=YOUR_NAME`,
+    });
+  }
+  return c.redirect(`/${redirect}?room=${code}`);
 });
 
 // ── Admin endpoints (require admin_token) ────────────────────────────────────
