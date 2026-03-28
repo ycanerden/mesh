@@ -148,6 +148,79 @@
       color: var(--muted);
       font-size: 14px;
     }
+
+    /* Checkout overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 100;
+      align-items: flex-start;
+      justify-content: center;
+      overflow-y: auto;
+      padding: 60px 16px 32px;
+    }
+    .overlay.open { display: flex; }
+    .overlay-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .overlay-box h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .overlay-box p { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+    .overlay-box input {
+      display: block;
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 12px;
+      font-family: inherit;
+    }
+    .overlay-box input:focus { outline: none; border-color: var(--accent); }
+    .overlay-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      flex: 1;
+    }
+    .btn-go {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      flex: 2;
+    }
+    .btn-go:hover { filter: brightness(1.1); }
+    @media (max-width: 480px) {
+      .overlay { padding: 32px 12px 24px; }
+      .overlay-box { padding: 24px 20px; border-radius: 12px; }
+      .overlay-actions { flex-direction: column-reverse; }
+      .btn-cancel, .btn-go { flex: unset; width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -192,7 +265,7 @@
       <div class="plan-desc">Your own persistent, private room.</div>
       <div class="plan-price">$9<span class="plan-period">/mo</span></div>
       <div class="price-sub">Cancel anytime</div>
-      <a href="https://buy.stripe.com/5kQaEZeB38zEgQydF29EI00" class="btn btn-accent" target="_blank" rel="noopener">Get started</a>
+      <button class="btn btn-accent" onclick="openCheckout()" style="cursor:pointer;border:none;font-family:inherit;">Get started</button>
       <ul class="features">
         <li>1 persistent room</li>
         <li>5 agents</li>
@@ -222,9 +295,55 @@
   </div>
 </div>
 
+<!-- Checkout overlay -->
+<div class="overlay" id="checkout-overlay">
+  <div class="overlay-box">
+    <h2>Get Room plan</h2>
+    <p>Enter your room code so we can activate private features after payment.</p>
+    <input type="text" id="room-code-input" placeholder="Room code (e.g. mesh01)" autocomplete="off" autocapitalize="off" />
+    <input type="email" id="email-input" placeholder="Your email (optional)" autocomplete="email" />
+    <div class="overlay-actions">
+      <button class="btn-cancel" onclick="closeCheckout()">Cancel</button>
+      <button class="btn-go" onclick="goToStripe()">Continue to payment</button>
+    </div>
+  </div>
+</div>
+
 <footer>
   <p>Mesh — <a href="/">Home</a> · <a href="/company">Company</a> · <a href="https://github.com/ycanerden/mesh">GitHub</a></p>
 </footer>
 
+<script>
+  const STRIPE_LINK = 'https://buy.stripe.com/5kQaEZeB38zEgQydF29EI00';
+
+  function openCheckout() {
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get('room') || '';
+    if (room) document.getElementById('room-code-input').value = room;
+    document.getElementById('checkout-overlay').classList.add('open');
+    setTimeout(() => document.getElementById('room-code-input').focus(), 50);
+  }
+
+  function closeCheckout() {
+    document.getElementById('checkout-overlay').classList.remove('open');
+  }
+
+  function goToStripe() {
+    const room = document.getElementById('room-code-input').value.trim();
+    let url = STRIPE_LINK;
+    if (room) url += '?client_reference_id=' + encodeURIComponent(room);
+    window.open(url, '_blank', 'noopener');
+    closeCheckout();
+  }
+
+  document.getElementById('checkout-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeCheckout();
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeCheckout();
+    if (e.key === 'Enter' && document.getElementById('checkout-overlay').classList.contains('open')) goToStripe();
+  });
+</script>
 </body>
 </html>

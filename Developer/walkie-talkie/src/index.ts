@@ -1817,7 +1817,8 @@ app.post("/api/billing/webhook", async (c) => {
     const customerId = session.customer || "";
     const subscriptionId = session.subscription || null;
     // Detect plan from metadata or price — default to pro
-    const plan = session.metadata?.plan || (session.amount_total >= 9900 ? "team" : "pro");
+    const plan = session.metadata?.plan || (session.amount_total >= 2900 ? "team" : "room");
+    const roomCode = session.metadata?.room_code || session.client_reference_id || null;
 
     if (email && customerId) {
       upsertSubscription({
@@ -1826,10 +1827,10 @@ app.post("/api/billing/webhook", async (c) => {
         email,
         plan,
         status: "active",
-        room_code: session.metadata?.room_code || null,
+        room_code: roomCode,
         current_period_end: null,
       });
-      console.log(`[billing] New ${plan} subscription: ${email}`);
+      console.log(`[billing] New ${plan} subscription: ${email}${roomCode ? ` → room ${roomCode}` : ""}`);
     }
   } else if (event.type === "customer.subscription.updated") {
     const sub = event.data.object;
