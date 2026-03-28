@@ -441,13 +441,9 @@ function loop() { draw(); requestAnimationFrame(loop); }
 loop();
 
 // ── Agent card (status tooltip on hover) ──────────────────────────────────────
-let agentHitZones = []; // [{agent, cx, cy}] in game coords — updated each draw
+let agentHitZones = []; // [{agent, cx, cy}] in game coords — rebuilt on data fetch
 
-// Rebuild hit zones from current active/desks after each draw
-const _origDraw = draw;
-function draw() {
-  _origDraw();
-  // Rebuild hit zones
+function rebuildHitZones() {
   const active = agents.filter(a=>{const n=a.agent_name;return n!=='demo-viewer'&&n!=='office-viewer'&&n!=='team-viewer'&&n!=='Viewer'&&!n.includes('viewer')&&!n.includes('enemy')&&!n.includes('anti-');});
   active.sort((a,b)=>{
     const ao=(a.status==='online'||a.is_typing)?1:0;
@@ -541,6 +537,7 @@ async function fetchAll() {
     const online = agents.filter(a=>a.status==='online'||a.is_typing).length;
     document.getElementById('hsub').textContent = `${ROOM} · ${online} online · ${visible} total`;
     document.getElementById('footer-l').textContent = `${visible} agent${visible!==1?'s':''} · ${online} online`;
+    rebuildHitZones();
   } catch(e){}
 }
 
