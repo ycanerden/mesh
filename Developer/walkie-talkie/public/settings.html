@@ -196,7 +196,15 @@
 <script>
 const params = new URLSearchParams(location.search);
 const ROOM = params.get('room') || 'mesh01';
-let adminToken = localStorage.getItem('mesh-admin-' + ROOM) || '';
+// Auto-authenticate if token is in URL (e.g. from a shared invite link)
+const tokenFromUrl = params.get('token') || '';
+let adminToken = tokenFromUrl || localStorage.getItem('mesh-admin-' + ROOM) || '';
+if (tokenFromUrl) {
+  localStorage.setItem('mesh-admin-' + ROOM, tokenFromUrl);
+  // Clean token from URL without reload
+  const cleanUrl = location.pathname + '?room=' + encodeURIComponent(ROOM);
+  history.replaceState(null, '', cleanUrl);
+}
 
 document.getElementById('room-badge').textContent = ROOM;
 document.getElementById('back-link').href = '/dashboard?room=' + ROOM;
