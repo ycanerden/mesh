@@ -92,6 +92,9 @@ import {
   deleteMessage,
   redactMessage,
   rotateAdminToken,
+  addToWaitlist,
+  getWaitlist,
+  getWaitlistCount,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -1324,6 +1327,16 @@ app.get("/analytics", async (c) => {
   }
 });
 
+// Pricing page
+app.get("/pricing", async (c) => {
+  try {
+    const html = await Bun.file("./public/pricing.html").text();
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
+  } catch {
+    return c.redirect("/");
+  }
+});
+
 // Activity — cross-room live feed
 app.get("/activity", async (c) => {
   try {
@@ -2415,6 +2428,30 @@ app.get("/api/verify-connection", (c) => {
     return c.json({ ok: true, connected: true, status: agent.status, last_heartbeat: agent.last_heartbeat });
   }
   return c.json({ ok: true, connected: false });
+});
+
+// ── Waitlist ──────────────────────────────────────────────────────────────────
+app.post("/api/waitlist", async (c) => {
+  const body = await c.req.json().catch(() => ({}));
+  const email = (body.email || "").trim().toLowerCase();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return c.json({ error: "invalid_email" }, 400);
+  }
+  const result = addToWaitlist(email, body.use_case);
+  const count = getWaitlistCount();
+  return c.json({ ok: true, duplicate: result.duplicate, count });
+});
+
+app.get("/api/waitlist/count", (c) => {
+  return c.json({ count: getWaitlistCount() });
+});
+
+// Admin-only: view full waitlist
+app.get("/api/waitlist", (c) => {
+  const secret = c.req.header("x-mesh-secret") || c.req.query("secret");
+  const ADMIN_CLAIM_SECRET = process.env.ADMIN_CLAIM_SECRET;
+  if (!ADMIN_CLAIM_SECRET || secret !== ADMIN_CLAIM_SECRET) return c.json({ error: "unauthorized" }, 401);
+  return c.json({ waitlist: getWaitlist(), count: getWaitlistCount() });
 });
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
