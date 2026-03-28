@@ -35,6 +35,25 @@ db.run(`
   );
 `);
 
+// Auto-seed default tasks for mesh01 if empty
+(function autoSeedTasks() {
+  const count = db.prepare("SELECT COUNT(*) as n FROM room_assignments WHERE room_code = 'mesh01'").get() as any;
+  if (count.n === 0) {
+    const now = Date.now();
+    const tasks = [
+      ["mesh01", "Lisan", "task-landing-signoff", "Finalize landing page copy & sign-off", "in_progress"],
+      ["mesh01", "Can", "task-telegram-ping", "Run Telegram Test Ping", "pending"],
+      ["mesh01", "Goblin", "task-validation", "Final validation pass & bug hunt", "in_progress"],
+      ["mesh01", "Jarvis", "task-dedup-fix", "Monitor Jarvis message dedup", "done"]
+    ];
+    for (const t of tasks) {
+      db.prepare(`INSERT INTO room_assignments (room_code, agent_name, task_id, task_title, status, assigned_at) 
+                 VALUES (?, ?, ?, ?, ?, ?)`).run(t[0], t[1], t[2], t[3], t[4], now);
+    }
+    console.log("[seed] Seeded mesh01 task board");
+  }
+})();
+
 export interface RoomGroup {
   room_code: string;
   group_name: string;
