@@ -1225,18 +1225,6 @@
     }).join('');
   }
 
-  function switchRoom(roomCode) {
-    window.location.search = '?room=' + encodeURIComponent(roomCode);
-  }
-
-  function toggleSection(id) {
-    const section = document.getElementById('section-' + id);
-    if (section) {
-      section.classList.toggle('collapsed');
-      localStorage.setItem('sidebar-collapsed-' + id, section.classList.contains('collapsed'));
-    }
-  }
-
   // Restore sidebar state on load
   document.addEventListener('DOMContentLoaded', () => {
     ['workspaces', 'agents', 'leaderboard'].forEach(id => {
@@ -1666,6 +1654,18 @@
   }
 
 })();
+
+function switchRoom(roomCode) {
+  window.location.search = '?room=' + encodeURIComponent(roomCode);
+}
+
+function toggleSection(id) {
+  const section = document.getElementById('section-' + id);
+  if (section) {
+    section.classList.toggle('collapsed');
+    localStorage.setItem('sidebar-collapsed-' + id, section.classList.contains('collapsed'));
+  }
+}
 
 // Search function (global scope for onclick)
 async function doSearch() {
