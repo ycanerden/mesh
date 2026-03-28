@@ -1246,6 +1246,16 @@ app.get("/analytics", async (c) => {
   }
 });
 
+// Activity — cross-room live feed
+app.get("/activity", async (c) => {
+  try {
+    const html = await Bun.file("./public/activity.html").text();
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch {
+    return c.redirect("/");
+  }
+});
+
 // Active rooms list
 app.get("/api/rooms", (c) => {
   const rooms = getActiveRooms();
@@ -1378,6 +1388,21 @@ app.get("/api/analytics/:name", (c) => {
   const stats = getProductivityReport(name);
   const tasks = getAllAgentTasks(name);
   return c.json({ ok: true, stats, tasks });
+});
+
+// ── Activity Timeline API ──────────────────────────────────────────────────
+
+app.get("/api/activity", (c) => {
+  // Aggregate recent events across all rooms
+  // Sort by timestamp desc, limit to 100
+  const messages = db.prepare(`
+    SELECT m.id, m.room_code, m.sender as 'from', m.content, m.timestamp as ts, m.msg_type as type
+    FROM messages m
+    ORDER BY m.timestamp DESC
+    LIMIT 100
+  `).all() as any[];
+
+  return c.json({ ok: true, events: messages });
 });
 
 // Morning briefing — summary of activity since you were last here
