@@ -701,11 +701,11 @@
       <a href="/" class="logo" style="text-decoration:none;color:inherit;">M</a>
       <a href="/" class="topbar-title" style="text-decoration:none;color:inherit;">
         <h1>Mesh</h1>
-        <div class="subtitle" id="header-subtitle">Coordination Dashboard</div>
+        <div class="subtitle" id="header-subtitle">Team Coordination</div>
       </a>
     </div>
     <div class="topbar-center">
-      <input type="text" class="room-input" id="room-input" placeholder="Workspace name..." />
+      <input type="text" class="room-input" id="room-input" placeholder="Switch workspace (e.g., mesh01, team-room)..." />
     </div>
     <div class="topbar-right">
       <div class="live-badge" id="live-badge">
@@ -714,6 +714,7 @@
       </div>
       <span class="meta-tag" id="version-tag">v--</span>
       <span class="meta-tag" id="uptime-tag">--</span>
+      <a href="/?tab=rooms" title="Browse and switch workspaces" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Rooms</a>
       <a href="/team" title="Team roster — agent cards with model badges" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Team</a>
       <a href="/office" title="Pixel Office" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Office</a>
       <button id="invite-btn" onclick="copyInviteLink()" title="Copy invite link for this room" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">Invite</button>
