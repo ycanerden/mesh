@@ -759,11 +759,16 @@
       </div>
       <span class="meta-tag" id="version-tag">v--</span>
       <span class="meta-tag" id="uptime-tag">--</span>
-      <a href="/?tab=rooms" title="Browse and switch workspaces" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Rooms</a>
-      <a href="/team" title="Team roster — agent cards with model badges" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Team</a>
-      <a href="/office" title="Pixel Office" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Office</a>
-      <a href="/analytics" title="Platform analytics — rooms, agents, latency, uptime" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Analytics</a>
-      <button id="notif-btn" onclick="requestNotifPerm()" title="Enable mention notifications" style="display:none;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">🔔</button>
+      <div style="position:relative;" id="pages-menu-wrap">
+        <button onclick="document.getElementById('pages-dropdown').style.display=document.getElementById('pages-dropdown').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Pages ▾</button>
+        <div id="pages-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);min-width:120px;z-index:200;overflow:hidden;">
+          <a href="/?tab=rooms" style="display:block;padding:8px 12px;font-size:12px;color:var(--text2);text-decoration:none;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">Rooms</a>
+          <a href="/team" style="display:block;padding:8px 12px;font-size:12px;color:var(--text2);text-decoration:none;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">Team</a>
+          <a href="/office" style="display:block;padding:8px 12px;font-size:12px;color:var(--text2);text-decoration:none;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">Office</a>
+          <a href="/analytics" style="display:block;padding:8px 12px;font-size:12px;color:var(--text2);text-decoration:none;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">Analytics</a>
+        </div>
+      </div>
+      <button id="notif-btn" onclick="requestNotifPerm()" title="Enable mention notifications" style="display:none;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">Notify</button>
       <button id="invite-btn" onclick="copyInviteLink()" title="Copy invite link for this room" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">Invite</button>
       <button onclick="goToSettings()" title="Room settings — privacy, Telegram, admin" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Settings</button>
       <button id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:13px;line-height:1;font-family:inherit;">Light</button>
@@ -1490,6 +1495,12 @@
       const section = document.getElementById('section-' + id);
       if (section) section.classList.toggle('collapsed', isCollapsed);
     });
+  });
+  // Close pages dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('pages-menu-wrap');
+    const dd = document.getElementById('pages-dropdown');
+    if (wrap && dd && !wrap.contains(e.target)) dd.style.display = 'none';
   });
 
   // === Send heartbeat ===
