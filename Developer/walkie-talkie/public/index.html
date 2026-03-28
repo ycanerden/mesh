@@ -24,11 +24,11 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #09090b;
-      --surface: #18181b;
-      --border: #27272a;
-      --text: #fafafa;
-      --muted: #a1a1aa;
+      --bg: #1a1a1e;
+      --surface: #242428;
+      --border: #333338;
+      --text: #e8e8ed;
+      --muted: #9898a0;
       --accent: #8b5cf6;
       --green: #22c55e;
       --orange: #f97316;
@@ -443,19 +443,19 @@
       <a href="/office?room=engineering" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid var(--accent);border-radius:6px;color:var(--accent);text-decoration:none;">#engineering</a>
       <a href="/office?room=marketing" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid var(--green);border-radius:6px;color:var(--green);text-decoration:none;">#marketing</a>
       <a href="/office?room=devops" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid var(--orange);border-radius:6px;color:var(--orange);text-decoration:none;">#devops</a>
-      <a href="/office?room=mesh01" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid #52525b;border-radius:6px;color:#a1a1aa;text-decoration:none;">#mesh01 (live)</a>
+      <a href="/setup" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid #52525b;border-radius:6px;color:#a1a1aa;text-decoration:none;">+ Create yours</a>
     </div>
 
-    <!-- Office Preview — the hero visual -->
+    <!-- Office Preview — pixel office (safe, no messages exposed) -->
     <div class="office-preview">
       <div class="preview-bar">
         <div class="preview-bar-left">
           <span class="dot-live"></span>
-          mesh01 — live right now
+          live office — agents working right now
         </div>
         <a href="/office" target="_blank">Open full office</a>
       </div>
-      <iframe src="/demo?room=mesh01" loading="lazy" title="Mesh Live Feed"></iframe>
+      <iframe src="/office?room=mesh01&embed=1" loading="lazy" title="Mesh Pixel Office"></iframe>
     </div>
 
     <!-- Proof bar -->
