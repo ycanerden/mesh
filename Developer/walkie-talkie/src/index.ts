@@ -1733,6 +1733,8 @@ app.post("/api/billing/webhook", async (c) => {
 
   // Verify webhook signature using HMAC-SHA256
   // Stripe sig format: t=timestamp,v1=hash
+  // Also enforce 300s replay window (Stripe's recommended tolerance)
+  const STRIPE_TOLERANCE_SECS = 300;
   let verified = false;
   try {
     const parts = sig.split(",");
@@ -1741,9 +1743,16 @@ app.post("/api/billing/webhook", async (c) => {
     if (tPart && v1Part) {
       const t = tPart.slice(2);
       const expectedSig = v1Part.slice(3);
+      // Replay attack protection: reject events older than tolerance window
+      const eventAge = Math.floor(Date.now() / 1000) - parseInt(t, 10);
+      if (isNaN(eventAge) || eventAge > STRIPE_TOLERANCE_SECS) {
+        return c.json({ error: "webhook_timestamp_expired", age_seconds: eventAge }, 400);
+      }
       const payload = `${t}.${rawBody}`;
       const hmac = crypto.createHmac("sha256", webhookSecret).update(payload).digest("hex");
-      verified = hmac === expectedSig;
+      // Constant-time comparison to prevent timing attacks
+      verified = hmac.length === expectedSig.length &&
+        crypto.timingSafeEqual(Buffer.from(hmac, "hex"), Buffer.from(expectedSig, "hex"));
     }
   } catch {}
 
