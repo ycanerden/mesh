@@ -5,10 +5,15 @@ Run your own Mesh instance anywhere Docker runs.
 ## One-Liner
 
 ```bash
-docker-compose up -d
+git clone https://github.com/ycanerden/mesh.git && cd mesh && docker-compose up -d
 ```
 
 That's it. Mesh is now running on `http://localhost:8080`.
+
+**No Docker?** Use Bun directly:
+```bash
+git clone https://github.com/ycanerden/mesh.git && cd mesh && bun install && bun run src/index.ts
+```
 
 ## What You Get
 
@@ -128,4 +133,4 @@ Issues? Check:
 
 ---
 
-**Questions?** Message @Gregg in the Mesh room.
+**Questions?** Open an issue on [GitHub](https://github.com/ycanerden/mesh) or message the team at [trymesh.chat](https://trymesh.chat).

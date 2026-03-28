@@ -27,7 +27,7 @@ function seedDefaultRooms() {
     const exists = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
     if (!exists) {
       const token = generateSecureToken();
-      db.prepare("INSERT INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)").run(code, Date.now(), token);
+      db.prepare("INSERT INTO rooms (code, last_activity, admin_token, is_demo) VALUES (?, ?, ?, ?)").run(code, Date.now(), token, 0);
       console.log(`[seed] Created default room: ${code} admin_token=${token}`);
     }
   }
@@ -38,7 +38,8 @@ function seedDefaultRooms() {
 db.run(`
   CREATE TABLE IF NOT EXISTS rooms (
     code TEXT PRIMARY KEY,
-    last_activity INTEGER
+    last_activity INTEGER,
+    is_demo INTEGER DEFAULT 0
   );
 `);
 
@@ -48,6 +49,7 @@ try { db.run("ALTER TABLE rooms ADD COLUMN read_only INTEGER DEFAULT 0;"); } cat
 try { db.run("ALTER TABLE rooms ADD COLUMN telegram_chat_id TEXT DEFAULT NULL;"); } catch (e) {}
 try { db.run("ALTER TABLE rooms ADD COLUMN telegram_token TEXT DEFAULT NULL;"); } catch (e) {}
 try { db.run("ALTER TABLE rooms ADD COLUMN is_private INTEGER DEFAULT 0;"); } catch (e) {}
+try { db.run("ALTER TABLE rooms ADD COLUMN is_demo INTEGER DEFAULT 0;"); } catch (e) {}
 try { db.run("ALTER TABLE rooms ADD COLUMN room_password_hash TEXT DEFAULT NULL;"); } catch (e) {}
 
 // Migration: backfill admin tokens for rooms that were created without one
@@ -252,6 +254,147 @@ db.run(`CREATE TABLE IF NOT EXISTS agent_personalities (
 try { db.run("ALTER TABLE agent_personalities ADD COLUMN model TEXT DEFAULT '';"); } catch(e) {}
 try { db.run("ALTER TABLE agent_personalities ADD COLUMN tool TEXT DEFAULT '';"); } catch(e) {}
 
+// ── Google OAuth identity ─────────────────────────────────────────────────────
+// Activated when GOOGLE_CLIENT_ID env var is set in Railway
+db.run(`CREATE TABLE IF NOT EXISTS google_accounts (
+  google_id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  picture TEXT DEFAULT '',
+  created_at INTEGER NOT NULL,
+  last_seen INTEGER NOT NULL
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS google_sessions (
+  token TEXT PRIMARY KEY,
+  google_id TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL,
+  FOREIGN KEY(google_id) REFERENCES google_accounts(google_id)
+);`);
+
+try { db.run("CREATE INDEX IF NOT EXISTS idx_sessions_google_id ON google_sessions(google_id);"); } catch(e) {}
+
+export interface GoogleAccount {
+  google_id: string;
+  email: string;
+  name: string;
+  picture: string;
+  created_at: number;
+  last_seen: number;
+}
+
+// Upsert a Google account after token verification
+export function upsertGoogleAccount(account: Omit<GoogleAccount, 'created_at' | 'last_seen'>): GoogleAccount {
+  const now = Date.now();
+  db.prepare(`
+    INSERT INTO google_accounts (google_id, email, name, picture, created_at, last_seen)
+    VALUES (?, ?, ?, ?, ?, ?)
+    ON CONFLICT(google_id) DO UPDATE SET
+      email=excluded.email, name=excluded.name, picture=excluded.picture, last_seen=excluded.last_seen
+  `).run(account.google_id, account.email, account.name, account.picture, now, now);
+  return db.prepare("SELECT * FROM google_accounts WHERE google_id = ?").get(account.google_id) as GoogleAccount;
+}
+
+// Create a 30-day session token for an authenticated Google account
+export function createGoogleSession(google_id: string): string {
+  const token = generateSecureToken();
+  const now = Date.now();
+  const expires = now + 30 * 24 * 60 * 60 * 1000; // 30 days
+  db.prepare("INSERT INTO google_sessions (token, google_id, created_at, expires_at) VALUES (?, ?, ?, ?)")
+    .run(token, google_id, now, expires);
+  return token;
+}
+
+// Validate a session token — returns the account or null if invalid/expired
+export function getAccountBySession(token: string): GoogleAccount | null {
+  const session = db.prepare(
+    "SELECT s.*, a.* FROM google_sessions s JOIN google_accounts a ON s.google_id = a.google_id WHERE s.token = ? AND s.expires_at > ?"
+  ).get(token, Date.now()) as any;
+  if (!session) return null;
+  return {
+    google_id: session.google_id,
+    email: session.email,
+    name: session.name,
+    picture: session.picture,
+    created_at: session.created_at,
+    last_seen: session.last_seen,
+  };
+}
+
+// Invalidate a session
+export function deleteGoogleSession(token: string): void {
+  db.prepare("DELETE FROM google_sessions WHERE token = ?").run(token);
+}
+
+// Clean up expired sessions (call periodically)
+export function cleanExpiredSessions(): void {
+  db.prepare("DELETE FROM google_sessions WHERE expires_at < ?").run(Date.now());
+}
+
+// ── Stripe subscriptions ──────────────────────────────────────────────────────
+// Activated when STRIPE_WEBHOOK_SECRET env var is set.
+db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  stripe_subscription_id TEXT UNIQUE,
+  stripe_customer_id TEXT NOT NULL,
+  email TEXT NOT NULL,
+  plan TEXT NOT NULL DEFAULT 'pro',
+  status TEXT NOT NULL DEFAULT 'active',
+  room_code TEXT,
+  created_at INTEGER NOT NULL,
+  current_period_end INTEGER
+);`);
+
+try { db.run("CREATE INDEX IF NOT EXISTS idx_sub_email ON subscriptions(email);"); } catch(e) {}
+try { db.run("CREATE INDEX IF NOT EXISTS idx_sub_customer ON subscriptions(stripe_customer_id);"); } catch(e) {}
+
+export interface Subscription {
+  id: number;
+  stripe_subscription_id: string | null;
+  stripe_customer_id: string;
+  email: string;
+  plan: string;
+  status: string;
+  room_code: string | null;
+  created_at: number;
+  current_period_end: number | null;
+}
+
+export function upsertSubscription(sub: Omit<Subscription, 'id' | 'created_at'>): void {
+  db.prepare(`
+    INSERT INTO subscriptions (stripe_subscription_id, stripe_customer_id, email, plan, status, room_code, created_at, current_period_end)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(stripe_subscription_id) DO UPDATE SET
+      status=excluded.status, current_period_end=excluded.current_period_end,
+      room_code=excluded.room_code, email=excluded.email
+  `).run(sub.stripe_subscription_id, sub.stripe_customer_id, sub.email, sub.plan, sub.status, sub.room_code, Date.now(), sub.current_period_end ?? null);
+}
+
+export function getSubscriptionByEmail(email: string): Subscription | null {
+  return db.prepare(
+    "SELECT * FROM subscriptions WHERE email = ? AND status = 'active' ORDER BY created_at DESC LIMIT 1"
+  ).get(email) as Subscription | null;
+}
+
+export function getSubscriptionByRoom(roomCode: string): Subscription | null {
+  return db.prepare(
+    "SELECT * FROM subscriptions WHERE room_code = ? AND status = 'active' ORDER BY created_at DESC LIMIT 1"
+  ).get(roomCode) as Subscription | null;
+}
+
+export function cancelSubscription(stripeSubscriptionId: string): void {
+  db.prepare("UPDATE subscriptions SET status = 'cancelled' WHERE stripe_subscription_id = ?").run(stripeSubscriptionId);
+}
+
+export function getSubscriptionStats(): { total: number; active: number; pro: number; team: number } {
+  const total = (db.prepare("SELECT COUNT(*) as n FROM subscriptions").get() as any).n;
+  const active = (db.prepare("SELECT COUNT(*) as n FROM subscriptions WHERE status = 'active'").get() as any).n;
+  const pro = (db.prepare("SELECT COUNT(*) as n FROM subscriptions WHERE status = 'active' AND plan = 'pro'").get() as any).n;
+  const team = (db.prepare("SELECT COUNT(*) as n FROM subscriptions WHERE status = 'active' AND plan = 'team'").get() as any).n;
+  return { total, active, pro, team };
+}
+
 // ── Message reactions ─────────────────────────────────────────────────────────
 db.run(`
   CREATE TABLE IF NOT EXISTS reactions (
@@ -283,12 +426,12 @@ export function ensureRoom(code: string): void {
   const exists = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!exists) {
     const token = generateSecureToken();
-    db.prepare("INSERT OR IGNORE INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)").run(code, Date.now(), token);
+    db.prepare("INSERT OR IGNORE INTO rooms (code, last_activity, admin_token, is_demo) VALUES (?, ?, ?, ?)").run(code, Date.now(), token, 0);
     console.log(`[room] auto-created room ${code} from MCP connection`);
   }
 }
 
-export function createRoom(): { code: string; admin_token: string } {
+export function createRoom(isDemo: boolean = false): { code: string; admin_token: string } {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   let code: string;
   const checkStmt = db.prepare("SELECT 1 FROM rooms WHERE code = ?");
@@ -301,7 +444,7 @@ export function createRoom(): { code: string; admin_token: string } {
   } while (checkStmt.get(code));
 
   const admin_token = generateSecureToken();
-  db.prepare("INSERT INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)").run(code, Date.now(), admin_token);
+  db.prepare("INSERT INTO rooms (code, last_activity, admin_token, is_demo) VALUES (?, ?, ?, ?)").run(code, Date.now(), admin_token, isDemo ? 1 : 0);
   return { code, admin_token };
 }
 
@@ -786,9 +929,16 @@ export function redactMessage(messageId: string, roomCode: string): boolean {
 
 export function sweepExpiredRooms(): number {
   const now = Date.now();
-  const threshold = now - ROOM_TTL_MS;
+  // Standard TTL: 72h
+  const standardThreshold = now - ROOM_TTL_MS;
+  // Demo TTL: 1h
+  const demoThreshold = now - (60 * 60 * 1000);
 
-  const expired = db.prepare("SELECT code FROM rooms WHERE last_activity < ?").all(threshold) as { code: string }[];
+  const expired = db.prepare(`
+    SELECT code FROM rooms 
+    WHERE (is_demo = 0 AND last_activity < ?)
+       OR (is_demo = 1 AND last_activity < ?)
+  `).all(standardThreshold, demoThreshold) as { code: string }[];
 
   for (const row of expired) {
     db.prepare("DELETE FROM messages WHERE room_code = ?").run(row.code);

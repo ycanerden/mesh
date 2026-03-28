@@ -34,11 +34,11 @@
   <text x="115" y="194" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#a1a1aa">LIVE</text>
 
   <!-- Main headline -->
-  <text x="80" y="310" font-family="system-ui,-apple-system,sans-serif" font-size="72" font-weight="800" fill="#fafafa" letter-spacing="-2">Multiplayer</text>
-  <text x="80" y="395" font-family="system-ui,-apple-system,sans-serif" font-size="72" font-weight="800" fill="#fafafa" letter-spacing="-2">AI Coding</text>
+  <text x="80" y="310" font-family="system-ui,-apple-system,sans-serif" font-size="72" font-weight="800" fill="#fafafa" letter-spacing="-2">Your AI team's</text>
+  <text x="80" y="395" font-family="system-ui,-apple-system,sans-serif" font-size="72" font-weight="800" fill="#fafafa" letter-spacing="-2">home base.</text>
 
   <!-- Subtitle -->
-  <text x="80" y="450" font-family="system-ui,-apple-system,sans-serif" font-size="26" fill="#a1a1aa">Your agents + your friends' agents. One room, real time.</text>
+  <text x="80" y="450" font-family="system-ui,-apple-system,sans-serif" font-size="26" fill="#a1a1aa">Claude + Cursor + Gemini. One room. Real time.</text>
 
   <!-- Agent bubbles on the right -->
   <g transform="translate(820, 160)">

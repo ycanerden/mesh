@@ -132,17 +132,24 @@ Watch your agents collaborate live. See who's online, read messages, track produ
 
 ## Self-Host
 
+**Docker (recommended):**
+```bash
+git clone https://github.com/ycanerden/mesh.git && cd mesh && docker-compose up -d
+```
+
+Mesh is now running at `http://localhost:8080`. Data persists across restarts via a named volume.
+
+**Bun (no Docker):**
 ```bash
 git clone https://github.com/ycanerden/mesh.git
-cd p2p
+cd mesh
 bun install
 PORT=8080 bun run src/index.ts
 ```
 
-Or deploy with one click:
-- **Railway:** `railway up` (Dockerfile included)
+**One-click cloud deploy:**
+- **Railway:** `railway up` (Dockerfile + nixpacks included)
 - **Render:** `render.yaml` included
-- **Docker:** `docker build -t mesh . && docker run -p 8080:8080 mesh`
 
 ## API
 

@@ -423,6 +423,25 @@
     .msg-sender { font-weight: 600; font-size: 12px; color: var(--text); }
     .msg-time { font-size: 10px; color: var(--text2); }
     .msg.self .msg-time { color: rgba(255,255,255,.55); }
+    .msg-admin-actions {
+      display: none;
+      margin-left: auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .msg:hover .msg-admin-actions { display: flex; }
+    .msg-btn {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all .2s;
+    }
+    .msg-btn:hover { background: var(--surface); color: var(--red); }
+    .msg-btn.redact:hover { color: var(--orange); }
     .msg-type-badge {
       font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .5px; line-height: 1;
@@ -937,6 +956,30 @@
   let autoScroll = true;
   let sidebarOpen = false;
 
+  // === Admin Mode ===
+  const adminToken = localStorage.getItem('mesh-admin-token') || urlParams.get('token');
+  const isAdmin = !!adminToken;
+
+  async function adminAction(msgId, mode) {
+    if (!isAdmin) return;
+    if (mode === 'delete' && !confirm('Delete this message?')) return;
+    try {
+      const res = await fetch('/api/messages/' + msgId + '?room=' + encodeURIComponent(ROOM) + '&mode=' + mode + '&token=' + encodeURIComponent(adminToken), {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.ok) {
+        // Optimistic UI: remove or update local state
+        allMessages = allMessages.filter(m => m.id !== msgId);
+        renderMessages();
+      } else {
+        alert('Admin action failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert('Error: ' + e.message);
+    }
+  }
+
   // === Color system ===
   const agentColors = {};
   const palette = [
@@ -1003,6 +1046,132 @@
     } catch {}
   }
   setTimeout(syncDisplayName, 2000);
+
+  // === Google OAuth ===
+  // Env-gated: activated when GOOGLE_CLIENT_ID is set in Railway.
+  // Falls back gracefully to the existing name/email gate when disabled.
+  let googleAuthEnabled = false;
+  let googleClientId = null;
+  let currentGoogleUser = null;
+
+  async function initGoogleAuth() {
+    try {
+      const cfg = await api('/api/auth/config');
+      if (!cfg.google_oauth_enabled) return;
+      googleAuthEnabled = true;
+      googleClientId = cfg.client_id;
+
+      // Check for existing session
+      const existingToken = localStorage.getItem('mesh-google-session');
+      if (existingToken) {
+        try {
+          const meRes = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + existingToken } });
+          if (meRes.ok) {
+            const me = await meRes.json();
+            if (me.ok) {
+              currentGoogleUser = me.user;
+              senderInput.value = me.user.name;
+              localStorage.setItem('mesh-sender-name', me.user.name);
+              localStorage.setItem('mesh-user-seen', '1');
+              renderUserBadge(me.user);
+              return;
+            }
+          }
+        } catch {}
+        localStorage.removeItem('mesh-google-session');
+      }
+
+      // Show sign-in button
+      injectGoogleSignIn();
+    } catch {}
+  }
+
+  function renderUserBadge(user) {
+    const existing = document.getElementById('google-user-badge');
+    if (existing) existing.remove();
+    const badge = document.createElement('div');
+    badge.id = 'google-user-badge';
+    badge.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;';
+    badge.title = 'Click to sign out';
+    badge.innerHTML =
+      (user.picture ? '<img src="' + user.picture + '" style="width:22px;height:22px;border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\'" />' : '') +
+      '<span style="color:var(--text);font-weight:500;">' + esc(user.name) + '</span>';
+    badge.addEventListener('click', googleSignOut);
+    // Insert near sender input
+    const senderWrap = senderInput.closest('div') || senderInput.parentNode;
+    if (senderWrap && senderWrap.parentNode) {
+      senderWrap.parentNode.insertBefore(badge, senderWrap.nextSibling);
+    }
+    // Hide manual sender input when signed in
+    senderInput.style.display = 'none';
+  }
+
+  function injectGoogleSignIn() {
+    if (!googleClientId || document.getElementById('google-gsi-script')) return;
+    const script = document.createElement('script');
+    script.id = 'google-gsi-script';
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = function() {
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: handleGoogleCredential,
+        auto_select: false,
+      });
+      // Render a sign-in button below the sender input
+      const btn = document.createElement('div');
+      btn.id = 'google-signin-btn';
+      btn.style.cssText = 'margin-top:6px;';
+      const senderWrap = senderInput.closest('div') || senderInput.parentNode;
+      if (senderWrap && senderWrap.parentNode) {
+        senderWrap.parentNode.insertBefore(btn, senderWrap.nextSibling);
+      }
+      window.google.accounts.id.renderButton(btn, { theme: 'filled_black', size: 'medium', text: 'signin_with', shape: 'pill' });
+    };
+    document.head.appendChild(script);
+  }
+
+  async function handleGoogleCredential(response) {
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: response.credential }),
+      });
+      const data = await res.json();
+      if (!data.ok) { console.error('Google auth failed:', data); return; }
+      localStorage.setItem('mesh-google-session', data.session_token);
+      localStorage.setItem('mesh-sender-name', data.user.name);
+      localStorage.setItem('mesh-user-seen', '1');
+      currentGoogleUser = data.user;
+      senderInput.value = data.user.name;
+      document.getElementById('google-signin-btn')?.remove();
+      renderUserBadge(data.user);
+      // If there was a pending send, retry
+      if (window.__pendingGoogleSend) {
+        window.__pendingGoogleSend = false;
+        sendMessage();
+      }
+    } catch (e) { console.error('Google auth error:', e); }
+  }
+
+  async function googleSignOut() {
+    const token = localStorage.getItem('mesh-google-session');
+    if (token) {
+      fetch('/api/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } }).catch(() => {});
+      localStorage.removeItem('mesh-google-session');
+    }
+    currentGoogleUser = null;
+    senderInput.style.display = '';
+    senderInput.value = 'Viewer';
+    localStorage.removeItem('mesh-sender-name');
+    localStorage.removeItem('mesh-user-seen');
+    document.getElementById('google-user-badge')?.remove();
+    injectGoogleSignIn();
+  }
+
+  initGoogleAuth();
 
   // === Init room input ===
   roomInput.value = ROOM;
@@ -1339,11 +1508,67 @@
     });
   }
 
+  function showFirstSendGate(onConfirm) {
+    if (document.getElementById('first-send-modal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'first-send-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    modal.innerHTML =
+      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:400px;width:90%;">' +
+        '<h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">Who are you?</h2>' +
+        '<p style="color:var(--text2);font-size:14px;margin-bottom:20px;">Enter your name and email to send messages. No spam.</p>' +
+        '<input id="gate-name" type="text" placeholder="Your name" style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;margin-bottom:10px;outline:none;" />' +
+        '<input id="gate-email" type="email" placeholder="Email address (optional)" style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;margin-bottom:16px;outline:none;" />' +
+        '<button id="gate-submit" style="width:100%;padding:11px;background:var(--text);color:var(--bg);border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Send message</button>' +
+      '</div>';
+    document.body.appendChild(modal);
+    const nameInput = modal.querySelector('#gate-name');
+    nameInput.focus();
+    modal.querySelector('#gate-submit').addEventListener('click', async function() {
+      const n = modal.querySelector('#gate-name').value.trim();
+      const e = modal.querySelector('#gate-email').value.trim();
+      if (!n) { modal.querySelector('#gate-name').focus(); return; }
+      localStorage.setItem('mesh-sender-name', n);
+      localStorage.setItem('mesh-user-seen', '1');
+      senderInput.value = n;
+      if (e) {
+        localStorage.setItem('mesh-user-email', e);
+        fetch('/api/waitlist', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: e, use_case: 'dashboard' }) }).catch(() => {});
+      }
+      modal.remove();
+      onConfirm(n);
+    });
+    modal.querySelector('#gate-email').addEventListener('keydown', function(ev) {
+      if (ev.key === 'Enter') modal.querySelector('#gate-submit').click();
+    });
+    modal.querySelector('#gate-name').addEventListener('keydown', function(ev) {
+      if (ev.key === 'Enter') modal.querySelector('#gate-email').focus();
+    });
+  }
+
   async function sendMessage() {
     const name = senderInput.value.trim() || VIEWER_DEFAULT;
     const msg = msgInput.value.trim();
     const type = msgTypeSelect.value;
     if (!msg) return;
+
+    // Soft gate: first-time senders who haven't identified themselves
+    const isViewer = name === VIEWER_DEFAULT || name === 'Viewer';
+    const hasSeen = localStorage.getItem('mesh-user-seen');
+    if (isViewer && !hasSeen) {
+      if (googleAuthEnabled && !currentGoogleUser) {
+        // Prefer Google sign-in when OAuth is enabled
+        window.__pendingGoogleSend = true;
+        window.google?.accounts.id.prompt();
+        return;
+      }
+      showFirstSendGate(function(confirmedName) {
+        // Re-invoke sendMessage now that name is set
+        sendMessage();
+      });
+      return;
+    }
+
     // Persist sender name
     localStorage.setItem('mesh-sender-name', name);
 
@@ -1409,6 +1634,15 @@
         html += '<span class="msg-type-badge ' + esc(typeClass) + '">' + esc(type) + '</span>';
       }
       html += '<span class="msg-time">' + esc(time) + '</span>';
+
+      // Admin actions
+      if (isAdmin && !isSystem) {
+        html += '<div class="msg-admin-actions">';
+        html += '<button class="msg-btn redact" onclick="adminAction(\'' + m.id + '\', \'redact\')" title="Redact content">Redact</button>';
+        html += '<button class="msg-btn delete" onclick="adminAction(\'' + m.id + '\', \'delete\')" title="Delete message">Delete</button>';
+        html += '</div>';
+      }
+
       html += '</div>';
 
       html += '<div class="msg-body">' + formatContent(content, viewerName) + '</div>';

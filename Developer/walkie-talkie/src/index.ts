@@ -5,6 +5,7 @@ import { cors } from "hono/cors";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
+import crypto from "node:crypto";
 import {
   createRoom,
   joinRoom,
@@ -100,6 +101,16 @@ import {
   getRoomPasswordHash,
   getGrowthMetrics,
   getPublicRoomActivity,
+  upsertGoogleAccount,
+  createGoogleSession,
+  getAccountBySession,
+  deleteGoogleSession,
+  cleanExpiredSessions,
+  upsertSubscription,
+  getSubscriptionByEmail,
+  getSubscriptionByRoom,
+  cancelSubscription,
+  getSubscriptionStats,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -118,7 +129,7 @@ import {
 
 const app = new Hono();
 const startTime = Date.now();
-const VERSION = "2.4.0";
+const VERSION = "2.6.0";
 
 // Agents that should never trigger join notifications (viewers, sentinels, system)
 const SYSTEM_AGENT_NAMES = new Set(["Scout", "Pulse", "Archie", "system"]);
@@ -1643,6 +1654,170 @@ app.get("/analytics", async (c) => {
   }
 });
 
+// ── Google OAuth ──────────────────────────────────────────────────────────────
+// Activated when GOOGLE_CLIENT_ID env var is set.
+// Verification: calls Google's tokeninfo endpoint (no client secret needed).
+
+// GET /api/auth/config — let the frontend know if Google OAuth is enabled
+app.get("/api/auth/config", (c) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  return c.json({ google_oauth_enabled: !!clientId, client_id: clientId || null });
+});
+
+// POST /api/auth/google  body: { id_token: "..." }
+app.post("/api/auth/google", async (c) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) return c.json({ error: "google_oauth_disabled", detail: "GOOGLE_CLIENT_ID not configured" }, 503);
+
+  const body = await c.req.json().catch(() => ({})) as any;
+  const idToken = body.id_token;
+  if (!idToken) return c.json({ error: "missing_id_token" }, 400);
+
+  // Verify token with Google — no client secret needed for tokeninfo endpoint
+  const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
+  if (!verifyRes.ok) return c.json({ error: "invalid_token", detail: "Google rejected the ID token" }, 401);
+  const payload = await verifyRes.json() as any;
+
+  // Verify audience matches our client ID
+  if (payload.aud !== clientId) return c.json({ error: "token_audience_mismatch" }, 401);
+  if (!payload.email_verified || payload.email_verified === "false") return c.json({ error: "email_not_verified" }, 401);
+
+  const account = upsertGoogleAccount({
+    google_id: payload.sub,
+    email: payload.email,
+    name: payload.name || payload.email.split("@")[0],
+    picture: payload.picture || "",
+  });
+
+  const sessionToken = createGoogleSession(payload.sub);
+  return c.json({ ok: true, session_token: sessionToken, user: account });
+});
+
+// GET /api/auth/me  header: Authorization: Bearer <session_token>
+app.get("/api/auth/me", (c) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) return c.json({ enabled: false });
+
+  const auth = c.req.header("Authorization") || "";
+  const token = auth.replace(/^Bearer /, "").trim() || c.req.query("session_token") || "";
+  if (!token) return c.json({ error: "no_session" }, 401);
+
+  const account = getAccountBySession(token);
+  if (!account) return c.json({ error: "invalid_session" }, 401);
+  return c.json({ ok: true, user: account });
+});
+
+// POST /api/auth/logout  header: Authorization: Bearer <session_token>
+app.post("/api/auth/logout", async (c) => {
+  const auth = c.req.header("Authorization") || "";
+  const token = auth.replace(/^Bearer /, "").trim();
+  if (token) deleteGoogleSession(token);
+  return c.json({ ok: true });
+});
+
+// ── Stripe Billing ────────────────────────────────────────────────────────────
+// Activated when STRIPE_WEBHOOK_SECRET is set in Railway.
+// Payment links (STRIPE_PRO_LINK / STRIPE_TEAM_LINK) are set separately.
+//
+// Webhook setup: in Stripe Dashboard → Webhooks → Add endpoint:
+//   https://trymesh.chat/api/billing/webhook
+//   Events: checkout.session.completed, customer.subscription.deleted, customer.subscription.updated
+
+// POST /api/billing/webhook — receives Stripe events
+app.post("/api/billing/webhook", async (c) => {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) return c.json({ error: "stripe_not_configured" }, 503);
+
+  const rawBody = await c.req.text();
+  const sig = c.req.header("stripe-signature") || "";
+
+  // Verify webhook signature using HMAC-SHA256
+  // Stripe sig format: t=timestamp,v1=hash
+  let verified = false;
+  try {
+    const parts = sig.split(",");
+    const tPart = parts.find(p => p.startsWith("t="));
+    const v1Part = parts.find(p => p.startsWith("v1="));
+    if (tPart && v1Part) {
+      const t = tPart.slice(2);
+      const expectedSig = v1Part.slice(3);
+      const payload = `${t}.${rawBody}`;
+      const hmac = crypto.createHmac("sha256", webhookSecret).update(payload).digest("hex");
+      verified = hmac === expectedSig;
+    }
+  } catch {}
+
+  if (!verified) return c.json({ error: "invalid_signature" }, 401);
+
+  let event: any;
+  try { event = JSON.parse(rawBody); } catch { return c.json({ error: "invalid_json" }, 400); }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const email = session.customer_details?.email || session.customer_email || "";
+    const customerId = session.customer || "";
+    const subscriptionId = session.subscription || null;
+    // Detect plan from metadata or price — default to pro
+    const plan = session.metadata?.plan || (session.amount_total >= 9900 ? "team" : "pro");
+
+    if (email && customerId) {
+      upsertSubscription({
+        stripe_subscription_id: subscriptionId,
+        stripe_customer_id: customerId,
+        email,
+        plan,
+        status: "active",
+        room_code: session.metadata?.room_code || null,
+        current_period_end: null,
+      });
+      console.log(`[billing] New ${plan} subscription: ${email}`);
+    }
+  } else if (event.type === "customer.subscription.updated") {
+    const sub = event.data.object;
+    const status = sub.status === "active" ? "active" : "cancelled";
+    if (sub.id) {
+      upsertSubscription({
+        stripe_subscription_id: sub.id,
+        stripe_customer_id: sub.customer,
+        email: sub.metadata?.email || "",
+        plan: sub.metadata?.plan || "pro",
+        status,
+        room_code: sub.metadata?.room_code || null,
+        current_period_end: sub.current_period_end ? sub.current_period_end * 1000 : null,
+      });
+    }
+  } else if (event.type === "customer.subscription.deleted") {
+    const sub = event.data.object;
+    if (sub.id) cancelSubscription(sub.id);
+    console.log(`[billing] Subscription cancelled: ${sub.id}`);
+  }
+
+  return c.json({ received: true });
+});
+
+// GET /api/billing/status?email=... or ?room=... — check subscription status
+app.get("/api/billing/status", (c) => {
+  const email = c.req.query("email");
+  const roomCode = c.req.query("room");
+  if (email) {
+    const sub = getSubscriptionByEmail(email);
+    return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none" });
+  }
+  if (roomCode) {
+    const sub = getSubscriptionByRoom(roomCode);
+    return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none" });
+  }
+  return c.json({ error: "provide email or room param" }, 400);
+});
+
+// GET /api/billing/stats — admin only, subscription counts
+app.get("/api/billing/stats", (c) => {
+  const secret = c.req.header("x-mesh-secret") || c.req.query("secret");
+  const ADMIN_CLAIM_SECRET = process.env.ADMIN_CLAIM_SECRET;
+  if (!ADMIN_CLAIM_SECRET || secret !== ADMIN_CLAIM_SECRET) return c.json({ error: "unauthorized" }, 401);
+  return c.json(getSubscriptionStats());
+});
+
 // YC Pitch page
 app.get("/pitch", async (c) => {
   try {
@@ -1661,7 +1836,7 @@ app.get("/pricing", async (c) => {
     const proLink  = process.env.STRIPE_PRO_LINK;
     const teamLink = process.env.STRIPE_TEAM_LINK;
     if (proLink)  html = html.replace('href="/waitlist" class="btn btn-accent"', `href="${proLink}" class="btn btn-accent" target="_blank" rel="noopener"`);
-    if (teamLink) html = html.replace('href="mailto:founders@mesh.com" class="btn btn-secondary"', `href="${teamLink}" class="btn btn-secondary" target="_blank" rel="noopener"`);
+    if (teamLink) html = html.replace('href="mailto:founders@trymesh.chat" class="btn btn-secondary"', `href="${teamLink}" class="btn btn-secondary" target="_blank" rel="noopener"`);
     return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
   } catch {
     return c.redirect("/");
