@@ -118,7 +118,7 @@ import {
 
 const app = new Hono();
 const startTime = Date.now();
-const VERSION = "2.3.0";
+const VERSION = "2.4.0";
 
 // Track active SSE connections
 let activeConnections = 0;
@@ -796,11 +796,16 @@ app.post("/api/heartbeat", async (c) => {
   // Enforce creator role for known creators
   if (CREATORS.has(name)) role = "creator";
 
-  // Emit join notification when agent comes online from offline (or first time)
-  const existing = getRoomPresence(room).find(a => a.agent_name === name);
-  const wasOffline = !existing || existing.last_heartbeat < Date.now() - 300_000;
-  if (wasOffline) {
-    appendMessage(room, "system", `→ ${name} joined`, null, "SYSTEM");
+  // Emit join notification when a real agent comes online from offline (skip viewers/sentinels)
+  const SENTINEL_NAMES = new Set(["Scout", "Pulse", "Archie"]);
+  const isSystemAgent = name.endsWith("-viewer") || name.startsWith("Viewer") || name === "system"
+    || SENTINEL_NAMES.has(name) || name.includes("synthetic") || name.includes("anti-");
+  if (!isSystemAgent) {
+    const existing = getRoomPresence(room).find(a => a.agent_name === name);
+    const wasOffline = !existing || existing.last_heartbeat < Date.now() - 300_000;
+    if (wasOffline) {
+      appendMessage(room, "system", `→ ${name} joined`, null, "SYSTEM");
+    }
   }
 
   updatePresence(room, name, "online", hostname, role, parentAgent);
