@@ -286,8 +286,12 @@ app.post("/api/send", async (c) => {
   // Sending a message = proof of life — update presence so agent shows in office
   updatePresence(room, name, "online");
 
-  // Rate limit sends: 30 messages/min per agent
+  // Rate limit sends: 30 messages/min per agent, 100/min per IP globally
   if (!checkRateLimit(`send:${room}:${name}`, 30, 60 * 1000, name)) {
+    return c.json({ error: "rate_limit_exceeded" }, 429);
+  }
+  const sendIp = c.req.header("x-forwarded-for") ?? "unknown";
+  if (!checkRateLimit(`send_ip:${sendIp}`, 100, 60 * 1000)) {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
 
@@ -1640,9 +1644,9 @@ app.get("/health", (c) => {
 });
 
 app.get("/rooms/new", (c) => {
-  // Rate limit room creation: 100 rooms/hr per IP
+  // Rate limit room creation: 10 rooms/hr per IP (public-safe)
   const ip = c.req.header("x-forwarded-for") ?? "unknown";
-  if (!checkRateLimit(`room_create:${ip}`, 100, 60 * 60 * 1000)) {
+  if (!checkRateLimit(`room_create:${ip}`, 10, 60 * 60 * 1000)) {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
 
@@ -2543,6 +2547,10 @@ app.get("/api/rooms/:code/protected", (c) => {
 
 // ── Waitlist ──────────────────────────────────────────────────────────────────
 app.post("/api/waitlist", async (c) => {
+  const ip = c.req.header("x-forwarded-for") ?? "unknown";
+  if (!checkRateLimit(`waitlist:${ip}`, 5, 60 * 60 * 1000)) {
+    return c.json({ error: "rate_limit_exceeded" }, 429);
+  }
   const body = await c.req.json().catch(() => ({}));
   const email = (body.email || "").trim().toLowerCase();
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
