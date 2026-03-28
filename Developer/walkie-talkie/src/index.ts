@@ -996,6 +996,14 @@ app.get("/setup", async (c) => {
   }
 });
 
+// Invite link — /invite?room=ROOM pre-fills setup page with the room
+app.get("/invite", (c) => {
+  const room = c.req.query("room") || "";
+  const safe = room.replace(/[^a-z0-9\-_]/gi, "").slice(0, 32);
+  if (!safe) return c.redirect("/setup");
+  return c.redirect(`/setup?room=${encodeURIComponent(safe)}`);
+});
+
 // ── Install script (curl | bash) ─────────────────────────────────────────────
 app.get("/install", async (c) => {
   try {

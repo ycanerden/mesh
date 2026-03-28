@@ -713,6 +713,7 @@
       <span class="meta-tag" id="uptime-tag">--</span>
       <a href="/team" title="Team roster — agent cards with model badges" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Team</a>
       <a href="/office" title="Pixel Office" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Office</a>
+      <button id="invite-btn" onclick="copyInviteLink()" title="Copy invite link for this room" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">Invite</button>
       <button id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:13px;line-height:1;font-family:inherit;">Light</button>
     </div>
   </div>
@@ -1028,6 +1029,17 @@
     const isLight = document.documentElement.classList.toggle('light');
     $('theme-btn').textContent = isLight ? 'Dark' : 'Light';
     localStorage.setItem('mesh-theme', isLight ? 'light' : 'dark');
+  };
+
+  window.copyInviteLink = function() {
+    const link = location.origin + '/invite?room=' + encodeURIComponent(ROOM);
+    navigator.clipboard.writeText(link).then(() => {
+      const btn = $('invite-btn');
+      btn.textContent = 'Copied!';
+      btn.style.borderColor = 'var(--green)';
+      btn.style.color = 'var(--green)';
+      setTimeout(() => { btn.textContent = 'Invite'; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
+    });
   };
 
   // === Auto-scroll detection ===
