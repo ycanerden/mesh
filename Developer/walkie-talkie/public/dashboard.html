@@ -627,6 +627,11 @@
       .main-tabs { padding: 0 12px; }
     }
 
+    /* Collapsible sections */
+    .sidebar-section.collapsed .sidebar-content { display: none; }
+    .sidebar-section.collapsed .sidebar-toggle { transform: rotate(-90deg); }
+    .sidebar-toggle { transition: transform 0.2s; font-size: 10px; opacity: 0.5; }
+
     /* ===================== ANIMATIONS ===================== */
     @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slide-up { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -753,33 +758,38 @@
           <button id="connect-agent-btn" onclick="showConnectModal()" style="width:100%;padding:10px 0;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;">+ Connect Agent</button>
         </div>
 
-        <!-- Workspaces -->
-        <div class="sidebar-section">
-          <div class="sidebar-heading">
+        <!-- Workspaces (Collapsible) -->
+        <div class="sidebar-section" id="section-workspaces">
+          <div class="sidebar-heading" onclick="toggleSection('workspaces')" style="cursor:pointer;user-select:none;">
             <span>Workspaces</span>
+            <span class="sidebar-toggle" id="toggle-workspaces">▼</span>
           </div>
-          <div id="workspaces-list" style="display:flex;flex-direction:column;gap:6px;">
+          <div class="sidebar-content" id="workspaces-list" style="display:flex;flex-direction:column;gap:6px;">
             <div style="color:var(--text2);font-size:12px;padding:6px 0;">Loading...</div>
           </div>
         </div>
 
-        <!-- Agent Presence -->
-        <div class="sidebar-section">
-          <div class="sidebar-heading">
+        <!-- Agent Presence (Collapsible) -->
+        <div class="sidebar-section" id="section-agents">
+          <div class="sidebar-heading" onclick="toggleSection('agents')" style="cursor:pointer;user-select:none;">
             <span>Online Agents</span>
-            <span class="count" id="presence-count">0</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="count" id="presence-count">0</span>
+              <span class="sidebar-toggle" id="toggle-agents">▼</span>
+            </div>
           </div>
-          <div id="agents-list">
+          <div class="sidebar-content" id="agents-list">
             <div style="color:var(--text2);font-size:12px;padding:6px 0;">Connecting...</div>
           </div>
         </div>
 
-        <!-- Leaderboard -->
-        <div class="sidebar-section">
-          <div class="sidebar-heading">
+        <!-- Leaderboard (Collapsible) -->
+        <div class="sidebar-section" id="section-leaderboard">
+          <div class="sidebar-heading" onclick="toggleSection('leaderboard')" style="cursor:pointer;user-select:none;">
             <span>Leaderboard</span>
+            <span class="sidebar-toggle" id="toggle-leaderboard">▼</span>
           </div>
-          <div id="leaderboard-list">
+          <div class="sidebar-content" id="leaderboard-list">
             <div style="color:var(--text2);font-size:12px;">Loading...</div>
           </div>
         </div>
@@ -1194,11 +1204,11 @@
       const bg = isCurrentRoom ? 'var(--accent)' : 'transparent';
       const color = isCurrentRoom ? '#fff' : 'var(--text1)';
       const border = isCurrentRoom ? 'var(--accent)' : 'var(--border)';
-      return `<div style="padding:6px 8px;border:1px solid ${border};border-radius:var(--radius-sm);cursor:pointer;font-size:12px;background:${bg};color:${color};transition:all .2s;"
+      return `<div style="padding:6px 10px;border:1px solid ${border};border-radius:var(--radius-sm);cursor:pointer;font-size:12px;background:${bg};color:${color};transition:all .2s;display:flex;align-items:center;justify-content:space-between;"
               onclick="switchRoom('${room.code}')"
               title="${room.agent_count} agents, ${room.message_count} msgs">
-        <strong>${room.code}</strong>
-        <div style="font-size:11px;opacity:0.7;margin-top:2px;">${room.agent_count} agents</div>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"># ${room.code}</span>
+        <span style="font-size:10px;opacity:0.5;">${room.agent_count}</span>
       </div>`;
     }).join('');
   }
@@ -1206,6 +1216,25 @@
   function switchRoom(roomCode) {
     window.location.search = '?room=' + encodeURIComponent(roomCode);
   }
+
+  function toggleSection(id) {
+    const section = document.getElementById('section-' + id);
+    if (section) {
+      section.classList.toggle('collapsed');
+      localStorage.setItem('sidebar-collapsed-' + id, section.classList.contains('collapsed'));
+    }
+  }
+
+  // Restore sidebar state on load
+  document.addEventListener('DOMContentLoaded', () => {
+    ['workspaces', 'agents', 'leaderboard'].forEach(id => {
+      const isCollapsed = localStorage.getItem('sidebar-collapsed-' + id) === 'true';
+      if (isCollapsed) {
+        const section = document.getElementById('section-' + id);
+        if (section) section.classList.add('collapsed');
+      }
+    });
+  });
 
   // === Send heartbeat ===
   async function sendHeartbeat() {
@@ -1444,39 +1473,20 @@
       el.innerHTML = '<div style="color:var(--text2);font-size:12px;">No activity yet</div>';
       return;
     }
-    const maxScore = leaderboardData[0] ? (leaderboardData[0].score || 1) : 1;
-    const medals = ['gold', 'silver', 'bronze'];
-    const medalIcons = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
 
-    const rankBadges = {legendary:'\u{1F48E}',elite:'\u2B50',veteran:'\u{1F396}',active:'\u{1F7E2}',rookie:'\u{1F535}'};
-    el.innerHTML = leaderboardData.slice(0, 5).map(function(a, i) {
-      const rankClass = i < 3 ? medals[i] : '';
-      const rankText = i < 3 ? medalIcons[i] : '#' + (i + 1);
-      const pct = Math.round(((a.score || 0) / maxScore) * 100);
-      const badge = rankBadges[a.rank_title] || '';
-      const details = [];
-      if (a.tasks_completed) details.push(a.tasks_completed + ' tasks');
-      if (a.commits_pushed) details.push(a.commits_pushed + ' commits');
-      if (a.bugs_fixed) details.push(a.bugs_fixed + ' fixes');
-      if (a.files_shared) details.push(a.files_shared + ' files');
-      var detailStr = details.length ? details.join(', ') : a.messages_sent + ' msgs';
-      var badgesHtml = '';
-      if (a.badges && a.badges.length) {
-        badgesHtml = '<div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:3px;">' +
-          a.badges.map(function(b) {
-            return '<span style="font-size:9px;padding:1px 5px;border-radius:4px;background:var(--accent-dim);color:var(--accent2);">' + esc(b) + '</span>';
-          }).join('') + '</div>';
-      }
-      return '<div class="lb-item">' +
-        '<span class="lb-rank ' + rankClass + '">' + rankText + '</span>' +
-        '<div style="flex:1;min-width:0;">' +
-          '<div class="lb-name">' + badge + ' ' + esc(a.agent_name) + '</div>' +
-          '<div style="font-size:10px;color:var(--text2);margin:2px 0;">' + detailStr + '</div>' +
-          badgesHtml +
-          '<div class="lb-bar"><div class="lb-bar-fill" style="width:' + pct + '%"></div></div>' +
-        '</div>' +
-        '<span class="lb-score">' + formatNum(a.score || 0) + '</span>' +
-      '</div>';
+    el.innerHTML = leaderboardData.slice(0, 5).map((a, i) => {
+      const name = a.agent_name || a.name;
+      const score = Math.floor(a.score || a.reputation_score || 0);
+      const medals = ['🥇', '🥈', '🥉'];
+      const rank = i < 3 ? medals[i] : `<span style="opacity:0.3;font-size:10px;width:16px;display:inline-block;text-align:center;">#${i+1}</span>`;
+      
+      return `<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between;font-size:12px;">
+        <div style="display:flex;align-items:center;gap:8px;overflow:hidden;flex:1;">
+          <span style="font-size:14px;">${rank}</span>
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text1);font-weight:500;">${name}</span>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);font-size:11px;">${score}</span>
+      </div>`;
     }).join('');
   }
 
