@@ -174,12 +174,20 @@ fetch('/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},
 .then(r=>{if(r.ok){location.href='${redirectTo}'}else{document.getElementById('err').style.display='block'}});return false;}</script></body></html>`;
 }
 
+// Derive a session token from the password itself so no state is needed
+function makeAdminToken(): string {
+  // HMAC-like: hash of (ADMIN_PASSWORD + secret salt) — forgeable only if you know ADMIN_PASSWORD
+  const raw = `mesh-admin-v1:${ADMIN_PASSWORD}:${process.env.ADMIN_SALT || "mesh-default-salt"}`;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < raw.length; i++) { h ^= raw.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  return h.toString(16).padStart(8, "0") + Buffer.from(ADMIN_PASSWORD).toString("base64").slice(0, 16);
+}
+
 app.post("/admin-login", async (c) => {
   if (!ADMIN_PASSWORD) return c.json({ error: "ADMIN_PASSWORD not configured" }, 503);
   const { password } = await c.req.json().catch(() => ({ password: "" }));
   if (password !== ADMIN_PASSWORD) return c.json({ error: "wrong password" }, 401);
-  // Set a signed cookie that lasts 24 hours
-  const token = Buffer.from(`mesh-admin:${Date.now()}`).toString("base64");
+  const token = makeAdminToken();
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,
     headers: {
@@ -195,9 +203,10 @@ app.use("*", async (c, next) => {
   const path = new URL(c.req.url).pathname;
   if (!ADMIN_PAGES.some(p => path === p || path.startsWith(p + "?"))) { await next(); return; }
   const cookie = c.req.header("cookie") || "";
-  const hasAdmin = cookie.includes("mesh_admin=");
-  if (hasAdmin) { await next(); return; }
-  // Show login page
+  // Verify the cookie value matches the expected token (not just presence)
+  const expectedToken = makeAdminToken();
+  const match = cookie.match(/mesh_admin=([^;]+)/);
+  if (match && match[1] === expectedToken) { await next(); return; }
   return new Response(getAdminLoginPage(path), { headers: { "Content-Type": "text/html; charset=utf-8" } });
 });
 
