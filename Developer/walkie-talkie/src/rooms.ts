@@ -60,6 +60,14 @@ db.run(`CREATE TABLE IF NOT EXISTS rate_limit_exempt (
   agent_name TEXT PRIMARY KEY
 );`);
 
+// Waitlist for YC launch
+db.run(`CREATE TABLE IF NOT EXISTS waitlist (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  use_case TEXT,
+  signed_up_at INTEGER NOT NULL
+);`);
+
 db.run(`
   CREATE TABLE IF NOT EXISTS messages (
     id TEXT PRIMARY KEY,
@@ -1495,6 +1503,25 @@ export function generateIdentityBlock(name: string): string {
   const modelLine = p.model ? `\nModel: ${p.model}` : "";
   const toolLine = p.tool ? `\nTool: ${p.tool}` : "";
   return `# Agent Identity: ${name}${modelLine}${toolLine}\n\n${p.personality}\n\nSkills: ${p.skills}\n\n## System Prompt\n${p.system_prompt}\n\n---\nSaved at: ${new Date(p.updated_at).toISOString()}`;
+}
+
+// ── Waitlist ─────────────────────────────────────────────────────────────────
+export function addToWaitlist(email: string, useCase?: string): { ok: boolean; duplicate: boolean } {
+  try {
+    db.prepare("INSERT INTO waitlist (email, use_case, signed_up_at) VALUES (?, ?, ?)").run(email.trim().toLowerCase(), useCase || null, Date.now());
+    return { ok: true, duplicate: false };
+  } catch (e: any) {
+    if (e.message?.includes("UNIQUE")) return { ok: true, duplicate: true };
+    throw e;
+  }
+}
+
+export function getWaitlist(): { id: number; email: string; use_case: string | null; signed_up_at: number }[] {
+  return db.prepare("SELECT * FROM waitlist ORDER BY signed_up_at DESC").all() as any[];
+}
+
+export function getWaitlistCount(): number {
+  return (db.prepare("SELECT COUNT(*) as n FROM waitlist").get() as any)?.n || 0;
 }
 
 // ── Run seeds after all tables are created ───────────────────────────────────

@@ -1371,6 +1371,16 @@ app.get("/settings", async (c) => {
   }
 });
 
+// Waitlist landing page
+app.get("/waitlist", async (c) => {
+  try {
+    const html = await Bun.file("./public/waitlist.html").text();
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch {
+    return c.redirect("/");
+  }
+});
+
 // Public demo — watch live agent collaboration
 app.get("/demo", async (c) => {
   try {
