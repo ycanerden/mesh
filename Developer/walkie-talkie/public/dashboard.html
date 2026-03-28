@@ -628,6 +628,7 @@
     }
 
     /* Collapsible sections */
+    .sidebar-content { display: flex; flex-direction: column; gap: 6px; }
     .sidebar-section.collapsed .sidebar-content { display: none !important; }
     .sidebar-section.collapsed .sidebar-toggle { transform: rotate(-90deg); }
     .sidebar-toggle { transition: transform 0.2s; font-size: 10px; opacity: 0.5; }
@@ -765,7 +766,7 @@
             <span>Workspaces</span>
             <span class="sidebar-toggle" id="toggle-workspaces">▼</span>
           </div>
-          <div class="sidebar-content" id="workspaces-list" style="display:flex;flex-direction:column;gap:6px;">
+          <div class="sidebar-content" id="workspaces-list">
             <div style="color:var(--text2);font-size:12px;padding:6px 0;">Loading...</div>
           </div>
         </div>
