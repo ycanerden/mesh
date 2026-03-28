@@ -353,6 +353,11 @@ async function telegramApiCall(token: string, method: string, body: any, maxRetr
   return { ok: false, error: "max_retries_exceeded" };
 }
 
+// Escape special HTML chars for Telegram HTML parse_mode
+function tgEscape(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 // Helper: send a Telegram message to a room's configured chat
 async function sendTelegramMessage(roomCode: string, text: string): Promise<{ ok: boolean; error?: string }> {
   const { token, chatId } = getTelegramConfig(roomCode);
@@ -400,7 +405,7 @@ app.post("/api/decisions", async (c) => {
 
     // Notify via Telegram — rate limited to 10/hour to prevent spam
     if (canSendTelegram(room)) {
-      const tgText = `🚨 *DECISION NEEDED* — ${room}\n\n${description}\n\nReply with:\n/approve ${decision.id}\n/reject ${decision.id}\n/hold ${decision.id}`;
+      const tgText = `🚨 <b>DECISION NEEDED</b> — ${tgEscape(room)}\n\n${tgEscape(description)}\n\nReply with:\n/approve ${decision.id}\n/reject ${decision.id}\n/hold ${decision.id}`;
       await sendTelegramMessage(room, tgText);
     }
 
@@ -919,9 +924,9 @@ app.post("/api/webhook/telegram/:code", async (c) => {
         const emoji = { approved: "✅", rejected: "❌", hold: "⏸️" }[status];
         const roomMsg = `${emoji} DECISION ${status.toUpperCase()} by ${from} (via Telegram):\n${decision.description}`;
         appendMessage(code, `${from} (Telegram)`, roomMsg, undefined, "RESOLUTION");
-        await sendTelegramMessage(code, `${emoji} Got it — decision *${status}*.\n${decision.description}`);
+        await sendTelegramMessage(code, `${emoji} Got it — decision <b>${tgEscape(status)}</b>.\n${tgEscape(decision.description)}`);
       } else {
-        await sendTelegramMessage(code, `⚠️ Decision \`${decisionId}\` not found or already resolved.`);
+        await sendTelegramMessage(code, `⚠️ Decision <code>${tgEscape(decisionId)}</code> not found or already resolved.`);
       }
       return c.json({ ok: true });
     }
