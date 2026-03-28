@@ -266,7 +266,10 @@ app.post("/api/send", async (c) => {
     const reqStart = Date.now();
     // Use display_name if set so senders appear with their chosen name
     const displayName = getDisplayName(room, name);
-    const result = appendMessage(room, displayName, message, to, type || "BROADCAST", reply_to);
+    // Sanitize type: block DECISION/RESOLUTION from /api/send (only /api/decisions creates those)
+    const rawType = (type || "BROADCAST").toUpperCase();
+    const safeType = (rawType === "DECISION" || rawType === "RESOLUTION") ? "BROADCAST" : rawType;
+    const result = appendMessage(room, displayName, message, to, safeType, reply_to);
     trackMetric("api_request", room!, name!, Date.now() - reqStart);
     trackAgentActivity(name!, "message");
     return c.json(result);
