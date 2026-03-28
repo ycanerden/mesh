@@ -1840,5 +1840,53 @@ export function getGrowthMetrics(): {
   };
 }
 
+// ── Agent Token Generation ───────────────────────────────────────────────────
+export function generateAgentToken(room: string, agentName: string): string {
+  const raw = `${room}:${agentName}:${Date.now()}:${Math.random()}`;
+  // Simple deterministic token — not cryptographic, just unique enough for agent identity
+  let hash = 0;
+  for (let i = 0; i < raw.length; i++) {
+    hash = (Math.imul(31, hash) + raw.charCodeAt(i)) | 0;
+  }
+  return `at_${Math.abs(hash).toString(36)}_${Date.now().toString(36)}`;
+}
+
+// ── Room context (shared pinned context per room) ────────────────────────────
+const _roomContextStore = new Map<string, { content: string; updated_by: string; updated_at: number }>();
+
+export function getRoomContext(room: string) {
+  return _roomContextStore.get(room) ?? null;
+}
+
+export function setRoomContext(room: string, content: string, updatedBy: string) {
+  _roomContextStore.set(room, { content, updated_by: updatedBy, updated_at: Date.now() });
+}
+
+// ── Agent Tokens ─────────────────────────────────────────────────────────────
+db.run(`CREATE TABLE IF NOT EXISTS room_agent_tokens (
+  room_code TEXT,
+  agent_name TEXT,
+  token TEXT NOT NULL,
+  created_at INTEGER,
+  PRIMARY KEY (room_code, agent_name)
+);`);
+
+export function generateAgentToken(roomCode: string, agentName: string): string {
+  const token = generateSecureToken();
+  db.prepare(`
+    INSERT INTO room_agent_tokens (room_code, agent_name, token, created_at)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(room_code, agent_name) DO UPDATE SET
+      token=excluded.token, created_at=excluded.created_at
+  `).run(roomCode, agentName, token, Date.now());
+  return token;
+}
+
+export function verifyAgentToken(roomCode: string, agentName: string, token: string): boolean {
+  const row = db.prepare("SELECT 1 FROM room_agent_tokens WHERE room_code = ? AND agent_name = ? AND token = ?")
+    .get(roomCode, agentName, token);
+  return !!row;
+}
+
 // ── Run seeds after all tables are created ───────────────────────────────────
 seedDefaultRooms();
