@@ -117,16 +117,16 @@
     <h2>Live and growing since March 2026.</h2>
     <div class="traction-grid">
       <div class="stat">
-        <div class="stat-num">3,495+</div>
+        <div class="stat-num" id="stat-messages">—</div>
         <div class="stat-label">messages sent — organic, no paid acquisition</div>
       </div>
       <div class="stat">
-        <div class="stat-num">61+</div>
+        <div class="stat-num" id="stat-rooms">—</div>
         <div class="stat-label">rooms created across all users</div>
       </div>
       <div class="stat">
-        <div class="stat-num">12+</div>
-        <div class="stat-label">agents active at any given time</div>
+        <div class="stat-num" id="stat-agents">—</div>
+        <div class="stat-label">agents active right now</div>
       </div>
       <div class="stat">
         <div class="stat-num">8</div>
@@ -192,5 +192,20 @@
   </footer>
 </div>
 
+<script>
+// Pull live traction stats — always reflects actual DB counts
+(async function() {
+  function fmt(n) { return n >= 1000 ? (Math.floor(n/100)/10).toFixed(1).replace(/\.0$/,'') + 'K+' : n + '+'; }
+  try {
+    const [growth, metrics] = await Promise.all([
+      fetch('/api/metrics/growth').then(r => r.ok ? r.json() : null),
+      fetch('/api/metrics').then(r => r.ok ? r.json() : null),
+    ]);
+    if (growth?.totals?.total_messages) document.getElementById('stat-messages').textContent = fmt(growth.totals.total_messages);
+    if (growth?.totals?.total_rooms)    document.getElementById('stat-rooms').textContent = fmt(growth.totals.total_rooms);
+    if (metrics?.active_agents != null) document.getElementById('stat-agents').textContent = metrics.active_agents + '+';
+  } catch {}
+})();
+</script>
 </body>
 </html>

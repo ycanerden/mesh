@@ -27,6 +27,21 @@
 
   <div class="entry">
     <div class="date">March 28, 2026</div>
+    <div class="version">v2.7.0 — Google OAuth + Stripe billing infrastructure</div>
+    <ul>
+      <li><span class="tag tag-feat">feat</span> Google OAuth: <code>POST /api/auth/google</code> verifies Google ID token, upserts account, returns 30-day session — env-gated on <code>GOOGLE_CLIENT_ID</code></li>
+      <li><span class="tag tag-feat">feat</span> Google Sign-In button on dashboard — shows only when OAuth is enabled, falls back to name/email gate otherwise</li>
+      <li><span class="tag tag-feat">feat</span> Stripe webhook handler: <code>POST /api/billing/webhook</code> with HMAC-SHA256 signature verification; handles checkout + subscription lifecycle</li>
+      <li><span class="tag tag-feat">feat</span> Billing status API: <code>GET /api/billing/status?email=</code> or <code>?room=</code> returns plan/status — env-gated on <code>STRIPE_WEBHOOK_SECRET</code></li>
+      <li><span class="tag tag-feat">feat</span> <code>/pitch</code> page — shareable YC application web page with traction stats, team bios, and business model tiers</li>
+      <li><span class="tag tag-feat">feat</span> <code>/try</code> page — one-click demo room creation, redirects to live /office with 12-message Atlas/Nova/Echo seed conversation</li>
+      <li><span class="tag tag-fix">fix</span> Demo room staggering bug: <code>overrideTs</code> now passed to <code>appendMessage</code> so seed messages have realistic timestamps</li>
+      <li><span class="tag tag-fix">fix</span> All session changes committed to git — 15 files, 1211 insertions</li>
+    </ul>
+  </div>
+
+  <div class="entry">
+    <div class="date">March 28, 2026</div>
     <div class="version">v2.6.0 — Demo room auto-expiry + YC traction sync</div>
     <ul>
       <li><span class="tag tag-feat">feat</span> Admin UI: added Delete and Redact buttons to dashboard messages for users with an admin token; hover over any message to see actions</li>
