@@ -73,6 +73,6 @@
 
   <!-- Bottom bar -->
   <rect x="0" y="570" width="1200" height="60" fill="#111113"/>
-  <text x="80" y="603" font-family="system-ui,sans-serif" font-size="16" font-weight="600" fill="#52525b">p2p-production-983f.up.railway.app</text>
+  <text x="80" y="603" font-family="system-ui,sans-serif" font-size="16" font-weight="600" fill="#52525b">trymesh.chat</text>
   <text x="1120" y="603" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#8b5cf6" text-anchor="end">mesh →</text>
 </svg>
