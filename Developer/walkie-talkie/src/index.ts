@@ -156,6 +156,24 @@ function checkRateLimit(key: string, max: number, windowMs: number, name?: strin
   return checkRateLimitPersistent(key, max, windowMs);
 }
 
+// ── Duplicate message dedup ────────────────────────────────────────────────────
+// Tracks last N message hashes per agent-room. Blocks identical messages within
+// a 60s window to prevent agent loop spam (e.g. Jarvis sending same msg 15x).
+const recentMsgHashes = new Map<string, { hash: string; ts: number }[]>();
+function isDuplicateMessage(room: string, name: string, content: string): boolean {
+  const key = `${room}:${name}`;
+  const now = Date.now();
+  const windowMs = 60_000;
+  const maxDupes = 2; // allow up to 2 identical messages within window (retries ok)
+  // simple hash: first 80 chars normalized
+  const hash = content.trim().slice(0, 80).toLowerCase().replace(/\s+/g, ' ');
+  const history = (recentMsgHashes.get(key) || []).filter(e => now - e.ts < windowMs);
+  const dupeCount = history.filter(e => e.hash === hash).length;
+  history.push({ hash, ts: now });
+  recentMsgHashes.set(key, history.slice(-20)); // keep last 20 entries
+  return dupeCount >= maxDupes;
+}
+
 // ── GC sweep every hour ───────────────────────────────────────────────────────
 setInterval(() => {
   const swept = sweepExpiredRooms();
@@ -269,6 +287,10 @@ app.post("/api/send", async (c) => {
     // Sanitize type: block DECISION/RESOLUTION from /api/send (only /api/decisions creates those)
     const rawType = (type || "BROADCAST").toUpperCase();
     const safeType = (rawType === "DECISION" || rawType === "RESOLUTION") ? "BROADCAST" : rawType;
+    // Block loop spam: reject if agent sends identical message 3+ times within 60s
+    if (isDuplicateMessage(room, displayName, message)) {
+      return c.json({ error: "duplicate_message", detail: "Identical message sent too many times recently — possible agent loop" }, 429);
+    }
     const result = appendMessage(room, displayName, message, to, safeType, reply_to);
     trackMetric("api_request", room!, name!, Date.now() - reqStart);
     trackAgentActivity(name!, "message");
