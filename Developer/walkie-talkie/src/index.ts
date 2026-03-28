@@ -82,6 +82,9 @@ import {
   generateIdentityBlock,
   setTelegramConfig,
   getTelegramConfig,
+  isExemptFromRateLimit,
+  setRateLimitExempt,
+  getRateLimitExemptList,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -355,6 +358,80 @@ app.get("/api/cards", (c) => {
 // ── Presence & Typing ──────────────────────────────────────────────────────
 // Known creators — always get "creator" role regardless of heartbeat body
 const CREATORS = new Set((process.env.MESH_CREATORS || "Can Erden,Vincent").split(",").map(s => s.trim()));
+
+// ── Model Hierarchy: task routing based on model capability ──────────────────
+// Tier 1 (strategist): complex architecture, security, sensitive decisions
+// Tier 2 (builder): feature implementation, debugging, code review
+// Tier 3 (runner): simple tasks, monitoring, data collection, repetitive work
+const MODEL_TIERS: Record<string, { tier: number; label: string }> = {
+  // Tier 1 — Strategist
+  "claude-opus-4-6": { tier: 1, label: "strategist" },
+  "claude-opus-4-5": { tier: 1, label: "strategist" },
+  "o3": { tier: 1, label: "strategist" },
+  "gpt-5": { tier: 1, label: "strategist" },
+  "gemini-2.5-pro": { tier: 1, label: "strategist" },
+  // Tier 2 — Builder
+  "claude-sonnet-4-6": { tier: 2, label: "builder" },
+  "claude-sonnet-4-5": { tier: 2, label: "builder" },
+  "gpt-4o": { tier: 2, label: "builder" },
+  "gemini-2.0-pro": { tier: 2, label: "builder" },
+  "codex": { tier: 2, label: "builder" },
+  // Tier 3 — Runner
+  "claude-haiku-4-5": { tier: 3, label: "runner" },
+  "gpt-4o-mini": { tier: 3, label: "runner" },
+  "gemini-2.0-flash": { tier: 3, label: "runner" },
+  "gemini-flash": { tier: 3, label: "runner" },
+};
+
+function getModelTier(model?: string): { tier: number; label: string } {
+  if (!model) return { tier: 3, label: "runner" };
+  const normalized = model.toLowerCase().trim();
+  // Exact match first
+  if (MODEL_TIERS[normalized]) return MODEL_TIERS[normalized];
+  // Partial match
+  for (const [key, val] of Object.entries(MODEL_TIERS)) {
+    if (normalized.includes(key) || key.includes(normalized)) return val;
+  }
+  return { tier: 2, label: "builder" }; // default to builder if unknown
+}
+
+// Expose hierarchy via API so agents and dashboards can use it
+app.get("/api/hierarchy", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  const presence = getRoomPresence(room);
+  const personalities = getAllPersonalities();
+  const persMap: Record<string, any> = {};
+  for (const p of personalities) persMap[p.name] = p;
+
+  const agents = presence
+    .filter(a => !a.agent_name.includes("viewer") && !a.agent_name.includes("synthetic") && !a.agent_name.includes("enemy") && !a.agent_name.includes("anti-") && a.agent_name !== "Viewer" && a.agent_name !== "Test" && a.agent_name !== "RateLimitTest" && !a.agent_name.includes("\ud83d"))
+    .map(a => {
+      const pers = persMap[a.agent_name];
+      const model = pers?.model || "";
+      const tier = getModelTier(model);
+      return {
+        name: a.agent_name,
+        display_name: a.display_name || a.agent_name,
+        status: a.status,
+        role: a.role,
+        model: model || "unknown",
+        tier: tier.tier,
+        tier_label: tier.label,
+      };
+    })
+    .sort((a, b) => a.tier - b.tier);
+
+  return c.json({
+    ok: true,
+    tiers: {
+      1: { label: "strategist", description: "Complex architecture, security audits, sensitive decisions, product strategy" },
+      2: { label: "builder", description: "Feature implementation, debugging, code review, testing" },
+      3: { label: "runner", description: "Monitoring, data collection, simple tasks, repetitive work" },
+    },
+    agents,
+  });
+});
 
 app.post("/api/heartbeat", async (c) => {
   const room = c.req.query("room");
