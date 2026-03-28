@@ -1567,9 +1567,9 @@ export function getGrowthMetrics(): {
   const now = Date.now();
   const days = [];
   for (let i = 6; i >= 0; i--) {
-    const start = Math.floor((now - (i + 1) * dayMs) / 1000);
-    const end   = Math.floor((now - i * dayMs) / 1000);
-    const label = new Date(end * 1000).toISOString().slice(0, 10);
+    const start = now - (i + 1) * dayMs;
+    const end   = now - i * dayMs;
+    const label = new Date(end).toISOString().slice(0, 10);
     const msgs    = (db.prepare("SELECT COUNT(*) as n FROM messages WHERE timestamp >= ? AND timestamp < ?").get(start, end) as any)?.n ?? 0;
     const rooms   = (db.prepare("SELECT COUNT(*) as n FROM rooms WHERE last_activity >= ? AND last_activity < ?").get(start, end) as any)?.n ?? 0;
     const agents  = (db.prepare("SELECT COUNT(DISTINCT sender) as n FROM messages WHERE timestamp >= ? AND timestamp < ?").get(start, end) as any)?.n ?? 0;
