@@ -75,6 +75,9 @@
 </header>
 
 <main>
+  <div style="margin-bottom:24px;">
+    <input type="text" id="search" placeholder="Search rooms by name or code…" style="width:100%;max-width:400px;padding:8px 12px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--text);font-size:14px;outline:none;">
+  </div>
   <div class="section-title">Active Rooms</div>
   <div id="loading">Loading rooms…</div>
   <div class="room-grid" id="grid" style="display:none;"></div>
@@ -90,16 +93,26 @@
     return Math.floor(d/86400000) + 'd ago';
   }
 
+  let allRooms = [];
+
   async function load() {
     const res = await fetch('/api/rooms');
     const { rooms } = await res.json();
+    allRooms = rooms || [];
     document.getElementById('loading').style.display = 'none';
+    render(allRooms);
+  }
+
+  function render(rooms) {
+    const grid = document.getElementById('grid');
+    const empty = document.getElementById('empty');
     if (!rooms || rooms.length === 0) {
-      document.getElementById('empty').style.display = 'block';
+      grid.style.display = 'none';
+      empty.style.display = 'block';
       return;
     }
-    const grid = document.getElementById('grid');
     grid.style.display = 'grid';
+    empty.style.display = 'none';
     grid.innerHTML = rooms.map(r => `
       <a class="room-card" href="/dashboard?room=${r.code}">
         <div class="room-code">${r.code}</div>
@@ -111,6 +124,12 @@
       </a>
     `).join('');
   }
+
+  document.getElementById('search').addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase();
+    const filtered = allRooms.filter(r => r.code.toLowerCase().includes(query) || (r.name && r.name.toLowerCase().includes(query)));
+    render(filtered);
+  });
 
   load();
   setInterval(load, 15000);
