@@ -1,10 +1,16 @@
 import { Database } from "bun:sqlite";
 import { EventEmitter } from "events";
 import LZString from "lz-string";
+import crypto from "node:crypto";
 
 // Persistent SQLite store using Bun's native driver
 // Uses /app/data/ volume on Railway for persistence across deploys
 import { existsSync, mkdirSync } from "node:fs";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function generateSecureToken(): string {
+  return crypto.randomBytes(32).toString("hex");
+}
 const DB_DIR = process.env.NODE_ENV === "production" ? "/app/data" : ".";
 if (DB_DIR !== "." && !existsSync(DB_DIR)) mkdirSync(DB_DIR, { recursive: true });
 const db = new Database(`${DB_DIR}/mesh.db`, { create: true });
@@ -269,7 +275,7 @@ const ROOM_TTL_MS = 72 * 60 * 60 * 1000; // 72h
 export function ensureRoom(code: string): void {
   const exists = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!exists) {
-    const token = crypto.randomUUID();
+    const token = generateSecureToken();
     db.prepare(
       "INSERT OR IGNORE INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)",
     ).run(code, Date.now(), token);
@@ -288,7 +294,7 @@ export function createRoom(): { code: string; admin_token: string } {
     );
   } while (checkStmt.get(code));
 
-  const admin_token = crypto.randomUUID();
+  const admin_token = generateSecureToken();
   db.prepare("INSERT INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)").run(
     code,
     Date.now(),
@@ -333,13 +339,13 @@ export function getTelegramConfig(roomCode: string): {
 export function claimRoomAdmin(roomCode: string): string | null {
   const row = db.prepare("SELECT admin_token FROM rooms WHERE code = ?").get(roomCode) as any;
   if (!row || row.admin_token) return null; // not found or already claimed
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }
 
 export function rotateAdminToken(roomCode: string): string {
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }
@@ -348,7 +354,7 @@ export function rotateAdminToken(roomCode: string): string {
 export function resetAdminToken(roomCode: string): string | null {
   const row = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(roomCode);
   if (!row) return null;
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }
@@ -470,6 +476,19 @@ export function getActiveRooms(): {
   return rows;
 }
 
+export function getPublicRoomActivity(limit: number = 50): any[] {
+  return db
+    .prepare(`
+    SELECT m.id, m.room_code, m.sender as 'from', SUBSTR(m.content, 1, 200) as content, m.timestamp as ts, m.msg_type as type
+    FROM messages m
+    JOIN rooms r ON m.room_code = r.code
+    WHERE r.is_private = 0
+    ORDER BY m.timestamp DESC
+    LIMIT ?
+  `)
+    .all(limit) as any[];
+}
+
 export function setRoomPrivate(roomCode: string, isPrivate: boolean): void {
   db.prepare("UPDATE rooms SET is_private = ? WHERE code = ?").run(isPrivate ? 1 : 0, roomCode);
 }
@@ -479,8 +498,16 @@ export function isRoomPrivate(roomCode: string): boolean {
   return row ? row.is_private === 1 : false;
 }
 
-// Simple hash for room passwords — no crypto dep, uses Bun.hash
-function simpleHash(s: string): string {
+// Secure password hashing with salt using Bun's built-in crypto
+function hashPassword(password: string, salt?: string): { hash: string; salt: string } {
+  const s = salt || crypto.randomUUID();
+  const hasher = new Bun.CryptoHasher("sha256");
+  hasher.update(s + ":" + password);
+  return { hash: hasher.digest("hex"), salt: s };
+}
+
+// Legacy DJB2 hash for backwards compatibility with existing passwords
+function legacyHash(s: string): string {
   let h = 5381n;
   for (let i = 0; i < s.length; i++)
     h = ((h * 33n) ^ BigInt(s.charCodeAt(i))) & 0xffffffffffffffffn;
@@ -488,10 +515,19 @@ function simpleHash(s: string): string {
 }
 
 export function setRoomPassword(roomCode: string, password: string | null): void {
-  const hash = password ? simpleHash(password) : null;
+  if (!password) {
+    db.prepare("UPDATE rooms SET room_password_hash = ?, is_private = ? WHERE code = ?").run(
+      null,
+      0,
+      roomCode,
+    );
+    return;
+  }
+  const { hash, salt } = hashPassword(password);
+  // Store as "salt:hash" format so we can verify later
   db.prepare("UPDATE rooms SET room_password_hash = ?, is_private = ? WHERE code = ?").run(
-    hash,
-    password ? 1 : 0,
+    `${salt}:${hash}`,
+    1,
     roomCode,
   );
 }
@@ -501,9 +537,25 @@ export function verifyRoomPassword(roomCode: string, password: string): boolean 
     .prepare("SELECT room_password_hash, is_private FROM rooms WHERE code = ?")
     .get(roomCode) as any;
   if (!row) return false;
-  // No password set — open room
   if (!row.room_password_hash) return true;
-  return simpleHash(password) === row.room_password_hash;
+  const stored = row.room_password_hash as string;
+  // New format: "salt:hash"
+  if (stored.includes(":")) {
+    const [salt, expectedHash] = stored.split(":");
+    const { hash } = hashPassword(password, salt);
+    return hash === expectedHash;
+  }
+  // Legacy format: plain DJB2 hash — verify and upgrade
+  if (legacyHash(password) === stored) {
+    // Upgrade to new format on successful verify
+    const { hash, salt } = hashPassword(password);
+    db.prepare("UPDATE rooms SET room_password_hash = ? WHERE code = ?").run(
+      `${salt}:${hash}`,
+      roomCode,
+    );
+    return true;
+  }
+  return false;
 }
 
 export function getRoomPasswordHash(roomCode: string): string | null {
@@ -2085,29 +2137,46 @@ export function getGrowthMetrics(): {
   const now = Date.now();
   const days = [];
   for (let i = 6; i >= 0; i--) {
-    const start = Math.floor((now - (i + 1) * dayMs) / 1000);
-    const end = Math.floor((now - i * dayMs) / 1000);
-    const label = new Date(end * 1000).toISOString().slice(0, 10);
+    const start = now - (i + 1) * dayMs;
+    const end = now - i * dayMs;
+    const sStart = Math.floor(start / 1000);
+    const sEnd = Math.floor(end / 1000);
+    const label = new Date(end).toISOString().slice(0, 10);
+
+    // Robust query: check both ms and seconds windows to prevent zeroing on format mismatch
     const msgs =
       (
         db
-          .prepare("SELECT COUNT(*) as n FROM messages WHERE timestamp >= ? AND timestamp < ?")
-          .get(start, end) as any
+          .prepare(`
+      SELECT COUNT(*) as n FROM messages 
+      WHERE (timestamp >= ? AND timestamp < ?) 
+         OR (timestamp >= ? AND timestamp < ?)
+    `)
+          .get(start, end, sStart, sEnd) as any
       )?.n ?? 0;
+
     const rooms =
       (
         db
-          .prepare("SELECT COUNT(*) as n FROM rooms WHERE last_activity >= ? AND last_activity < ?")
-          .get(start, end) as any
+          .prepare(`
+      SELECT COUNT(*) as n FROM rooms 
+      WHERE (last_activity >= ? AND last_activity < ?)
+         OR (last_activity >= ? AND last_activity < ?)
+    `)
+          .get(start, end, sStart, sEnd) as any
       )?.n ?? 0;
+
     const agents =
       (
         db
-          .prepare(
-            "SELECT COUNT(DISTINCT sender) as n FROM messages WHERE timestamp >= ? AND timestamp < ?",
-          )
-          .get(start, end) as any
+          .prepare(`
+      SELECT COUNT(DISTINCT sender) as n FROM messages 
+      WHERE (timestamp >= ? AND timestamp < ?)
+         OR (timestamp >= ? AND timestamp < ?)
+    `)
+          .get(start, end, sStart, sEnd) as any
       )?.n ?? 0;
+
     days.push({ date: label, messages: msgs, rooms, agents });
   }
   return {
