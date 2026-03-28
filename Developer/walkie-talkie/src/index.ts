@@ -411,13 +411,18 @@ app.post("/api/decisions", async (c) => {
 });
 
 // ── Telegram Test Ping (no decision created, no rate limit impact) ───────────
-app.post("/api/rooms/:code/telegram/test", async (c) => {
+const telegramTestHandler = async (c: any) => {
   const code = c.req.param("code");
-  const token = c.req.header("x-mesh-secret") || (await c.req.json().catch(() => ({} as any))).secret;
+  const token = c.req.header("x-mesh-secret") || c.req.query("token") || (await c.req.json().catch(() => ({} as any))).secret;
   if (!verifyAdmin(code, token)) return c.json({ ok: false, error: "unauthorized" }, 401);
-  await sendTelegramMessage(code, `✅ Mesh Telegram test ping — room *${code}* is connected.`);
-  return c.json({ ok: true, message: "Test ping sent" });
-});
+  const result = await sendTelegramMessage(code, `✅ Mesh test ping — room <b>${code}</b> is connected.`);
+  if (!result.ok) {
+    return c.json({ ok: false, error: result.error }, 400);
+  }
+  return c.json({ ok: true, message: "Test ping sent! Check your Telegram." });
+};
+app.get("/api/rooms/:code/telegram/test", telegramTestHandler);
+app.post("/api/rooms/:code/telegram/test", telegramTestHandler);
 
 // ── Telegram Decision Bot: Get Pending Decisions ────────────────────────────
 app.get("/api/decisions", (c) => {
