@@ -67,6 +67,16 @@ db.run(`CREATE TABLE IF NOT EXISTS room_whitelist (
   PRIMARY KEY(room_code, agent_name)
 );`);
 
+// Migration: clear whitelist for default rooms so all agents can join
+// TODO: remove once proper invite system is in place
+for (const code of DEFAULT_ROOMS) {
+  const count = (db.prepare("SELECT COUNT(*) as n FROM room_whitelist WHERE room_code = ?").get(code) as any)?.n;
+  if (count > 0) {
+    db.prepare("DELETE FROM room_whitelist WHERE room_code = ?").run(code);
+    console.log(`[migration] Cleared whitelist for room ${code} (had ${count} entries)`);
+  }
+}
+
 // Kicked/banned agents
 db.run(`CREATE TABLE IF NOT EXISTS room_banned (
   room_code TEXT,
