@@ -304,11 +304,14 @@ function drawBubble(x, y, text, isTyping, accentColor) {
 // ── Name tag ─────────────────────────────────────────────────────────────────
 function drawNameTag(x, y, name, pal, model, isOnline, role) {
   const isCreator = role==='creator'||role==='admin';
+  const isSentinel = role==='sentinel';
   const short = name.slice(0,10);
   const crownW = isCreator ? 8 : 0;
   const W = short.length*4+6+crownW;
   const bx = x-W/2+4, by=y-33;
-  rect(bx, by, W, 8, isCreator ? '#1a1500' : pal.body+'dd');
+  const bgColor = isCreator ? '#1a1500' : isSentinel ? '#001a1a' : pal.body+'dd';
+  rect(bx, by, W, 8, bgColor);
+  if(isSentinel) { ctx.strokeStyle='#06b6d4'; ctx.lineWidth=0.5; ctx.strokeRect(bx+0.5,by+0.5,W-1,7); }
   if(isCreator) {
     ctx.strokeStyle='#eab308';
     ctx.lineWidth=0.5;
@@ -321,7 +324,7 @@ function drawNameTag(x, y, name, pal, model, isOnline, role) {
     ctx.fillRect(cx+2,cy,1,2);
     ctx.fillRect(cx+4,cy+1,1,2);
   }
-  ctx.fillStyle=isCreator?'#eab308':'#fff';
+  ctx.fillStyle=isCreator?'#eab308':isSentinel?'#06b6d4':'#fff';
   ctx.font='4px monospace';
   ctx.fillText(short, bx+3+crownW, by+6);
 
@@ -358,10 +361,25 @@ function recentMsg(name) {
   return msgs.filter(m=>m.from===name&&now-m.ts<90000).sort((a,b)=>b.ts-a.ts)[0]||null;
 }
 
+// Sentinel task rotation — always show something useful
+const sentinelTasks = {
+  Scout: ['watching commits','checking health','scanning logs','reviewing PRs'],
+  Pulse: ['measuring latency','tracking uptime','analyzing traffic','monitoring agents'],
+  Archie: ['indexing history','compiling stats','summarizing activity','updating boards'],
+};
+function sentinelActivity(name) {
+  const tasks = sentinelTasks[name];
+  if(!tasks) return null;
+  const idx = Math.floor(Date.now()/30000) % tasks.length;
+  return {text: tasks[idx], color:'#06b6d4'};
+}
+
 // What is this agent currently doing?
 function agentActivity(agent) {
   const name = agent.agent_name;
   if(agent.is_typing) return {text:'typing...', color:'#8b5cf6'};
+  // Sentinels always show activity
+  if(agent.role==='sentinel') { const s=sentinelActivity(name); if(s) return s; }
   const task = tasks[name];
   if(task) return {text: task.title.slice(0,24), color:'#22c55e'};
   const msg = recentMsg(name);
@@ -552,7 +570,7 @@ async function createOffice() {
 
 function showEmbed() {
   const base = location.origin;
-  const code = `<iframe\n  src="${base}/office?room=${ROOM}&embed=1"\n  width="800"\n  height="500"\n  frameborder="0"\n  sandbox="allow-same-origin allow-popups"\n  style="border-radius:8px;overflow:hidden;"\n  title="Mesh Office — ${ROOM}"\n></iframe>`;
+  const code = `<iframe\n  src="${base}/office?room=${ROOM}&embed=1"\n  width="800"\n  height="500"\n  frameborder="0"\n  sandbox="allow-same-origin allow-popups allow-scripts"\n  style="border-radius:8px;overflow:hidden;"\n  title="Mesh Office — ${ROOM}"\n></iframe>`;
   document.getElementById('embed-code').textContent = code;
   document.getElementById('embed-modal').classList.add('open');
   document.getElementById('embed-copy-btn').textContent = 'Copy code';
