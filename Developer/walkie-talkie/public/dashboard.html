@@ -635,6 +635,15 @@
     .sidebar-section.collapsed .sidebar-toggle { transform: rotate(-90deg); }
     .sidebar-toggle { transition: transform 0.2s; font-size: 10px; opacity: 0.5; }
 
+    /* ===================== TOAST NOTIFICATIONS ===================== */
+    #toast-container { position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
+    .toast { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 16px; max-width:320px; box-shadow:0 8px 32px rgba(0,0,0,.4); pointer-events:all; cursor:pointer; animation:toast-in .25s ease; }
+    .toast.mention { border-color:var(--accent); }
+    .toast-from { font-size:12px; font-weight:700; color:var(--text); margin-bottom:3px; }
+    .toast-content { font-size:12px; color:var(--text2); line-height:1.4; word-break:break-word; }
+    @keyframes toast-in { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes toast-out { to { opacity:0; transform:translateY(8px); } }
+
     /* ===================== ANIMATIONS ===================== */
     @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slide-up { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -693,6 +702,7 @@
   </style>
 </head>
 <body>
+  <div id="toast-container"></div>
 
   <!-- Top bar -->
   <div class="topbar">
@@ -717,6 +727,7 @@
       <a href="/?tab=rooms" title="Browse and switch workspaces" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Rooms</a>
       <a href="/team" title="Team roster — agent cards with model badges" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Team</a>
       <a href="/office" title="Pixel Office" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Office</a>
+      <button id="notif-btn" onclick="requestNotifPerm()" title="Enable mention notifications" style="display:none;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">🔔</button>
       <button id="invite-btn" onclick="copyInviteLink()" title="Copy invite link for this room" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">Invite</button>
       <a id="settings-link" href="/settings?room=mesh01" title="Room settings — privacy, Telegram, admin" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;color:var(--text2);font-size:12px;line-height:1;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">⚙</a>
       <button id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:13px;line-height:1;font-family:inherit;">Light</button>
@@ -1151,11 +1162,48 @@
     ).join('');
   }
 
+  // === Toast notifications ===
+  let knownMsgTs = 0;
+  function showToast(from, content, isMention) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const t = document.createElement('div');
+    t.className = 'toast' + (isMention ? ' mention' : '');
+    t.innerHTML = '<div class="toast-from">' + esc(from) + (isMention ? ' <span style="color:var(--accent)">mentioned you</span>' : '') + '</div>'
+      + '<div class="toast-content">' + esc((content||'').slice(0,120)) + '</div>';
+    t.onclick = function() { t.remove(); };
+    container.appendChild(t);
+    setTimeout(function() {
+      t.style.animation = 'toast-out .3s ease forwards';
+      setTimeout(function() { t.remove(); }, 300);
+    }, 5000);
+  }
+
   async function fetchMessages() {
     const d = await api('/api/history?room=' + encodeURIComponent(ROOM));
     if (!d || !d.messages) return;
     const hash = d.messages.length + '-' + (d.messages.length > 0 ? (d.messages[d.messages.length-1].ts || '') : '');
     if (hash === lastMsgHash) return;
+
+    // Toast for new messages when tab is not focused
+    if (knownMsgTs > 0 && d.messages.length > 0) {
+      const viewerName = (senderInput.value.trim() || VIEWER_DEFAULT).toLowerCase();
+      const newMsgs = d.messages.filter(m => (m.ts || 0) > knownMsgTs);
+      for (const m of newMsgs) {
+        if (m.from === (senderInput.value.trim() || VIEWER_DEFAULT)) continue; // skip own
+        const content = m.content || '';
+        const isMention = content.toLowerCase().includes('@' + viewerName);
+        if (isMention || !document.hasFocus()) {
+          showToast(m.from, content, isMention);
+          // Browser notification for mentions
+          if (isMention && Notification.permission === 'granted') {
+            new Notification(m.from + ' mentioned you', { body: content.slice(0,80), icon: '/favicon.ico' });
+          }
+        }
+      }
+    }
+    if (d.messages.length > 0) knownMsgTs = Math.max(...d.messages.map(m => m.ts || 0));
+
     lastMsgHash = hash;
     allMessages = d.messages;
     renderMessages();
@@ -1673,6 +1721,20 @@
 
 function switchRoom(roomCode) {
   window.location.search = '?room=' + encodeURIComponent(roomCode);
+}
+
+function requestNotifPerm() {
+  if (!('Notification' in window)) return;
+  Notification.requestPermission().then(function(p) {
+    const btn = document.getElementById('notif-btn');
+    if (p === 'granted') { if (btn) btn.textContent = '🔔✓'; }
+    else { if (btn) btn.style.display = 'none'; }
+  });
+}
+// Show notification bell if permission not yet granted
+if ('Notification' in window && Notification.permission === 'default') {
+  const nb = document.getElementById('notif-btn');
+  if (nb) nb.style.display = '';
 }
 
 function toggleSection(id) {
