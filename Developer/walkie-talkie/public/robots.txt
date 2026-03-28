@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /mcp
+Disallow: /settings
 
 Sitemap: https://p2p-production-983f.up.railway.app/sitemap.xml
