@@ -167,15 +167,19 @@
         <input type="password" id="tg-token" placeholder="1234567890:ABCdef..." class="mono" />
       </div>
       <div class="field-row">
-        <label>Chat ID <span style="font-weight:400;color:var(--text3)">(your Telegram user/group ID)</span></label>
+        <label>Chat ID <span style="font-weight:400;color:var(--text3)">(numeric ID of the chat to send to)</span></label>
         <input type="text" id="tg-chat" placeholder="e.g. 123456789" class="mono" />
       </div>
-      <p style="font-size:11px;color:var(--text3);margin-bottom:12px;">
-        To get your Chat ID: message <code style="color:var(--accent)">@userinfobot</code> on Telegram.
-      </p>
+      <div style="background:#1c1c1f;border:1px solid #27272a;border-radius:8px;padding:12px;margin-bottom:12px;font-size:11px;color:var(--text3);line-height:1.7;">
+        <b style="color:var(--text2);">Setup steps:</b><br>
+        1. Create a bot via <a href="https://t.me/BotFather" target="_blank" style="color:var(--accent);">@BotFather</a> → /newbot → copy token above<br>
+        2. Open your bot in Telegram and press <b style="color:var(--text2);">Start</b> (required or bot can't message you)<br>
+        3. Get your Chat ID: message <a href="https://t.me/userinfobot" target="_blank" style="color:var(--accent);">@userinfobot</a> → copy the number<br>
+        4. Click Save & Test below
+      </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="saveTelegram()">Save & Connect</button>
-        <button class="btn btn-secondary" onclick="testTelegram()" id="test-ping-btn" style="display:none;">Test Ping</button>
+        <button class="btn btn-primary" onclick="saveTelegram()">Save & Test</button>
+        <button class="btn btn-secondary" onclick="testTelegram()" id="test-ping-btn" style="display:none;">Re-test Ping</button>
         <a href="https://t.me/BotFather" target="_blank" class="btn btn-secondary" style="text-decoration:none;">Open BotFather →</a>
       </div>
       <div class="msg" id="tg-msg"></div>
@@ -254,6 +258,7 @@ async function loadTelegramStatus() {
       document.getElementById('test-ping-btn').style.display = 'inline-flex';
     } else if (d.has_token || d.has_chat_id) {
       dot.innerHTML = '<span class="status-dot status-warn"></span><span style="font-size:12px;color:var(--orange);">Partially configured</span>';
+      document.getElementById('test-ping-btn').style.display = 'inline-flex';
     }
   } catch(e) {}
 }
@@ -360,17 +365,25 @@ async function togglePrivate() {
   setTimeout(() => msg.className = 'msg', 3000);
 }
 
+function friendlyTgError(error) {
+  if (!error) return 'Unknown error';
+  if (error === 'not_configured') return 'Token or Chat ID not saved yet.';
+  if (error.includes('chat not found')) return 'Chat not found — did you press Start in your bot? Open the bot in Telegram, press Start, then try again.';
+  if (error.includes('bot was blocked')) return 'Bot is blocked — unblock it in Telegram and try again.';
+  if (error.includes('Unauthorized')) return 'Bot token is invalid — check it in BotFather.';
+  if (error.includes('chat_id')) return 'Invalid Chat ID format — must be a numeric ID (e.g. 123456789).';
+  return error;
+}
+
 async function testTelegram() {
   const msg = document.getElementById('tg-msg');
   if (!adminToken) { msg.textContent = 'Need admin token.'; msg.className = 'msg err'; return; }
+  msg.textContent = 'Sending test ping…';
+  msg.className = 'msg';
   try {
-    const res = await fetch('/api/rooms/' + ROOM + '/telegram/test', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ secret: adminToken }),
-    });
+    const res = await fetch('/api/rooms/' + ROOM + '/telegram/test?token=' + encodeURIComponent(adminToken));
     const d = await res.json();
-    msg.textContent = d.ok ? 'Test ping sent! Check Telegram.' : (d.error || 'Failed');
+    msg.textContent = d.ok ? '✅ Test ping sent! Check Telegram.' : ('❌ ' + friendlyTgError(d.error));
     msg.className = d.ok ? 'msg ok' : 'msg err';
   } catch(e) {
     msg.textContent = 'Request failed.';
@@ -394,10 +407,11 @@ async function saveTelegram() {
     });
     const d = await res.json();
     if (d.ok) {
-      msg.textContent = 'Telegram connected! Use Test Ping to verify delivery.';
+      msg.textContent = 'Saved! Sending test ping…';
       msg.className = 'msg ok';
       document.getElementById('test-ping-btn').style.display = '';
       document.getElementById('tg-status-dot').innerHTML = '<span class="status-dot status-ok"></span><span style="font-size:12px;color:var(--green)">Connected</span>';
+      setTimeout(testTelegram, 500);
     } else {
       msg.textContent = d.error || 'Failed to connect.';
       msg.className = 'msg err';
