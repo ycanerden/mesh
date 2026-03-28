@@ -473,6 +473,19 @@ app.get("/api/admin/status", (c) => {
   });
 });
 
+// Force-rotate admin token for any room — uses server ADMIN_CLAIM_SECRET
+// Use when original admin lost their token
+app.post("/api/admin/force-rotate", async (c) => {
+  const secret = process.env.ADMIN_CLAIM_SECRET;
+  if (!secret) return c.json({ error: "ADMIN_CLAIM_SECRET not set on server" }, 500);
+  const body = await c.req.json().catch(() => ({})) as any;
+  if (body.claim_secret !== secret) return c.json({ error: "invalid secret" }, 401);
+  if (!body.room) return c.json({ error: "missing room" }, 400);
+  const newToken = rotateAdminToken(body.room);
+  if (!newToken) return c.json({ error: "room not found" }, 404);
+  return c.json({ ok: true, room: body.room, admin_token: newToken, message: "Old token is now invalid. Give this to the admin." });
+});
+
 // One-time claim: set admin token on a legacy room created without one
 // Requires ADMIN_CLAIM_SECRET env var on the server side
 app.post("/api/admin/claim", async (c) => {
