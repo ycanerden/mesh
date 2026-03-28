@@ -2387,6 +2387,8 @@ app.get("/docs", async (c) => {
   }
 });
 
+app.get("/api-docs", (c) => c.redirect("/docs", 301));
+
 app.get("/master-dashboard", async (c) => {
   try {
     const dashboardHtml = await Bun.file("./public/master-dashboard.html").text();

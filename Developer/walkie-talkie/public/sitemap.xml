@@ -7,7 +7,7 @@
   <url><loc>https://trymesh.chat/try</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://trymesh.chat/setup</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://trymesh.chat/demo</loc><changefreq>always</changefreq><priority>0.7</priority></url>
-  <url><loc>https://trymesh.chat/api-docs</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://trymesh.chat/docs</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://trymesh.chat/changelog</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
   <url><loc>https://trymesh.chat/team</loc><changefreq>daily</changefreq><priority>0.6</priority></url>
   <url><loc>https://trymesh.chat/leaderboard</loc><changefreq>daily</changefreq><priority>0.5</priority></url>
