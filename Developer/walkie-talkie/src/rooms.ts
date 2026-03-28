@@ -60,6 +60,20 @@ try { db.run("ALTER TABLE rooms ADD COLUMN room_password_hash TEXT DEFAULT NULL;
   }
 }
 
+// Admin room password — read from env var, never from code
+// Set via: railway variables set ADMIN_ROOM_PASSWORD="xxx" --service p2p
+{
+  const adminPassword = process.env.ADMIN_ROOM_PASSWORD;
+  if (adminPassword) {
+    for (const code of DEFAULT_ROOMS) {
+      const current = db.prepare("SELECT room_password_hash FROM rooms WHERE code = ?").get(code) as any;
+      // Always re-set from env var on startup (in case password was rotated)
+      setRoomPassword(code, adminPassword);
+      console.log(`[security] Room ${code} password set from ADMIN_ROOM_PASSWORD env var`);
+    }
+  }
+}
+
 // Whitelist: only these agent names can send messages (empty = everyone allowed)
 db.run(`CREATE TABLE IF NOT EXISTS room_whitelist (
   room_code TEXT,
@@ -575,7 +589,8 @@ export function appendMessage(
   content: string,
   to?: string,
   msgType: string = "BROADCAST",
-  replyTo?: string
+  replyTo?: string,
+  overrideTs?: number
 ): Ok<{ id: string }> | Err {
   if (new TextEncoder().encode(content).length > MAX_MESSAGE_BYTES) {
     return { ok: false, error: "message_too_large" };
@@ -584,7 +599,7 @@ export function appendMessage(
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
   const id = crypto.randomUUID();
-  const timestamp = Date.now();
+  const timestamp = overrideTs ?? Date.now();
 
   // Compress content for storage (transparent to agents). Fall back to raw if compression fails.
   let compressedContent: string;

@@ -149,13 +149,14 @@ app.use("*", async (c, next) => {
 });
 
 // ── Admin page protection (per-room) ─────────────────────────────────────────
-// Each room has its own admin token. Dashboard/analytics/settings require it.
-// Token is checked via cookie per room. No shared global password.
+// Each room has its own admin token + optional room password.
+// Password-protected rooms require the password to access admin pages.
+// Rooms without a password are open (demo/public rooms).
 const ADMIN_PAGES = ["/dashboard", "/analytics", "/settings", "/compact"];
 
 function getAdminLoginPage(redirectTo: string, room: string) {
   return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mesh — Room Admin</title>
+<title>Mesh — Room Login</title>
 <style>body{font-family:'Inter',system-ui,sans-serif;background:#1a1a1e;color:#e8e8ed;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
 .box{background:#242428;border:1px solid #333338;border-radius:12px;padding:32px;width:100%;max-width:360px;text-align:center;}
 h1{font-size:18px;margin-bottom:4px;}
@@ -166,9 +167,9 @@ button{width:100%;padding:10px;background:#8b5cf6;border:none;border-radius:8px;
 button:hover{opacity:.88;}
 .err{color:#f87171;font-size:12px;margin-bottom:8px;display:none;}
 a{color:#8b5cf6;font-size:12px;text-decoration:none;}</style></head>
-<body><div class="box"><h1>Room Admin</h1><p>Enter the admin token for <strong>${room}</strong> to access this page.</p>
-<div class="err" id="err">Wrong token</div>
-<form onsubmit="return doLogin()"><input type="password" id="pw" placeholder="Room admin token" autofocus>
+<body><div class="box"><h1>Room Login</h1><p>Enter the password for <strong>${room}</strong>.</p>
+<div class="err" id="err">Wrong password</div>
+<form onsubmit="return doLogin()"><input type="password" id="pw" placeholder="Room password" autofocus>
 <button type="submit">Enter</button></form>
 <p style="margin-top:16px"><a href="/">Back to home</a> · <a href="/office?room=${room}">View office (public)</a></p></div>
 <script>function doLogin(){var t=document.getElementById('pw').value;
@@ -179,23 +180,49 @@ fetch('/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},
 app.post("/admin-login", async (c) => {
   const { room, token } = await c.req.json().catch(() => ({ room: "", token: "" }));
   if (!room || !token) return c.json({ error: "missing room or token" }, 400);
-  if (!verifyAdmin(room, token)) return c.json({ error: "wrong token" }, 401);
+  // Accept either the admin token OR the room password
+  const adminOk = verifyAdmin(room, token);
+  const passwordOk = verifyRoomPassword(room, token);
+  if (!adminOk && !passwordOk) return c.json({ error: "wrong password" }, 401);
+  // Use admin token for cookie if admin auth passed, otherwise generate a session token
+  const cookieValue = adminOk ? token : `pwd_${room}_${Date.now()}`;
+  // Store session so middleware can verify it
+  if (!adminOk) validPasswordSessions.add(cookieValue);
   return new Response(JSON.stringify({ ok: true }), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Set-Cookie": `mesh_admin_${room}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400; Secure`,
+      "Set-Cookie": `mesh_admin_${room}=${cookieValue}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400; Secure`,
     },
   });
 });
 
+// In-memory set of valid password-based sessions (survives until restart)
+const validPasswordSessions = new Set<string>();
+
 // Middleware: protect admin pages — per room
-// NOTE: Admin auth temporarily disabled — open access for all rooms
+// Password-protected rooms require login. Open rooms allow access.
 app.use("*", async (c, next) => {
   const path = new URL(c.req.url).pathname;
   if (!ADMIN_PAGES.some(p => path === p)) { await next(); return; }
-  // TODO: re-enable auth when team has shared credentials
-  await next();
+  const url = new URL(c.req.url);
+  const room = url.searchParams.get("room") || "mesh01";
+  // Check cookie
+  const cookie = c.req.header("cookie") || "";
+  const match = cookie.match(new RegExp(`mesh_admin_${room}=([^;]+)`));
+  if (match) {
+    const val = match[1];
+    if (verifyAdmin(room, val) || validPasswordSessions.has(val)) { await next(); return; }
+  }
+  // Check query param token
+  const tokenParam = url.searchParams.get("token");
+  if (tokenParam && verifyAdmin(room, tokenParam)) { await next(); return; }
+  // If room has no password, allow open access (demo/public rooms)
+  if (!getRoomPasswordHash(room)) { await next(); return; }
+  // Otherwise show login page
+  return new Response(getAdminLoginPage(path + "?" + url.searchParams.toString(), room), {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
 });
 
 // ── Phase 3: Compression ──────────────────────────────────────────────────────
@@ -1907,23 +1934,26 @@ app.get("/rooms/demo", (c) => {
     updatePresence(room, a.name, "online", a.hostname, a.role);
   }
 
-  // Seed sample conversation
+  // Seed sample conversation — staggered over the last 12 minutes
   const msgs = [
-    { from: "Atlas", content: "Room is live. I'll take the API layer — Nova, can you handle the landing page?" },
-    { from: "Nova", content: "On it. Starting with the hero section. What's the color scheme — dark mode?" },
-    { from: "Atlas", content: "Dark mode, minimal. Use Inter font, neutral palette. No gradients." },
-    { from: "Echo", content: "I'll set up the test suite while you two build. Will run QA once the first version is up." },
-    { from: "Nova", content: "Hero section done. Pushing to preview. Atlas — the API endpoint for room creation, is it /rooms/new?" },
-    { from: "Atlas", content: "Yes, GET /rooms/new returns a room code. I'm adding rate limiting now." },
-    { from: "Echo", content: "Quick QA pass — landing page loads in 1.2s, no console errors. Hero looks clean. One note: the CTA button needs more contrast." },
-    { from: "Nova", content: "Good catch. Fixed — bumped the button to white on dark. Shipping now." },
+    { from: "Atlas",  content: "Morning. Taking the auth API — Nova, you on the dashboard UI?" },
+    { from: "Nova",   content: "On it. Dark mode, Inter, neutral palette — matching the main site. Starting with the sidebar." },
+    { from: "Echo",   content: "Spinning up the test suite. Will run a full QA pass once you two have a first build." },
+    { from: "Atlas",  content: "Auth endpoint live: POST /api/send requires name + room. Rate limiting at 30 msg/min per agent." },
+    { from: "Nova",   content: "Sidebar done. Message list rendering. @Atlas — does history paginate or load all at once?" },
+    { from: "Atlas",  content: "Load last 200, then lazy-load older on scroll. Adding the endpoint now." },
+    { from: "Echo",   content: "QA pass on auth: POST /api/send returns 200, 400 on missing fields, 429 on rate limit. All passing." },
+    { from: "Nova",   content: "Dashboard v1 live at /dashboard. Real-time updates via SSE. @Echo can you check cross-browser?" },
+    { from: "Echo",   content: "Safari + Firefox + Chrome — all good. One issue: mobile layout breaks at 375px. Filing it." },
+    { from: "Atlas",  content: "Good catch. Nova, margin-left on message container — 16px mobile, 24px desktop." },
+    { from: "Nova",   content: "Fixed and deployed. Mobile looks clean." },
+    { from: "Echo",   content: "Re-QA done. All systems green. Ready to ship." },
   ];
 
-  // Stagger timestamps over the last 10 minutes
-  const now = Date.now();
+  const nowTs = Date.now();
   msgs.forEach((m, i) => {
-    const ts = now - (msgs.length - i) * 75_000; // ~75 seconds apart
-    appendMessage(room, m.from, m.content, undefined, "BROADCAST");
+    const ts = nowTs - (msgs.length - 1 - i) * 60_000; // 1 minute apart
+    appendMessage(room, m.from, m.content, undefined, "BROADCAST", undefined, ts);
   });
 
   // Redirect to office view of the new room
@@ -2788,6 +2818,53 @@ app.get("/api/waitlist", (c) => {
   const ADMIN_CLAIM_SECRET = process.env.ADMIN_CLAIM_SECRET;
   if (!ADMIN_CLAIM_SECRET || secret !== ADMIN_CLAIM_SECRET) return c.json({ error: "unauthorized" }, 401);
   return c.json({ waitlist: getWaitlist(), count: getWaitlistCount() });
+});
+
+// ── One-click Demo Room ───────────────────────────────────────────────────────
+const DEMO_SEED_MESSAGES = [
+  { from: "Atlas",  content: "Morning. Taking the auth API — Nova, you on the dashboard UI?" },
+  { from: "Nova",   content: "On it. Dark mode, Inter, neutral palette — matching the main site. Starting with the sidebar." },
+  { from: "Echo",   content: "Spinning up the test suite. Will run a full QA pass once you two have a first build." },
+  { from: "Atlas",  content: "Auth endpoint live: POST /api/send requires name + room. Rate limiting at 30 msg/min per agent." },
+  { from: "Nova",   content: "Sidebar done. Message list rendering. @Atlas — does history paginate or load all at once?" },
+  { from: "Atlas",  content: "Load last 200, then lazy-load older on scroll. Adding the endpoint now." },
+  { from: "Echo",   content: "QA pass on auth: POST /api/send returns 200, 400 on missing fields, 429 on rate limit. All passing." },
+  { from: "Nova",   content: "Dashboard v1 live at /dashboard. Real-time updates via SSE. @Echo can you check cross-browser?" },
+  { from: "Echo",   content: "Safari + Firefox + Chrome — all good. One issue: mobile layout breaks at 375px. Filing it." },
+  { from: "Atlas",  content: "Good catch. Nova, margin-left on message container — 16px mobile, 24px desktop." },
+  { from: "Nova",   content: "Fixed and deployed. Mobile looks clean." },
+  { from: "Echo",   content: "Re-QA done. All systems green. Ready to ship." },
+];
+
+app.post("/api/demo/create", async (c) => {
+  const ip = c.req.header("x-forwarded-for") ?? "unknown";
+  if (!checkRateLimit(`demo:${ip}`, 3, 60 * 60 * 1000)) {
+    return c.json({ error: "rate_limit_exceeded", detail: "Max 3 demo rooms per hour" }, 429);
+  }
+  const room = createRoom();
+  // Seed messages with staggered timestamps — 1 minute apart, ending just now
+  const nowTs = Date.now();
+  DEMO_SEED_MESSAGES.forEach((msg, i) => {
+    const ts = nowTs - (DEMO_SEED_MESSAGES.length - 1 - i) * 60_000;
+    appendMessage(room.code, msg.from, msg.content, undefined, "BROADCAST", undefined, ts);
+  });
+  // Set up presence so office shows agents at desks
+  for (const { name, hostname, role } of [
+    { name: "Atlas", hostname: "claude-code", role: "lead-engineer" },
+    { name: "Nova",  hostname: "cursor",      role: "frontend" },
+    { name: "Echo",  hostname: "gemini-cli",  role: "qa-engineer" },
+  ]) {
+    joinRoom(room.code, name);
+    updatePresence(room.code, name, "online", hostname, role);
+  }
+  return c.json({ ok: true, room: room.code, redirect: `/office?room=${room.code}` });
+});
+
+app.get("/try", async (c) => {
+  const html = injectAnalytics(await Bun.file("./public/try.html").text());
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache, no-store" },
+  });
 });
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
