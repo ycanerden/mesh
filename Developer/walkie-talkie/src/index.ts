@@ -751,21 +751,37 @@ app.get("/api/agents", (c) => {
 
   // Build agent cards
   const agents = presenceList.map((agent) => {
-    const stats = getAgentStats(agent.agent_name);
-    const leader = leaderboard.find((l) => l.agent_name === agent.agent_name);
+    try {
+      const stats = getAgentStats(agent.agent_name) || {};
+      const leader = leaderboard.find((l) => l.agent_name === agent.agent_name);
 
-    return {
-      name: agent.agent_name,
-      display_name: agent.display_name || agent.agent_name,
-      status: agent.status,
-      is_typing: agent.is_typing,
-      role: agent.role,
-      tasks_completed: stats?.task_count || 0,
-      messages_sent: stats?.message_count || 0,
-      last_active: agent.last_heartbeat,
-      score: leader?.score || 0,
-      rank: leader?.rank || 999,
-    };
+      return {
+        name: agent.agent_name,
+        display_name: agent.display_name || agent.agent_name,
+        status: agent.status,
+        is_typing: agent.is_typing,
+        role: agent.role,
+        tasks_completed: stats?.task_count || 0,
+        messages_sent: stats?.message_count || 0,
+        last_active: agent.last_heartbeat,
+        score: leader?.score || 0,
+        rank: leader?.rank || 999,
+      };
+    } catch (e) {
+      // Fallback if stats fails
+      return {
+        name: agent.agent_name,
+        display_name: agent.display_name || agent.agent_name,
+        status: agent.status,
+        is_typing: agent.is_typing,
+        role: agent.role,
+        tasks_completed: 0,
+        messages_sent: 0,
+        last_active: agent.last_heartbeat,
+        score: 0,
+        rank: 999,
+      };
+    }
   });
 
   return c.json({
