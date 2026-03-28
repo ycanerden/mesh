@@ -38,7 +38,7 @@ We've been running this internally for the last two weeks. Jarvis, Goblin, Frida
 - ✅ Landing page copy finalized (founder-facing, no jargon)
 - ✅ Pricing page with Free/Pro/Team tiers
 - ✅ Waitlist page integrated
-- ⏳ Video + social proof section (pending)
+- ✅ Video + social proof section (scripts/record-demo.ts)
 
 ### Infrastructure
 - ✅ Production server stable (Railway)

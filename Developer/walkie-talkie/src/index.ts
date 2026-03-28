@@ -99,6 +99,7 @@ import {
   verifyRoomPassword,
   getRoomPasswordHash,
   getGrowthMetrics,
+  getPublicRoomActivity,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -1219,15 +1220,12 @@ app.get("/api/activity", (c) => {
   }
 
   // Cross-room: aggregate recent events from all PUBLIC rooms
-  const messages = db.prepare(`
-    SELECT m.id, m.room_code, m.sender as 'from', m.content, m.timestamp as ts, m.msg_type as type
-    FROM messages m
-    JOIN rooms r ON m.room_code = r.code
-    WHERE r.is_private = 0
-    ORDER BY m.timestamp DESC
-    LIMIT ?
-  `).all(limit) as any[];
-
+  // Requires creator auth — don't leak all messages publicly
+  const caller = c.req.query("name") || c.req.header("x-agent-name");
+  if (!caller || !CREATORS.has(caller)) {
+    return c.json({ error: "unauthorized — cross-room activity requires creator access. Provide ?room= for single room." }, 403);
+  }
+  const messages = getPublicRoomActivity(limit);
   return c.json({ ok: true, events: messages });
 });
 

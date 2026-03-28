@@ -396,6 +396,17 @@ export function getActiveRooms(): { code: string; agent_count: number; message_c
   return rows;
 }
 
+export function getPublicRoomActivity(limit: number = 50): any[] {
+  return db.prepare(`
+    SELECT m.id, m.room_code, m.sender as 'from', SUBSTR(m.content, 1, 200) as content, m.timestamp as ts, m.msg_type as type
+    FROM messages m
+    JOIN rooms r ON m.room_code = r.code
+    WHERE r.is_private = 0
+    ORDER BY m.timestamp DESC
+    LIMIT ?
+  `).all(limit) as any[];
+}
+
 export function setRoomPrivate(roomCode: string, isPrivate: boolean): void {
   db.prepare("UPDATE rooms SET is_private = ? WHERE code = ?").run(isPrivate ? 1 : 0, roomCode);
 }
