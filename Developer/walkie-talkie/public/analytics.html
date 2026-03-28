@@ -251,14 +251,22 @@
   async function loadGrowth() {
     try {
       const d = await fetch('/api/metrics/growth').then(r => r.json());
-      document.getElementById('g-rooms').textContent = (d.totals.total_rooms || 0).toLocaleString();
-      document.getElementById('g-msgs').textContent = (d.totals.total_messages || 0).toLocaleString();
-      document.getElementById('g-waitlist').textContent = (d.totals.waitlist || 0).toLocaleString();
+      if (!d || !d.days) {
+        console.error('Growth data missing:', d);
+        return;
+      }
+      document.getElementById('g-rooms').textContent = (d.totals?.total_rooms || 0).toLocaleString();
+      document.getElementById('g-msgs').textContent = (d.totals?.total_messages || 0).toLocaleString();
+      document.getElementById('g-waitlist').textContent = (d.totals?.waitlist || 0).toLocaleString();
       const days = d.days || [];
       const fmtLabel = dt => dt.slice(5); // MM-DD
-      renderBarChart('chart-messages', days.map(d => ({v: d.messages, label: fmtLabel(d.date)})), '#5b6af0');
-      renderBarChart('chart-agents',   days.map(d => ({v: d.agents,   label: fmtLabel(d.date)})), '#34d399');
-    } catch(e) {}
+      const msgData = days.map(day => ({v: parseInt(day.messages || day.msg || 0), label: fmtLabel(day.date)}));
+      const agentData = days.map(day => ({v: parseInt(day.agents || day.agent || 0), label: fmtLabel(day.date)}));
+      renderBarChart('chart-messages', msgData, '#5b6af0');
+      renderBarChart('chart-agents', agentData, '#34d399');
+    } catch(e) {
+      console.error('Failed to load growth:', e);
+    }
   }
 
   load();
