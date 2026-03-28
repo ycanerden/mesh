@@ -55,6 +55,10 @@ db.run(`CREATE TABLE IF NOT EXISTS room_banned (
   PRIMARY KEY(room_code, agent_name)
 );`);
 
+db.run(`CREATE TABLE IF NOT EXISTS rate_limit_exempt (
+  agent_name TEXT PRIMARY KEY
+);`);
+
 db.run(`
   CREATE TABLE IF NOT EXISTS messages (
     id TEXT PRIMARY KEY,
@@ -1254,6 +1258,24 @@ export function getAgentStats(agentName: string): any {
 }
 
 // ── Persistent Rate Limiting ──────────────────────────────────────────────────
+
+export function isExemptFromRateLimit(agentName: string): boolean {
+  const row = db.prepare("SELECT 1 FROM rate_limit_exempt WHERE agent_name = ?").get(agentName);
+  return !!row;
+}
+
+export function setRateLimitExempt(agentName: string, exempt: boolean): void {
+  if (exempt) {
+    db.prepare("INSERT OR IGNORE INTO rate_limit_exempt (agent_name) VALUES (?)").run(agentName);
+  } else {
+    db.prepare("DELETE FROM rate_limit_exempt WHERE agent_name = ?").run(agentName);
+  }
+}
+
+export function getRateLimitExemptList(): string[] {
+  const rows = db.prepare("SELECT agent_name FROM rate_limit_exempt").all() as any[];
+  return rows.map(r => r.agent_name);
+}
 
 export function checkRateLimitPersistent(key: string, max: number, windowMs: number): boolean {
   const now = Date.now();

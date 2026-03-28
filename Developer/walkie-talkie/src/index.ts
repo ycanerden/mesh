@@ -137,7 +137,8 @@ if (SECRET) {
 
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 // Persistent SQLite-backed rate limiter (survives restarts)
-function checkRateLimit(key: string, max: number, windowMs: number): boolean {
+function checkRateLimit(key: string, max: number, windowMs: number, name?: string): boolean {
+  if (name && (CREATORS.has(name) || isExemptFromRateLimit(name))) return true;
   return checkRateLimitPersistent(key, max, windowMs);
 }
 
@@ -185,7 +186,7 @@ app.get("/api/messages", (c) => {
   // Viewers (demo-viewer, office-viewer, web viewers) get generous limits
   const isViewer = name.endsWith('-viewer') || name.startsWith('Viewer');
   const msgLimit = isViewer ? 120 : 30;
-  if (!checkRateLimit(`get_msgs:${room}:${name}`, msgLimit, 60 * 1000)) {
+  if (!checkRateLimit(`get_msgs:${room}:${name}`, msgLimit, 60 * 1000, name)) {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
   const result = getMessages(room, name, msgType);
@@ -238,7 +239,7 @@ app.post("/api/send", async (c) => {
   updatePresence(room, name, "online");
 
   // Rate limit sends: 30 messages/min per agent
-  if (!checkRateLimit(`send:${room}:${name}`, 30, 60 * 1000)) {
+  if (!checkRateLimit(`send:${room}:${name}`, 30, 60 * 1000, name)) {
     return c.json({ error: "rate_limit_exceeded" }, 429);
   }
 
@@ -291,15 +292,30 @@ app.post("/api/admin/kick", async (c) => {
   return c.json({ ok: true, banned: getBanned(room) });
 });
 
+app.post("/api/admin/rate-limit-exempt", async (c) => {
+  const room = c.req.query("room");
+  const token = c.req.query("token") || c.req.header("x-admin-token");
+  if (!room || !token || !verifyAdmin(room, token)) return c.json({ error: "unauthorized" }, 401);
+  try {
+    const { name, exempt } = await c.req.json();
+    if (!name) return c.json({ error: "missing name" }, 400);
+    setRateLimitExempt(name, exempt !== false);
+    return c.json({ ok: true, name, exempt: exempt !== false });
+  } catch (e) {
+    return c.json({ error: "invalid json body" }, 400);
+  }
+});
+
 app.get("/api/admin/status", (c) => {
   const room = c.req.query("room");
-  const token = c.req.query("token");
+  const token = c.req.query("token") || c.req.header("x-admin-token");
   if (!room || !token || !verifyAdmin(room, token)) return c.json({ error: "unauthorized" }, 401);
   return c.json({
     ok: true,
     read_only: isRoomReadOnly(room),
     whitelist: getWhitelist(room),
     banned: getBanned(room),
+    rate_limit_exempt: getRateLimitExemptList(),
   });
 });
 
@@ -309,7 +325,7 @@ app.post("/api/admin/claim", async (c) => {
   const room = c.req.query("room");
   const secret = process.env.ADMIN_CLAIM_SECRET;
   if (!room) return c.json({ error: "missing room" }, 400);
-  if (!secret) return c.json({ error: "ADMIN_CLAIM_SECRET not configured on server" }, 503);
+  if (!secret) return c.json({ error: "unauthorized" }, 401);
   const body = await c.req.json().catch(() => ({})) as any;
   if (body.claim_secret !== secret) return c.json({ error: "invalid secret" }, 401);
   const result = claimRoomAdmin(room);
@@ -370,7 +386,13 @@ app.post("/api/typing", async (c) => {
 app.get("/api/presence", (c) => {
   const room = c.req.query("room");
   if (!room) return c.json({ error: "missing room" }, 400);
-  const agents = getRoomPresence(room);
+  const token = c.req.query("token") || c.req.header("x-admin-token");
+  const isAdmin = token && verifyAdmin(room, token);
+  const agents = getRoomPresence(room).map(a => ({
+    ...a,
+    // Strip hostname for non-admins — leaks machine names
+    hostname: isAdmin ? a.hostname : undefined,
+  }));
   return c.json({ ok: true, agents });
 });
 
@@ -505,21 +527,27 @@ app.post("/api/directory/register", async (c) => {
   return c.json({ ok: true, profile }, 201);
 });
 
+// Strip sensitive fields from directory listings
+const stripDirectorySensitive = (a: any) => {
+  const { contact_room, ...safe } = a;
+  return safe;
+};
+
 app.get("/api/directory", (c) => {
   const q = c.req.query("q");
-  const agents = q ? searchAgents(q) : getAllAgents();
+  const agents = (q ? searchAgents(q) : getAllAgents()).map(stripDirectorySensitive);
   return c.json({ ok: true, agents, count: agents.length });
 });
 
 app.get("/api/directory/available", (c) => {
-  const agents = getAvailableAgents();
+  const agents = getAvailableAgents().map(stripDirectorySensitive);
   return c.json({ ok: true, agents, count: agents.length });
 });
 
 app.get("/api/directory/:agentId", (c) => {
   const profile = getAgentProfile(c.req.param("agentId"));
   if (!profile) return c.json({ error: "agent not found" }, 404);
-  return c.json({ ok: true, profile });
+  return c.json({ ok: true, profile: stripDirectorySensitive(profile) });
 });
 
 app.put("/api/directory/:agentId/status", async (c) => {
@@ -872,11 +900,17 @@ app.post("/api/personality", async (c) => {
 
 app.get("/api/personality", (c) => {
   const name = c.req.query("name");
+  // Strip system_prompt from public responses — contains internal config
+  const stripSensitive = (p: any) => {
+    const { system_prompt, ...safe } = p;
+    return safe;
+  };
   if (name) {
     const p = getPersonality(name);
-    return p ? c.json({ ok: true, ...p }) : c.json({ error: "not found" }, 404);
+    return p ? c.json({ ok: true, ...stripSensitive(p) }) : c.json({ error: "not found" }, 404);
   }
-  return c.json({ ok: true, agents: getAllPersonalities() });
+  const agents = getAllPersonalities().map(stripSensitive);
+  return c.json({ ok: true, agents });
 });
 
 // Serve the /mesh skill file for Claude Code
@@ -959,7 +993,9 @@ app.get("/api/briefing", (c) => {
     tasks_done: doneSince.length,
     tasks_in_progress: inProgress.length,
     briefing: lines.join("\n"),
-    by_agent: byAgent,
+    by_agent: Object.fromEntries(
+      Object.entries(byAgent).map(([name, d]: [string, any]) => [name, { count: d.count }])
+    ),
   });
 });
 
@@ -985,17 +1021,18 @@ app.get("/rooms/new", (c) => {
   const { code, admin_token } = createRoom();
   const baseUrl = new URL(c.req.url).origin;
   const mcpUrl = `${baseUrl}/mcp?room=${code}&name=YOUR_NAME`;
-  return c.json({
+  // Admin token is only returned via x-admin-token header (not in body)
+  // Room creator must save it from the response header
+  const response = c.json({
     ok: true,
     room_code: code,
-    room: code, // backward compat
-    admin_token,
+    room: code,
     mcp_url: mcpUrl,
-    claude_code_url: mcpUrl, // backward compat
-    antigravity_url: mcpUrl, // backward compat
     instructions:
       "Replace YOUR_NAME with your name. Add the mcp_url to your AI tool's MCP config.",
   });
+  response.headers.set("x-admin-token", admin_token);
+  return response;
 });
 
 // ── One-click demo room ──────────────────────────────────────────────────────
@@ -1051,24 +1088,6 @@ app.get("/rooms/demo", (c) => {
     });
   }
   return c.redirect(`/${redirect}?room=${code}`);
-});
-
-// ── Admin endpoints (require admin_token) ────────────────────────────────────
-app.post("/api/admin/read-only", async (c) => {
-  const room = c.req.query("room");
-  const token = c.req.query("token") || c.req.header("x-admin-token");
-  if (!room || !token) return c.json({ error: "missing room or token" }, 400);
-  if (!verifyAdmin(room, token)) return c.json({ error: "unauthorized" }, 403);
-  const { read_only } = await c.req.json();
-  setRoomReadOnly(room, read_only !== false);
-  return c.json({ ok: true, read_only: read_only !== false });
-});
-
-app.get("/api/admin/verify", (c) => {
-  const room = c.req.query("room");
-  const token = c.req.query("token") || c.req.header("x-admin-token");
-  if (!room || !token) return c.json({ error: "missing room or token" }, 400);
-  return c.json({ ok: true, is_admin: verifyAdmin(room, token) });
 });
 
 app.get("/dashboard", async (c) => {
@@ -1266,7 +1285,7 @@ app.all("/mcp", async (c) => {
     },
     async ({ message, to, type }) => {
       // Rate limit sends: 30 messages/min per agent
-      if (!checkRateLimit(`send:${room}:${name}`, 30, 60 * 1000)) {
+      if (!checkRateLimit(`send:${room}:${name}`, 30, 60 * 1000, name)) {
         return {
           content: [
             {
@@ -1338,7 +1357,7 @@ app.all("/mcp", async (c) => {
     {},
     async () => {
       // Rate limit: 10 calls/min per room+user
-      if (!checkRateLimit(`get_msgs:${room}:${name}`, 10, 60 * 1000)) {
+      if (!checkRateLimit(`get_msgs:${room}:${name}`, 10, 60 * 1000, name)) {
         return {
           content: [
             {
