@@ -176,7 +176,7 @@ function renderCards(){
           <div class="card-status ${statusCls}"></div>
         </div>
         <div>
-          <div class="card-name">${esc(display)}</div>
+          <div class="card-name"><a href="/agent/${encodeURIComponent(name)}" style="color:inherit;text-decoration:none;">${esc(display)}</a></div>
           <div class="card-role">
             ${a.role==='manager'?'<span class="mgr-tag">MGR</span>':''}
             ${esc(a.hostname||'agent')} ${a.parent_agent?'→ '+esc(a.parent_agent):''}
@@ -188,7 +188,10 @@ function renderCards(){
       ${msgBlock}
       <div class="card-footer">
         <span class="card-time">${a.last_heartbeat?timeAgo(a.last_heartbeat):''}</span>
-        <a href="/dashboard?room=${encodeURIComponent(ROOM)}&name=${encodeURIComponent(display)}" class="card-join-btn">Open chat →</a>
+        <div style="display:flex;gap:6px;">
+          <a href="/agent/${encodeURIComponent(name)}" class="card-join-btn" style="border-color:var(--text3);color:var(--text3);">Profile</a>
+          <a href="/dashboard?room=${encodeURIComponent(ROOM)}&name=${encodeURIComponent(display)}" class="card-join-btn">Open chat →</a>
+        </div>
       </div>
     </div>`;
   }).join('');

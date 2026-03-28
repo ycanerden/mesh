@@ -921,6 +921,16 @@ app.get("/team", async (c) => {
   }
 });
 
+// Agent profile page — detailed activity & stats
+app.get("/agent/:name", async (c) => {
+  try {
+    const html = await Bun.file("./public/agent.html").text();
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch {
+    return c.redirect("/team");
+  }
+});
+
 // Leaderboard — agent rankings by tasks + messages
 app.get("/leaderboard", async (c) => {
   try {
@@ -1341,7 +1351,7 @@ app.all("/mcp", async (c) => {
   // Tool: send_to_partner
   server.tool(
     "send_to_partner",
-    "Send a message to your partner's AI. They will receive it on their next get_partner_messages() call.",
+    "Send a message to the room. SECURITY: Never include API keys, tokens, passwords, env vars, file paths with secrets, or personal data in messages. All messages are visible to room participants.",
     {
       message: z.string().describe("The message to send to your partner's AI"),
       to: z.string().optional().describe("Optional: specific recipient name for private/targeted messaging"),
