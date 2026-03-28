@@ -22,6 +22,9 @@ const MESH_ROOM = process.env.MESH_ROOM || "mesh01";
 const MESH_NAME = process.env.MESH_NAME || "TelegramBridge";
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 const STATE_FILE = process.env.BRIDGE_STATE_FILE || ".bridge-state.json";
+// Set BRIDGE_MENTIONS=true to also forward messages that @mention room owners.
+// Default: off — only DECISION and RESOLUTION events reach Telegram.
+const BRIDGE_MENTIONS = process.env.BRIDGE_MENTIONS === "true";
 
 if (!BOT_TOKEN) {
   console.log(`
@@ -156,12 +159,16 @@ async function listenToMesh(): Promise<void> {
           if (msg.from?.includes("(Telegram)")) continue;
           if (msg.from === MESH_NAME) continue;
 
-          // STRICT FILTER: Only relay DECISION/RESOLUTION events + @Vincent/@Can mentions
+          // Filter: only relay DECISION/RESOLUTION events (no spam).
+          // Set BRIDGE_MENTIONS=true env var to also forward @mention messages.
           const type = (msg.type || "BROADCAST").toUpperCase();
-          const content = (msg.content || msg.message || "").toLowerCase();
           const isDecision = type === "DECISION" || type === "RESOLUTION";
-          const isMention = content.includes("@vincent") || content.includes("@can erden");
-          if (!isDecision && !isMention) continue;
+          if (!isDecision) {
+            if (!BRIDGE_MENTIONS) continue;
+            const content = (msg.content || msg.message || "").toLowerCase();
+            const isMention = content.includes("@vincent") || content.includes("@can erden");
+            if (!isMention) continue;
+          }
 
           const formatted = `[${type}] <b>${msg.from}</b>: ${msg.content || msg.message || ""}`;
           console.log(`[mesh→telegram] ${msg.from}: ${msg.content || ""}`);
@@ -198,6 +205,7 @@ console.log(`
   Bot: ${MESH_NAME}
   Server: ${MESH_SERVER}
   State: ${STATE_FILE} (lastUpdateId=${state.lastUpdateId}, chatId=${state.chatId || "auto-detect"})
+  Filter: ${BRIDGE_MENTIONS ? "DECISION + RESOLUTION + @mentions" : "DECISION + RESOLUTION only (set BRIDGE_MENTIONS=true to also forward @mentions)"}
 
   Waiting for messages...
 `);
