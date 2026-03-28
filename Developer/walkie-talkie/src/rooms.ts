@@ -1,10 +1,16 @@
 import { Database } from "bun:sqlite";
 import { EventEmitter } from "events";
 import LZString from "lz-string";
+import crypto from "node:crypto";
 
 // Persistent SQLite store using Bun's native driver
 // Uses /app/data/ volume on Railway for persistence across deploys
 import { existsSync, mkdirSync } from "node:fs";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function generateSecureToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
 const DB_DIR = process.env.NODE_ENV === "production" ? "/app/data" : ".";
 if (DB_DIR !== "." && !existsSync(DB_DIR)) mkdirSync(DB_DIR, { recursive: true });
 const db = new Database(`${DB_DIR}/mesh.db`, { create: true });
@@ -241,7 +247,7 @@ const ROOM_TTL_MS = 72 * 60 * 60 * 1000; // 72h
 export function ensureRoom(code: string): void {
   const exists = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!exists) {
-    const token = crypto.randomUUID();
+    const token = generateSecureToken();
     db.prepare("INSERT OR IGNORE INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)").run(code, Date.now(), token);
     console.log(`[room] auto-created room ${code} from MCP connection`);
   }
@@ -259,7 +265,7 @@ export function createRoom(): { code: string; admin_token: string } {
     ).join("");
   } while (checkStmt.get(code));
 
-  const admin_token = crypto.randomUUID();
+  const admin_token = generateSecureToken();
   db.prepare("INSERT INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)").run(code, Date.now(), admin_token);
   return { code, admin_token };
 }
@@ -291,13 +297,13 @@ export function getTelegramConfig(roomCode: string): { token: string | null; cha
 export function claimRoomAdmin(roomCode: string): string | null {
   const row = db.prepare("SELECT admin_token FROM rooms WHERE code = ?").get(roomCode) as any;
   if (!row || row.admin_token) return null; // not found or already claimed
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }
 
 export function rotateAdminToken(roomCode: string): string {
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }
@@ -306,7 +312,7 @@ export function rotateAdminToken(roomCode: string): string {
 export function resetAdminToken(roomCode: string): string | null {
   const row = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(roomCode);
   if (!row) return null;
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }

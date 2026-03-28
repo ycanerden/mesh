@@ -150,10 +150,14 @@ app.use("*", compress());
 
 // ── CORS Configuration ────────────────────────────────────────────────────────
 // Allow dashboard and frontend to make requests
+// Set ALLOWED_ORIGINS env var to restrict (comma-separated), e.g. "https://trymesh.chat,https://p2p-production-983f.up.railway.app"
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map(s => s.trim())
+  : null;
 app.use("*", cors({
-  origin: "*",
+  origin: ALLOWED_ORIGINS || "*",
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowHeaders: ["Content-Type", "x-mesh-secret"],
+  allowHeaders: ["Content-Type", "x-mesh-secret", "x-admin-token"],
   exposeHeaders: ["Content-Type"],
 }));
 
@@ -1191,6 +1195,15 @@ app.get("/api/activity", (c) => {
   const limit = Math.min(parseInt(c.req.query("limit") || "50"), 200);
 
   if (room) {
+    // Password-protected room check
+    const roomHash = getRoomPasswordHash(room);
+    if (roomHash) {
+      const accessToken = c.req.query("access_token") || c.req.header("x-room-token");
+      if (!accessToken || accessToken !== `${room}.${roomHash}`) {
+        return c.json({ error: "room_protected", detail: "This room requires a password to view activity" }, 403);
+      }
+    }
+
     const messagesResult = getAllMessages(room, limit);
     const presence = getRoomPresence(room);
     if (!messagesResult.ok) return c.json({ error: messagesResult.error }, 404);
@@ -1205,19 +1218,17 @@ app.get("/api/activity", (c) => {
     return c.json({ ok: true, room, events, agents_online: presence.filter((a) => a.status === "online").length });
   }
 
-  // Cross-room: aggregate recent events from all public rooms
-  const rooms = getActiveRooms();
-  const allEvents: any[] = [];
-  for (const r of rooms.slice(0, 10)) {
-    const result = getAllMessages(r.code, Math.ceil(limit / Math.max(rooms.length, 1)));
-    if (result.ok) {
-      for (const msg of result.messages || []) {
-        allEvents.push({ id: msg.id, from: msg.from, room_code: r.code, type: msg.type || "BROADCAST", content: msg.content.slice(0, 200), ts: msg.ts });
-      }
-    }
-  }
-  allEvents.sort((a, b) => b.ts - a.ts);
-  return c.json({ ok: true, events: allEvents.slice(0, limit) });
+  // Cross-room: aggregate recent events from all PUBLIC rooms
+  const messages = db.prepare(`
+    SELECT m.id, m.room_code, m.sender as 'from', m.content, m.timestamp as ts, m.msg_type as type
+    FROM messages m
+    JOIN rooms r ON m.room_code = r.code
+    WHERE r.is_private = 0
+    ORDER BY m.timestamp DESC
+    LIMIT ?
+  `).all(limit) as any[];
+
+  return c.json({ ok: true, events: messages });
 });
 
 // Agent profile cards for a room
@@ -1626,12 +1637,21 @@ app.get("/office", async (c) => {
   }
 });
 
-// ── Agent Personality Persistence ─────────────────────────────────────────
+// ── Agent Personality Persistence (auth: caller must identify themselves) ──
 app.post("/api/personality", async (c) => {
   const name = c.req.query("name");
+  const caller = c.req.query("caller") || c.req.header("x-agent-name");
   if (!name) return c.json({ error: "missing name" }, 400);
+  // Caller MUST be provided — no anonymous personality writes
+  if (!caller) return c.json({ error: "unauthorized — caller or x-agent-name header required" }, 401);
+  // Only allow the agent to set its own personality, or creators to set anyone's
+  if (caller !== name && !CREATORS.has(caller)) {
+    return c.json({ error: "unauthorized — can only set your own personality" }, 403);
+  }
   const { personality, system_prompt, skills, model, tool } = await c.req.json();
-  savePersonality(name, personality || "", system_prompt || "", skills || "", model, tool);
+  // Never allow system_prompt from non-creators
+  const safePrompt = CREATORS.has(caller) ? (system_prompt || "") : "";
+  savePersonality(name, personality || "", safePrompt, skills || "", model, tool);
   return c.json({ ok: true, name });
 });
 
@@ -1712,21 +1732,6 @@ app.get("/api/analytics/:name", (c) => {
   const stats = getProductivityReport(name);
   const tasks = getAllAgentTasks(name);
   return c.json({ ok: true, stats, tasks });
-});
-
-// ── Activity Timeline API ──────────────────────────────────────────────────
-
-app.get("/api/activity", (c) => {
-  // Aggregate recent events across all rooms
-  // Sort by timestamp desc, limit to 100
-  const messages = db.prepare(`
-    SELECT m.id, m.room_code, m.sender as 'from', m.content, m.timestamp as ts, m.msg_type as type
-    FROM messages m
-    ORDER BY m.timestamp DESC
-    LIMIT 100
-  `).all() as any[];
-
-  return c.json({ ok: true, events: messages });
 });
 
 // Morning briefing — summary of activity since you were last here
