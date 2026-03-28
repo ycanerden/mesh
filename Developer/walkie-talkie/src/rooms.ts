@@ -372,8 +372,9 @@ export function getActiveRooms(): { code: string; agent_count: number; message_c
     LEFT JOIN messages m ON m.room_code = r.code
     WHERE r.is_private = 0
     GROUP BY r.code
+    HAVING message_count >= 5 OR agent_count >= 2
     ORDER BY last_active DESC
-    LIMIT 50
+    LIMIT 30
   `).all() as any[];
   return rows;
 }
