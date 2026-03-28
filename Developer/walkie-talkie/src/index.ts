@@ -98,6 +98,10 @@ import {
   getAgentTasks,
   getRoomTasks,
   getAllAgentTasks,
+  createDecision,
+  getDecision,
+  getPendingDecisions,
+  resolveDecision,
 } from "./room-manager.js";
 
 const app = new Hono();
@@ -262,6 +266,75 @@ app.post("/api/send", async (c) => {
     trackMetric("api_request", room!, name!, Date.now() - reqStart);
     trackAgentActivity(name!, "message");
     return c.json(result);
+  } catch (e) {
+    return c.json({ error: "invalid_request", detail: String(e) }, 400);
+  }
+});
+
+// ── Telegram Decision Bot: Create Decision ─────────────────────────────────
+app.post("/api/decisions", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+
+  try {
+    const { description, notifyList } = await c.req.json();
+    if (!description || !notifyList || !Array.isArray(notifyList)) {
+      return c.json({ error: "missing description or notifyList" }, 400);
+    }
+
+    const decision = createDecision(room, name, description, notifyList);
+
+    // Post decision message to room
+    const mentions = notifyList.map(u => `@${u}`).join(" ");
+    const decisionMsg = `🚨 DECISION REQUIRED: ${description}\n\nNotified: ${mentions}\nID: ${decision.id}`;
+    appendMessage(room, name, decisionMsg, null, "DECISION");
+
+    return c.json({ ok: true, decision });
+  } catch (e) {
+    return c.json({ error: "invalid_request", detail: String(e) }, 400);
+  }
+});
+
+// ── Telegram Decision Bot: Get Pending Decisions ────────────────────────────
+app.get("/api/decisions", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+
+  const decisions = getPendingDecisions(room);
+  return c.json({ ok: true, decisions });
+});
+
+// ── Telegram Decision Bot: Resolve Decision ────────────────────────────────
+app.post("/api/decisions/:id", async (c) => {
+  const id = c.req.param("id");
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+
+  if (!id || !room || !name) {
+    return c.json({ error: "missing id, room, or name" }, 400);
+  }
+
+  const decision = getDecision(id);
+  if (!decision) return c.json({ error: "decision not found" }, 404);
+  if (decision.status !== "pending") {
+    return c.json({ error: "decision already resolved" }, 409);
+  }
+
+  try {
+    const { status, text } = await c.req.json();
+    if (!["approved", "rejected", "hold"].includes(status)) {
+      return c.json({ error: "invalid status" }, 400);
+    }
+
+    resolveDecision(id, status, text || "", name);
+
+    // Post resolution to room
+    const emoji = { approved: "✅", rejected: "❌", hold: "⏸️" }[status];
+    const resolutionMsg = `${emoji} DECISION RESOLVED:\n${decision.description}\n**${status.toUpperCase()}** by @${name}${text ? `: ${text}` : ""}`;
+    appendMessage(room, name, resolutionMsg, null, "RESOLUTION");
+
+    return c.json({ ok: true, decision: getDecision(id) });
   } catch (e) {
     return c.json({ error: "invalid_request", detail: String(e) }, 400);
   }

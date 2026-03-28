@@ -38,6 +38,24 @@
     .embed-copy:hover{background:#7c3aed;}
     .embed-close{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:4px 8px;cursor:pointer;}
     .embed-close:hover{color:#a1a1aa;}
+    /* decision modal */
+    .decision-modal{display:none;position:fixed;inset:0;background:#0009;z-index:100;align-items:center;justify-content:center;}
+    .decision-modal.open{display:flex;}
+    .decision-box{background:#111113;border:1px solid #27272a;border-radius:8px;padding:20px;width:420px;max-width:90vw;}
+    .decision-box h3{font-size:12px;font-weight:600;margin-bottom:12px;color:#fafafa;}
+    .decision-form{display:flex;flex-direction:column;gap:10px;}
+    .decision-input{background:#0d0d0f;border:1px solid #27272a;border-radius:4px;padding:8px;font-size:10px;color:#fafafa;font-family:monospace;}
+    .decision-input::placeholder{color:#52525b;}
+    .decision-textarea{background:#0d0d0f;border:1px solid #27272a;border-radius:4px;padding:8px;font-size:10px;color:#fafafa;font-family:monospace;min-height:60px;resize:vertical;}
+    .decision-textarea::placeholder{color:#52525b;}
+    .decision-checkbox{display:flex;align-items:center;gap:8px;color:#a1a1aa;font-size:10px;}
+    .decision-checkbox input{cursor:pointer;}
+    .decision-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:6px;}
+    .decision-submit{font-size:10px;font-weight:600;color:#fafafa;background:#8b5cf6;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;}
+    .decision-submit:hover{background:#7c3aed;}
+    .decision-submit:disabled{opacity:.5;cursor:not-allowed;}
+    .decision-cancel{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:6px 10px;cursor:pointer;}
+    .decision-cancel:hover{color:#a1a1aa;}
     /* agent status card tooltip */
     .agent-card{display:none;position:absolute;z-index:50;background:#111113;border:1px solid #27272a;border-radius:6px;padding:10px 12px;min-width:160px;pointer-events:none;}
     .agent-card.visible{display:block;}
@@ -70,6 +88,7 @@
       <a href="/dashboard?room=mesh01" class="nlink">Dashboard</a>
       <a href="/demo" class="nlink">Feed</a>
       <button class="btn-embed" onclick="showEmbed()">Embed</button>
+      <button class="btn-embed" onclick="showDecision()">Tag Decision</button>
       <button class="btn-create" id="btn-create" onclick="createOffice()">Create your office →</button>
     </div>
   </div>
@@ -83,6 +102,28 @@
     <div class="embed-actions">
       <button class="embed-close" onclick="document.getElementById('embed-modal').classList.remove('open')">Close</button>
       <button class="embed-copy" id="embed-copy-btn" onclick="copyEmbed()">Copy code</button>
+    </div>
+  </div>
+</div>
+
+<!-- Decision modal -->
+<div class="decision-modal" id="decision-modal" onclick="closeDecision(event)">
+  <div class="decision-box">
+    <h3>Tag as Decision (Telegram Bot)</h3>
+    <div class="decision-form">
+      <textarea class="decision-textarea" id="decision-desc" placeholder="What decision needs to be made?"></textarea>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div class="decision-checkbox">
+          <input type="checkbox" id="notify-vincent" checked> Notify @vincent
+        </div>
+        <div class="decision-checkbox">
+          <input type="checkbox" id="notify-can" checked> Notify @can
+        </div>
+      </div>
+      <div class="decision-actions">
+        <button class="decision-cancel" onclick="document.getElementById('decision-modal').classList.remove('open')">Cancel</button>
+        <button class="decision-submit" id="decision-submit-btn" onclick="submitDecision()">Post Decision</button>
+      </div>
     </div>
   </div>
 </div>
@@ -589,6 +630,67 @@ function copyEmbed() {
     btn.textContent = 'Copied!';
     setTimeout(()=>{ btn.textContent = 'Copy code'; }, 2000);
   });
+}
+
+// ── Telegram Decision Bot UI ──────────────────────────────────────────────
+function showDecision() {
+  document.getElementById('decision-modal').classList.add('open');
+  document.getElementById('decision-desc').focus();
+}
+
+function closeDecision(e) {
+  if(e.target === document.getElementById('decision-modal')) {
+    document.getElementById('decision-modal').classList.remove('open');
+  }
+}
+
+async function submitDecision() {
+  const desc = document.getElementById('decision-desc').value.trim();
+  const notifyVincent = document.getElementById('notify-vincent').checked;
+  const notifyCan = document.getElementById('notify-can').checked;
+
+  if(!desc) {
+    alert('Please enter a decision description');
+    return;
+  }
+
+  const notifyList = [];
+  if(notifyVincent) notifyList.push('vincent');
+  if(notifyCan) notifyList.push('can');
+
+  if(notifyList.length === 0) {
+    alert('Please select at least one person to notify');
+    return;
+  }
+
+  const btn = document.getElementById('decision-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Posting...';
+
+  try {
+    const res = await fetch(`/api/decisions?room=${ROOM}&name=office-viewer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: desc, notifyList })
+    });
+
+    if(!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Failed to post decision');
+    }
+
+    const data = await res.json();
+    document.getElementById('decision-modal').classList.remove('open');
+    document.getElementById('decision-desc').value = '';
+    btn.textContent = 'Decision Posted ✓';
+    setTimeout(()=>{ btn.textContent = 'Post Decision'; }, 2000);
+
+  } catch(e) {
+    alert('Error: ' + e.message);
+    btn.textContent = 'Error — try again';
+  } finally {
+    btn.disabled = false;
+  }
 }
 </script>
 </body>

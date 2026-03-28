@@ -178,3 +178,86 @@ export function getAllAgentTasks(agentName: string): TaskAssignment[] {
     )
     .all(agentName) as TaskAssignment[];
 }
+
+// Decisions table for Telegram Decision Bot
+db.run(`
+  CREATE TABLE IF NOT EXISTS decisions (
+    id TEXT PRIMARY KEY,
+    room_code TEXT,
+    created_by TEXT,
+    description TEXT,
+    notified_users TEXT,
+    status TEXT DEFAULT 'pending',
+    decision_text TEXT,
+    decision_by TEXT,
+    created_at INTEGER,
+    resolved_at INTEGER
+  );
+`);
+
+export interface Decision {
+  id: string;
+  room_code: string;
+  created_by: string;
+  description: string;
+  notified_users: string;
+  status: "pending" | "approved" | "rejected" | "hold";
+  decision_text: string | null;
+  decision_by: string | null;
+  created_at: number;
+  resolved_at: number | null;
+}
+
+export function createDecision(
+  roomCode: string,
+  createdBy: string,
+  description: string,
+  notifiedUsers: string[]
+): Decision {
+  const id = `decision-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const decision: Decision = {
+    id,
+    room_code: roomCode,
+    created_by: createdBy,
+    description,
+    notified_users: notifiedUsers.join(","),
+    status: "pending",
+    decision_text: null,
+    decision_by: null,
+    created_at: Date.now(),
+    resolved_at: null,
+  };
+
+  db.prepare(
+    `INSERT INTO decisions (id, room_code, created_by, description, notified_users, status, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).run(id, roomCode, createdBy, description, notifiedUsers.join(","), "pending", decision.created_at);
+
+  return decision;
+}
+
+export function getDecision(id: string): Decision | null {
+  const result = db
+    .prepare("SELECT * FROM decisions WHERE id = ?")
+    .get(id) as any;
+  return result || null;
+}
+
+export function getPendingDecisions(roomCode: string): Decision[] {
+  return db
+    .prepare(
+      `SELECT * FROM decisions WHERE room_code = ? AND status = 'pending' ORDER BY created_at DESC`
+    )
+    .all(roomCode) as Decision[];
+}
+
+export function resolveDecision(
+  id: string,
+  status: "approved" | "rejected" | "hold",
+  decisionText: string,
+  decisionBy: string
+): void {
+  db.prepare(
+    `UPDATE decisions SET status = ?, decision_text = ?, decision_by = ?, resolved_at = ? WHERE id = ?`
+  ).run(status, decisionText, decisionBy, Date.now(), id);
+}
