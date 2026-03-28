@@ -346,7 +346,7 @@ function drawBubble(x, y, text, isTyping, accentColor) {
   ctx.strokeRect(bx+W/2, by+H, 1, 2);
 
   ctx.fillStyle = isTyping ? ac : '#e4e4e7';
-  ctx.font = 'bold 4px monospace';
+  ctx.font = 'bold 6px monospace';
   ctx.fillText(str, bx+5, by+7);
 }
 
@@ -374,7 +374,7 @@ function drawNameTag(x, y, name, pal, model, isOnline, role) {
     ctx.fillRect(cx+4,cy+1,1,2);
   }
   ctx.fillStyle=isCreator?'#eab308':isSentinel?'#06b6d4':'#fff';
-  ctx.font='4px monospace';
+  ctx.font='6px monospace';
   ctx.fillText(short, bx+3+crownW, by+6);
 
   // Status dot — green if online, grey if offline
