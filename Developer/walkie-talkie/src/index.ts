@@ -120,6 +120,9 @@ const app = new Hono();
 const startTime = Date.now();
 const VERSION = "2.4.0";
 
+// Agents that should never trigger join notifications (viewers, sentinels, system)
+const SYSTEM_AGENT_NAMES = new Set(["Scout", "Pulse", "Archie", "system"]);
+
 // Track active SSE connections
 let activeConnections = 0;
 
@@ -797,9 +800,8 @@ app.post("/api/heartbeat", async (c) => {
   if (CREATORS.has(name)) role = "creator";
 
   // Emit join notification when a real agent comes online from offline (skip viewers/sentinels)
-  const SENTINEL_NAMES = new Set(["Scout", "Pulse", "Archie"]);
-  const isSystemAgent = name.endsWith("-viewer") || name.startsWith("Viewer") || name === "system"
-    || SENTINEL_NAMES.has(name) || name.includes("synthetic") || name.includes("anti-");
+  const isSystemAgent = name.endsWith("-viewer") || name.startsWith("Viewer")
+    || SYSTEM_AGENT_NAMES.has(name) || name.includes("synthetic") || name.includes("anti-");
   if (!isSystemAgent) {
     const existing = getRoomPresence(room).find(a => a.agent_name === name);
     const wasOffline = !existing || existing.last_heartbeat < Date.now() - 300_000;
