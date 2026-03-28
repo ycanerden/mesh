@@ -1571,7 +1571,7 @@
           <span style="font-size:14px;">${rank}</span>
           <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text1);font-weight:500;">${name}</span>
         </div>
-        <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);font-size:11px;">${score}</span>
+        <span title="Score: msgs + commits×25 + tasks×10" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);font-size:11px;">${score}<span style="font-size:9px;opacity:0.5;margin-left:2px;">pts</span></span>
       </div>`;
     }).join('');
   }
@@ -1744,7 +1744,7 @@
 function goToSettings() {
   const urlParams = new URLSearchParams(window.location.search);
   const room = urlParams.get('room') || 'mesh01';
-  window.open('/settings?room=' + encodeURIComponent(room), '_blank');
+  window.location.href = '/settings?room=' + encodeURIComponent(room);
 }
 
 function switchRoom(roomCode) {
