@@ -524,17 +524,27 @@ export function getMessages(
 }
 
 export function getAllMessages(
-  code: string
+  code: string,
+  limit: number = 50,
+  since?: number
 ): Ok<{ messages: Message[] }> | Err {
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
-  const messages = (db.prepare("SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ?")
-    .all(code) as Message[])
+  const query = since
+    ? db.prepare("SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND timestamp > ? ORDER BY timestamp DESC LIMIT ?")
+    : db.prepare("SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? ORDER BY timestamp DESC LIMIT ?");
+
+  const rows = since
+    ? query.all(code, since, limit) as Message[]
+    : query.all(code, limit) as Message[];
+
+  const messages = rows
     .map(m => ({
       ...m,
       content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content
-    }));
+    }))
+    .reverse(); // chronological order
 
   return { ok: true, messages };
 }
@@ -1267,25 +1277,37 @@ export function checkRateLimitPersistent(key: string, max: number, windowMs: num
 
 // ── Message Search ───────────────────────────────────────────────────────────
 export function searchMessages(roomCode: string, query: string, limit: number = 50): Message[] {
-  // Fetch all messages for the room (content is LZ-compressed, so SQL LIKE won't work)
+  const lowerQuery = query.toLowerCase();
+
+  // First: try sender match via SQL (no decompression needed)
+  const senderMatches = db.prepare(`
+    SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as type
+    FROM messages WHERE room_code = ? AND LOWER(sender) LIKE ?
+    ORDER BY timestamp DESC LIMIT ?
+  `).all(roomCode, `%${lowerQuery}%`, limit) as any[];
+
+  const results: Message[] = senderMatches.map(m => ({
+    ...m,
+    content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content,
+  }));
+
+  if (results.length >= limit) return results;
+
+  // Second: scan recent messages for content match (cap at 500 to avoid full table scan)
+  const remaining = limit - results.length;
+  const seenIds = new Set(results.map(r => r.id));
   const rows = db.prepare(`
     SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as type
     FROM messages WHERE room_code = ?
-    ORDER BY timestamp DESC
+    ORDER BY timestamp DESC LIMIT 500
   `).all(roomCode) as any[];
 
-  const lowerQuery = query.toLowerCase();
-  const results: Message[] = [];
-
   for (const m of rows) {
+    if (seenIds.has(m.id)) continue;
     const plainContent = m.content.startsWith("lz:")
       ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content
       : m.content;
-
-    const fromMatch = m.from?.toLowerCase().includes(lowerQuery);
-    const contentMatch = plainContent.toLowerCase().includes(lowerQuery);
-
-    if (fromMatch || contentMatch) {
+    if (plainContent.toLowerCase().includes(lowerQuery)) {
       results.push({ ...m, content: plainContent });
       if (results.length >= limit) break;
     }

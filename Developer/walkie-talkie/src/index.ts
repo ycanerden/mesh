@@ -184,7 +184,9 @@ app.get("/api/messages", (c) => {
 app.get("/api/history", (c) => {
   const room = c.req.query("room");
   if (!room) return c.json({ error: "missing room" }, 400);
-  const result = getAllMessages(room);
+  const limit = Math.min(parseInt(c.req.query("limit") || "50"), 200);
+  const since = c.req.query("since") ? parseInt(c.req.query("since")!) : undefined;
+  const result = getAllMessages(room, limit, since);
   return c.json(result);
 });
 
@@ -324,6 +326,9 @@ app.get("/api/cards", (c) => {
 });
 
 // ── Presence & Typing ──────────────────────────────────────────────────────
+// Known creators — always get "creator" role regardless of heartbeat body
+const CREATORS = new Set((process.env.MESH_CREATORS || "Can Erden,Vincent").split(",").map(s => s.trim()));
+
 app.post("/api/heartbeat", async (c) => {
   const room = c.req.query("room");
   const name = c.req.query("name");
@@ -336,6 +341,8 @@ app.post("/api/heartbeat", async (c) => {
     role = body.role;
     parentAgent = body.parent;
   } catch {}
+  // Enforce creator role for known creators
+  if (CREATORS.has(name)) role = "creator";
   updatePresence(room, name, "online", hostname, role, parentAgent);
   return c.json({ ok: true, status: "online" });
 });
@@ -865,12 +872,15 @@ app.get("/api/skill", async (c) => {
   }
 });
 
-// Serve the agent manifesto — injected into every agent on join
+// Serve the agent manifesto — cached in memory, read once on first request
+let _manifestoCache: string | null = null;
 app.get("/api/manifesto", async (c) => {
   try {
-    const file = Bun.file("public/MESH_MANIFESTO.md");
-    const text = await file.text();
-    return new Response(text, { headers: { "Content-Type": "text/markdown" } });
+    if (!_manifestoCache) {
+      _manifestoCache = await Bun.file("public/MESH_MANIFESTO.md").text();
+    }
+    c.header("Cache-Control", "public, max-age=3600");
+    return new Response(_manifestoCache, { headers: { "Content-Type": "text/markdown" } });
   } catch {
     return c.json({ error: "manifesto not found" }, 404);
   }
@@ -889,9 +899,8 @@ app.get("/api/briefing", (c) => {
   const since = parseInt(c.req.query("since") || "0") || Date.now() - 8 * 60 * 60 * 1000; // default: last 8h
   if (!room) return c.json({ error: "missing room" }, 400);
 
-  const result = getAllMessages(room);
-  const msgs = (result as any).messages || (result as any) || [];
-  const recent = (Array.isArray(msgs) ? msgs : []).filter((m: any) => m.ts > since);
+  const result = getAllMessages(room, 200, since);
+  const recent = (result as any).messages || [];
 
   // Count by agent
   const byAgent: Record<string, { count: number; last: string; ts: number }> = {};
@@ -954,13 +963,17 @@ app.get("/rooms/new", (c) => {
 
   const { code, admin_token } = createRoom();
   const baseUrl = new URL(c.req.url).origin;
+  const mcpUrl = `${baseUrl}/mcp?room=${code}&name=YOUR_NAME`;
   return c.json({
-    room: code,
+    ok: true,
+    room_code: code,
+    room: code, // backward compat
     admin_token,
-    claude_code_url: `${baseUrl}/mcp?room=${code}&name=YOUR_NAME`,
-    antigravity_url: `${baseUrl}/mcp?room=${code}&name=YOUR_NAME`,
+    mcp_url: mcpUrl,
+    claude_code_url: mcpUrl, // backward compat
+    antigravity_url: mcpUrl, // backward compat
     instructions:
-      "Replace YOUR_NAME with your name. Add the URL to your AI tool's MCP config.",
+      "Replace YOUR_NAME with your name. Add the mcp_url to your AI tool's MCP config.",
   });
 });
 
