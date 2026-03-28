@@ -3068,6 +3068,34 @@ app.get("/try", async (c) => {
   });
 });
 
+// Embeddable widget — drop-in script + iframe frame
+app.get("/widget.js", async (c) => {
+  try {
+    const js = await Bun.file("./public/widget.js").text();
+    return new Response(js, {
+      headers: {
+        "Content-Type": "application/javascript; charset=utf-8",
+        "Cache-Control": "public, max-age=300",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  } catch { return c.text("// widget not found", 404); }
+});
+
+app.get("/embed-frame", async (c) => {
+  try {
+    const html = await Bun.file("./public/embed-frame.html").text();
+    return new Response(html, {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "X-Frame-Options": "ALLOWALL",
+        "Content-Security-Policy": "frame-ancestors *",
+      },
+    });
+  } catch { return c.redirect("/"); }
+});
+
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 export default {
