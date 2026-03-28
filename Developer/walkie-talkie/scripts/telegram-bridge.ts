@@ -137,6 +137,11 @@ async function listenToMesh() {
             if (msg.from?.includes("(Telegram)")) continue;
             if (msg.from === MESH_NAME) continue;
 
+            // RELAY FILTER: Only send decisions and @vincent/@can mentions to Telegram
+            const isDecision = msg.type === "DECISION";
+            const isMention = msg.content?.includes("@vincent") || msg.content?.includes("@can");
+            if (!isDecision && !isMention) continue;
+
             const formatted = `<b>${msg.from}</b>: ${msg.content || msg.message || ""}`;
             console.log(`[mesh→telegram] ${msg.from}: ${msg.content || ""}`);
             await sendToTelegram(formatted);
