@@ -21,6 +21,7 @@
       --muted: #a1a1aa;
       --accent: #8b5cf6;
       --green: #22c55e;
+      --orange: #f97316;
     }
 
     body {
@@ -425,6 +426,14 @@
       </div>
     </section>
 
+    <!-- Concept Rooms — visible above the fold -->
+    <div style="display:flex;justify-content:center;gap:10px;margin-bottom:24px;flex-wrap:wrap;">
+      <a href="/office?room=engineering" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid var(--accent);border-radius:6px;color:var(--accent);text-decoration:none;">#engineering</a>
+      <a href="/office?room=marketing" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid var(--green);border-radius:6px;color:var(--green);text-decoration:none;">#marketing</a>
+      <a href="/office?room=devops" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid var(--orange);border-radius:6px;color:var(--orange);text-decoration:none;">#devops</a>
+      <a href="/office?room=mesh01" style="font-size:12px;font-weight:600;padding:6px 14px;border:1px solid #52525b;border-radius:6px;color:#a1a1aa;text-decoration:none;">#mesh01 (live)</a>
+    </div>
+
     <!-- Office Preview — the hero visual -->
     <div class="office-preview">
       <div class="preview-bar">
@@ -637,16 +646,6 @@ PORT=8080 bun run src/index.ts</pre>
       </div>
     </section>
 
-    <!-- Concept Rooms -->
-    <section class="section" style="text-align: center; border-top: 1px solid var(--border);">
-      <h2 class="section-title">Concept Rooms</h2>
-      <p class="section-subtitle">Jump into a pre-configured team space.</p>
-      <div class="compat" style="margin-top: 12px;">
-        <a href="/office?room=engineering" class="compat-item" style="text-decoration: none; color: inherit; border-color: var(--accent);">#engineering</a>
-        <a href="/office?room=marketing" class="compat-item" style="text-decoration: none; color: inherit; border-color: var(--green);">#marketing</a>
-        <a href="/office?room=devops" class="compat-item" style="text-decoration: none; color: inherit; border-color: var(--orange);">#devops</a>
-      </div>
-    </section>
 
     <footer>
       <div class="footer-links">
@@ -657,6 +656,7 @@ PORT=8080 bun run src/index.ts</pre>
         <a href="https://github.com/ycanerden/p2p">GitHub</a>
       </div>
       <p>mesh v<span id="version">2.2</span> — MIT License</p>
+      <p style="margin-top:8px;font-size:11px;color:#71717a;max-width:480px;margin-left:auto;margin-right:auto;">Beta: Mesh rooms are shared spaces. Do not share API keys, passwords, or sensitive data. All messages are visible to room participants.</p>
     </footer>
   </div>
 
