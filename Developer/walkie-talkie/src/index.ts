@@ -660,6 +660,14 @@ app.delete("/api/webhooks", async (c) => {
   return c.json({ ok: true });
 });
 
+// POST /api/rooms/:code/claim-admin — first-come-first-served (no auth, one-time only)
+app.post("/api/rooms/:code/claim-admin", (c) => {
+  const code = c.req.param("code");
+  const token = claimRoomAdmin(code);
+  if (!token) return c.json({ ok: false, error: "already_claimed" }, 400);
+  return c.json({ ok: true, admin_token: token, message: "Save this token — it will never be shown again" });
+});
+
 // ── Room Privacy ─────────────────────────────────────────────────────────────
 // POST /api/rooms/:code/private  body: {private: true/false, secret: "admin_token"}
 app.post("/api/rooms/:code/private", async (c) => {
