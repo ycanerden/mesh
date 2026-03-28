@@ -295,6 +295,21 @@ app.post("/api/admin/kick", async (c) => {
   return c.json({ ok: true, banned: getBanned(room) });
 });
 
+// Creator-level cleanup — uses MESH_CREATORS env for auth (no admin_token needed)
+app.post("/api/admin/cleanup", async (c) => {
+  const room = c.req.query("room");
+  const callerName = c.req.query("name");
+  if (!room || !callerName || !CREATORS.has(callerName)) return c.json({ error: "unauthorized — creators only" }, 401);
+  const { remove } = await c.req.json();
+  if (!Array.isArray(remove)) return c.json({ error: "provide {remove: [\"name1\", ...]}" }, 400);
+  const removed: string[] = [];
+  for (const name of remove) {
+    kickAgent(room, name);
+    removed.push(name);
+  }
+  return c.json({ ok: true, removed, count: removed.length });
+});
+
 app.post("/api/admin/rate-limit-exempt", async (c) => {
   const room = c.req.query("room");
   const token = c.req.query("token") || c.req.header("x-admin-token");
@@ -1190,7 +1205,9 @@ app.get("/rooms/new", (c) => {
   }
 
   const { code, admin_token } = createRoom();
-  const baseUrl = new URL(c.req.url).origin;
+  const rawOrigin = new URL(c.req.url).origin;
+  const proto = c.req.header("x-forwarded-proto") || new URL(c.req.url).protocol.replace(":","");
+  const baseUrl = rawOrigin.replace(/^https?/, proto);
   const mcpUrl = `${baseUrl}/mcp?room=${code}&name=YOUR_NAME`;
   // Admin token is only returned via x-admin-token header (not in body)
   // Room creator must save it from the response header
@@ -1248,7 +1265,8 @@ app.get("/rooms/demo", (c) => {
 
   // Redirect to office view of the new room
   const redirect = c.req.query("redirect") || "office";
-  const baseUrl = new URL(c.req.url).origin;
+  const _proto = c.req.header("x-forwarded-proto") || new URL(c.req.url).protocol.replace(":","");
+  const baseUrl = new URL(c.req.url).origin.replace(/^https?/, _proto);
   if (redirect === "json") {
     return c.json({
       room: code,
