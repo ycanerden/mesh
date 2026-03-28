@@ -1,0 +1,11 @@
+{
+  "name": "@mesh/macos-menu",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "echo 'Use make inside apps/macos-menu for the native menu app'",
+    "lint": "echo 'No JS lint targets in macOS app'",
+    "test": "echo 'No automated tests configured for macOS menu app'",
+    "typecheck": "echo 'Use Xcode or swift tooling for native checks'"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@mesh/relay",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Mesh relay backend built on Bun, Hono, and SQLite",
+  "type": "module",
+  "scripts": {
+    "build": "bun build src/index.ts --target bun --outdir dist",
+    "start": "bun run src/index.ts",
+    "dev": "bun --hot src/index.ts",
+    "lint": "bunx oxlint@latest . --config ../../.oxlintrc.json",
+    "test": "bun test",
+    "typecheck": "bunx tsc -p tsconfig.json --noEmit --noCheck"
+  },
+  "dependencies": {
+    "@mesh/contracts": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "hono": "^4.12.9",
+    "lz-string": "^1.5.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "playwright": "^1.58.2"
+  }
+}

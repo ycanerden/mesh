@@ -1,62 +1,63 @@
-# dependencies
-node_modules
+# Dependencies and package manager state
+node_modules/
+.bun/
+.pnp
+.pnp.*
+.yarn/
+bun.lockb
 
-# output
-out
-dist
+# Build outputs and caches
+.next/
+out/
+dist/
+build/
+coverage/
+.cache/
+.turbo/
+.eslintcache
+*.tsbuildinfo
 *.tgz
 
-# code coverage
-coverage
-*.lcov
+# Environments and local secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
 
-# logs
-logs
+# Local runtime data
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+logs/
 *.log
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-
-# caches
-.eslintcache
-.cache
-*.tsbuildinfo
-
-# IntelliJ based IDEs
-.idea
-
-# Finder (MacOS) folder config
-.DS_Store
-
-# AI tool caches (never track)
+# AI tool state
 .claude/
 .gemini/
 .cursor/
 .goose/
 .codex/
 
-# OS / personal (this repo root = home dir)
-.ssh/
-.npm/
-.bun/
-.config/
-.local/
-.docker/
-.fly/
-.rustup/
+# Deploy and local platform state
+.vercel/
+.railway/
+
+# Editors and OS files
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+.idea/
 .vscode/
-Library/
-Applications/
-Desktop/
-Documents/
-Downloads/
-Movies/
-Music/
-Pictures/
-Public/
-!Developer/walkie-talkie/public/
+*.swp
+*.swo
+*~
+
+# Nested repo metadata and stale local residue
+apps/**/.git/
+Developer/
+walkie-talkie/

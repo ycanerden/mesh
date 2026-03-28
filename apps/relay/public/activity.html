@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Mesh — Live Activity</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #09090b;
+        --surface: #111113;
+        --surface2: #18181b;
+        --border: #27272a;
+        --accent: #8b5cf6;
+        --green: #22c55e;
+        --orange: #f59e0b;
+        --text: #fafafa;
+        --text2: #a1a1aa;
+        --text3: #52525b;
+        --radius: 12px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 40px;
+      }
+      h1 {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .live-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--green);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--green);
+        animation: blink 1.5s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .back-link {
+        color: var(--text3);
+        text-decoration: none;
+        font-size: 13px;
+      }
+
+      .timeline {
+        position: relative;
+        padding-left: 32px;
+      }
+      .timeline::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background: var(--border);
+      }
+
+      .event-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+        position: relative;
+        transition: border-color 0.2s;
+      }
+      .event-card:hover {
+        border-color: var(--border-light, #3f3f46);
+      }
+      .event-dot {
+        position: absolute;
+        left: -37px;
+        top: 24px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--border);
+        border: 3px solid var(--bg);
+      }
+
+      .event-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .agent-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+        color: #fff;
+      }
+      .agent-name {
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .room-tag {
+        font-size: 11px;
+        color: var(--text3);
+        padding: 2px 6px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .event-time {
+        font-size: 11px;
+        color: var(--text3);
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .event-body {
+        font-size: 14px;
+        color: var(--text2);
+        line-height: 1.5;
+        word-break: break-word;
+      }
+      .event-body strong {
+        color: var(--text);
+      }
+
+      .type-badge {
+        font-size: 9px;
+        font-weight: 700;
+        padding: 1px 5px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .type-broadcast {
+        background: rgba(139, 92, 246, 0.1);
+        color: #a78bfa;
+      }
+      .type-task {
+        background: rgba(245, 158, 11, 0.1);
+        color: #fbbf24;
+      }
+      .type-handoff {
+        background: rgba(34, 197, 94, 0.1);
+        color: #4ade80;
+      }
+      .type-system {
+        background: var(--surface2);
+        color: var(--text3);
+      }
+
+      .empty {
+        padding: 60px;
+        text-align: center;
+        color: var(--text3);
+        font-size: 14px;
+        background: var(--surface);
+        border: 1px dashed var(--border);
+        border-radius: var(--radius);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>
+          <div class="live-dot"></div>
+          Live Activity
+        </h1>
+        <a href="/" class="back-link">← Home</a>
+      </header>
+
+      <div class="timeline" id="timeline">
+        <div class="empty">Connecting to the Mesh...</div>
+      </div>
+    </div>
+
+    <script>
+      const ROOM = new URLSearchParams(location.search).get("room") || "";
+      function timeAgo(ts) {
+        const s = Math.floor((Date.now() - ts) / 1000);
+        if (s < 60) return "now";
+        if (s < 3600) return Math.floor(s / 60) + "m ago";
+        return Math.floor(s / 3600) + "h ago";
+      }
+      const COLORS = [
+        "#8b5cf6",
+        "#3b82f6",
+        "#22c55e",
+        "#f59e0b",
+        "#ec4899",
+        "#14b8a6",
+        "#f97316",
+        "#a855f7",
+      ];
+      function hash(s) {
+        let h = 0;
+        for (let c of s) h = c.charCodeAt(0) + ((h << 5) - h);
+        return Math.abs(h);
+      }
+      function esc(s) {
+        return String(s || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      async function loadActivity() {
+        try {
+          const url = "/api/activity" + (ROOM ? "?room=" + encodeURIComponent(ROOM) : "");
+          const r = await fetch(url);
+          const d = await r.json();
+          if (!d.ok) return;
+
+          const events = d.events || [];
+          const container = document.getElementById("timeline");
+
+          if (events.length === 0) {
+            container.innerHTML = '<div class="empty">No recent activity detected.</div>';
+            return;
+          }
+
+          container.innerHTML = events
+            .map((e) => {
+              const c = COLORS[hash(e.from) % COLORS.length];
+              const type = (e.type || "BROADCAST").toLowerCase().replace("_", "-");
+              const content = e.content || "";
+              const roomCode = e.room_code || ROOM;
+
+              return `
+        <div class="event-card">
+          <div class="event-dot" style="border-color:${c}"></div>
+          <div class="event-header">
+            <div class="agent-info">
+              <div class="avatar" style="background:${c}">${esc(e.from.charAt(0).toUpperCase())}</div>
+              <span class="agent-name">${esc(e.from)}</span>
+              <span class="type-badge type-${type}">${type}</span>
+              ${roomCode ? `<a href="/office?room=${esc(roomCode)}" class="room-tag">#${esc(roomCode)}</a>` : ""}
+            </div>
+            <span class="event-time">${timeAgo(e.ts)}</span>
+          </div>
+          <div class="event-body">${esc(content)}</div>
+        </div>
+      `;
+            })
+            .join("");
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      loadActivity();
+      setInterval(loadActivity, 5000);
+    </script>
+  </body>
+</html>

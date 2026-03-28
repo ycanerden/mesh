@@ -1,0 +1,136 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-heading);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-heading);
+  --radius-sm: calc(var(--radius) * 0.65);
+  --radius-md: calc(var(--radius) * 0.85);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+}
+
+:root {
+  --font-heading: "Avenir Next", "Segoe UI", "Trebuchet MS", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", "SF Mono", "Menlo", monospace;
+  --background: oklch(0.98 0.01 85);
+  --foreground: oklch(0.2 0.03 240);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.23 0.03 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.23 0.03 240);
+  --primary: oklch(0.4 0.09 214);
+  --primary-foreground: oklch(0.98 0.01 85);
+  --secondary: oklch(0.93 0.02 190);
+  --secondary-foreground: oklch(0.24 0.03 210);
+  --muted: oklch(0.95 0.02 85);
+  --muted-foreground: oklch(0.48 0.03 240);
+  --accent: oklch(0.83 0.1 75);
+  --accent-foreground: oklch(0.22 0.03 240);
+  --destructive: oklch(0.61 0.2 26);
+  --border: oklch(0.88 0.03 82);
+  --input: oklch(0.9 0.02 80);
+  --ring: oklch(0.62 0.08 214);
+  --chart-1: oklch(0.74 0.13 76);
+  --chart-2: oklch(0.68 0.1 190);
+  --chart-3: oklch(0.56 0.11 237);
+  --chart-4: oklch(0.72 0.09 142);
+  --chart-5: oklch(0.63 0.12 25);
+  --radius: 1rem;
+}
+
+* {
+  @apply border-border outline-ring/50;
+}
+
+html {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply min-h-screen bg-background text-foreground antialiased;
+  background-image:
+    radial-gradient(
+      circle at top left,
+      color-mix(in oklch, var(--accent) 18%, transparent),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at top right,
+      color-mix(in oklch, var(--secondary) 40%, transparent),
+      transparent 25%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.92));
+}
+
+main {
+  @apply flex-1;
+}
+
+a {
+  @apply transition-colors;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--accent) 55%, white);
+}
+
+.mesh-grid {
+  background-image:
+    linear-gradient(to right, rgba(28, 44, 74, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(28, 44, 74, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.mesh-shell {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.mesh-heading {
+  font-family: var(--font-heading), sans-serif;
+  letter-spacing: -0.04em;
+}
+
+.mesh-kicker {
+  @apply text-[0.7rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground;
+}
+
+.mesh-glass {
+  @apply border border-white/70 bg-white/80 shadow-[0_24px_80px_-36px_rgba(43,57,89,0.45)] backdrop-blur;
+}
+
+.mesh-panel {
+  @apply rounded-3xl border border-white/70 bg-white/80 p-6 shadow-[0_24px_80px_-36px_rgba(43,57,89,0.45)] backdrop-blur;
+}
+
+.mesh-code {
+  @apply rounded-2xl border border-border/70 bg-[color:color-mix(in_oklch,var(--foreground)_4%,white)] p-4 font-mono text-sm text-foreground;
+}

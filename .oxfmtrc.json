@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [
+    ".git/**",
+    "node_modules/**",
+    ".bun/**",
+    ".turbo/**",
+    ".next/**",
+    "out/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    ".vercel/**",
+    "apps/web/.git/**",
+    "walkie-talkie/**"
+  ]
+}
