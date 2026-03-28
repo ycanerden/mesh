@@ -1,3 +1,4 @@
+
 import { Database } from "bun:sqlite";
 import { EventEmitter } from "events";
 import LZString from "lz-string";
@@ -413,10 +414,91 @@ export interface Message {
   ts: number;
   content: string;
   type?: string;
+  reply_to?: string;
+  reactions?: { agent_name: string; emoji: string }[];
 }
 
 const MAX_MESSAGE_BYTES = 10 * 1024; // 10KB
 const ROOM_TTL_MS = 72 * 60 * 60 * 1000; // 72h
+
+// ── Task Assignments ─────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS room_assignments (
+    task_id TEXT PRIMARY KEY,
+    room_code TEXT NOT NULL,
+    agent_name TEXT NOT NULL,
+    task_title TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    note TEXT,
+    assigned_at INTEGER NOT NULL,
+    updated_at INTEGER,
+    due_date INTEGER,
+    FOREIGN KEY(room_code) REFERENCES rooms(code)
+  );
+`);
+
+try { db.run("CREATE INDEX IF NOT EXISTS idx_assignments_room ON room_assignments(room_code);"); } catch (e) {}
+try { db.run("CREATE INDEX IF NOT EXISTS idx_assignments_agent ON room_assignments(agent_name);"); } catch (e) {}
+
+export interface TaskAssignment {
+  task_id: string;
+  room_code: string;
+  agent_name: string;
+  task_title: string;
+  status: 'pending' | 'in_progress' | 'done' | 'blocked';
+  note?: string;
+  assigned_at: number;
+  updated_at?: number;
+  due_date?: number;
+}
+
+export function assignTask(
+  roomCode: string,
+  agentName: string,
+  taskTitle: string,
+  dueDate?: number
+): TaskAssignment {
+  const taskId = `task_${crypto.randomBytes(6).toString('hex')}`;
+  const now = Date.now();
+  db.prepare(`
+    INSERT INTO room_assignments (task_id, room_code, agent_name, task_title, assigned_at, due_date)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(taskId, roomCode, agentName, taskTitle, now, dueDate || null);
+
+  appendMessage(roomCode, 'system', `TASK ASSIGNED to @agent:${agentName}: ${taskTitle}`, agentName, 'TASK');
+
+  return { task_id: taskId, room_code: roomCode, agent_name: agentName, task_title: taskTitle, status: 'pending', assigned_at: now, due_date: dueDate };
+}
+
+export function updateTaskStatus(
+  roomCode: string,
+  agentName: string,
+  taskId: string,
+  status: 'in_progress' | 'done' | 'blocked',
+  note?: string
+): void {
+  db.prepare(
+    "UPDATE room_assignments SET status = ?, note = ?, updated_at = ? WHERE task_id = ? AND room_code = ?"
+  ).run(status, note || null, Date.now(), taskId, roomCode);
+  
+  const task = db.prepare("SELECT task_title FROM room_assignments WHERE task_id = ?").get(taskId) as { task_title: string };
+  if (task) {
+    const statusEmoji = { done: '✅', in_progress: '⏳', blocked: '🛑' }[status];
+    appendMessage(roomCode, 'system', `${statusEmoji} TASK UPDATE by @agent:${agentName}: ${task.task_title} → ${status.toUpperCase()}`, undefined, 'TASK');
+  }
+}
+
+export function getRoomTasks(roomCode: string): TaskAssignment[] {
+  return db
+    .prepare("SELECT * FROM room_assignments WHERE room_code = ? ORDER BY assigned_at DESC")
+    .all(roomCode) as TaskAssignment[];
+}
+
+export function getAgentTasks(agentName: string): TaskAssignment[] {
+  return db
+    .prepare("SELECT * FROM room_assignments WHERE agent_name = ? ORDER BY assigned_at DESC")
+    .all(agentName) as TaskAssignment[];
+}
 
 // ── Room management ──────────────────────────────────────────────────────────
 
@@ -509,9 +591,18 @@ export function getWhitelist(roomCode: string): string[] {
 }
 
 // Returns true if agent is allowed to send (whitelist empty = everyone allowed)
-export function canAgentSend(roomCode: string, agentName: string): boolean {
+// If an agent token is set in room_agent_tokens, it MUST match.
+export function canAgentSend(roomCode: string, agentName: string, providedToken?: string): boolean {
   const banned = db.prepare("SELECT 1 FROM room_banned WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
   if (banned) return false;
+
+  // Identity check: if this agent has a token registered, it must be provided and match
+  const tokenRow = db.prepare("SELECT token FROM room_agent_tokens WHERE room_code = ? AND agent_name = ?")
+    .get(roomCode, agentName) as { token: string } | undefined;
+  if (tokenRow) {
+    if (!providedToken || tokenRow.token !== providedToken) return false;
+  }
+
   const whitelistCount = db.prepare("SELECT COUNT(*) as n FROM room_whitelist WHERE room_code = ?").get(roomCode) as any;
   if (whitelistCount.n === 0) return true; // no whitelist = open room
   const allowed = db.prepare("SELECT 1 FROM room_whitelist WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
@@ -793,7 +884,7 @@ export function getMessages(
 
   // Fetch messages using rowid cursor (avoids skips on mixed broadcast+DM)
   let query = `
-    SELECT rowid, id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type'
+    SELECT rowid, id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to
     FROM messages
     WHERE room_code = ?
     AND rowid > ?
@@ -818,7 +909,18 @@ export function getMessages(
       const decompressed = m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content;
       const mentionMatches = decompressed.match(/@([\w\s.-]+?)(?=\s|[^a-zA-Z0-9._\s-]|$)/g);
       const mentions = mentionMatches ? [...new Set(mentionMatches.map((m: string) => m.slice(1).trim()))] : undefined;
-      return { id: m.id, from: m.from, to: m.to, ts: m.ts, content: decompressed, type: m.type, ...(mentions?.length ? { mentions } : {}) };
+      const reactions = getMessageReactions(m.id);
+      return {
+        id: m.id,
+        from: m.from,
+        to: m.to,
+        ts: m.ts,
+        content: decompressed,
+        type: m.type,
+        reply_to: m.reply_to,
+        ...(mentions?.length ? { mentions } : {}),
+        ...(reactions.length ? { reactions } : {})
+      };
     });
 
   // Advance cursor to max rowid seen (eliminates skips)
@@ -847,25 +949,30 @@ export function getAllMessages(
   let rows: Message[];
   if (viewer) {
     const query = since
-      ? db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND timestamp > ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`)
-      : db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`);
+      ? db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to FROM messages WHERE room_code = ? AND timestamp > ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`)
+      : db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to FROM messages WHERE room_code = ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`);
     rows = since
       ? query.all(code, since, viewer, viewer, limit) as Message[]
       : query.all(code, viewer, viewer, limit) as Message[];
   } else {
     const query = since
-      ? db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND timestamp > ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`)
-      : db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`);
+      ? db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to FROM messages WHERE room_code = ? AND timestamp > ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`)
+      : db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to FROM messages WHERE room_code = ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`);
     rows = since
       ? query.all(code, since, limit) as Message[]
       : query.all(code, limit) as Message[];
   }
 
   const messages = rows
-    .map(m => ({
-      ...m,
-      content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content
-    }))
+    .map(m => {
+      const decompressed = m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content;
+      const reactions = getMessageReactions(m.id);
+      return {
+        ...m,
+        content: decompressed,
+        ...(reactions.length ? { reactions } : {})
+      };
+    })
     .reverse() // chronological order
     .map((m: any) => {
       const mentionMatches = m.content.match(/@([\w\s.-]+?)(?=\s|[^a-zA-Z0-9._\s-]|$)/g);
@@ -909,6 +1016,7 @@ export function getRoomStatus(
     connected: partnersWithCards.length > 0,
     partners: partnersWithCards,
     message_count: countRow.count,
+    context: getRoomContext(code), // Shared room-level context
   };
 }
 // ── Message Admin ─────────────────────────────────────────────────────────────
@@ -1307,7 +1415,7 @@ export function getRoomFiles(roomCode: string): Array<{ file_id: string; filenam
     .all(roomCode) as any[];
 }
 
-// ── Handoff Protocol ─────────────────────────────────────────────────────────
+// ── Handoff Protocol ───────────────────────────────────────────────────────
 db.run(`
   CREATE TABLE IF NOT EXISTS handoffs (
     handoff_id TEXT PRIMARY KEY,
@@ -1770,10 +1878,23 @@ export function getAllPersonalities(): any[] {
 // Generate a CLAUDE.md-compatible identity block for an agent
 export function generateIdentityBlock(name: string): string {
   const p = getPersonality(name);
-  if (!p) return `# ${name}\nNo saved personality. Use /api/personality to save one.`;
-  const modelLine = p.model ? `\nModel: ${p.model}` : "";
-  const toolLine = p.tool ? `\nTool: ${p.tool}` : "";
-  return `# Agent Identity: ${name}${modelLine}${toolLine}\n\n${p.personality}\n\nSkills: ${p.skills}\n\n## System Prompt\n${p.system_prompt}\n\n---\nSaved at: ${new Date(p.updated_at).toISOString()}`;
+  if (!p) return `# ${name}
+No saved personality. Use /api/personality to save one.`;
+  const modelLine = p.model ? `
+Model: ${p.model}` : "";
+  const toolLine = p.tool ? `
+Tool: ${p.tool}` : "";
+  return `# Agent Identity: ${name}${modelLine}${toolLine}
+
+${p.personality}
+
+Skills: ${p.skills}
+
+## System Prompt
+${p.system_prompt}
+
+---
+Saved at: ${new Date(p.updated_at).toISOString()}`;
 }
 
 // ── Waitlist ─────────────────────────────────────────────────────────────────
