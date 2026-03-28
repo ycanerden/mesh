@@ -1,9 +1,0 @@
-# Tell Railway/Railpack to use Bun
-[phases.setup]
-nixPkgs = ["...", "bun"]
-
-[phases.install]
-cmds = ["bun install"]
-
-[start]
-cmd = "bun run src/index.ts"

@@ -1,9 +1,0 @@
-[build]
-builder = "DOCKERFILE"
-dockerfilePath = "walkie-talkie/Dockerfile"
-watchPatterns = ["walkie-talkie/**"]
-
-[deploy]
-healthcheckPath = "/health"
-healthcheckTimeout = 120
-restartPolicy = "always"
