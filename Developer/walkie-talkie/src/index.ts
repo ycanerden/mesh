@@ -1288,6 +1288,33 @@ app.get("/og-image.svg", async (c) => {
   }
 });
 
+app.get("/sitemap.xml", async (c) => {
+  try {
+    const xml = await Bun.file("./public/sitemap.xml").text();
+    return new Response(xml, { headers: { "Content-Type": "application/xml", "Cache-Control": "public, max-age=86400" } });
+  } catch {
+    return c.text("Not found", 404);
+  }
+});
+
+app.get("/robots.txt", async (c) => {
+  try {
+    const txt = await Bun.file("./public/robots.txt").text();
+    return new Response(txt, { headers: { "Content-Type": "text/plain", "Cache-Control": "public, max-age=86400" } });
+  } catch {
+    return c.text("Not found", 404);
+  }
+});
+
+app.get("/changelog", async (c) => {
+  try {
+    const html = await Bun.file("./public/changelog.html").text();
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch {
+    return c.redirect("/");
+  }
+});
+
 // ── Install script (curl | bash) ─────────────────────────────────────────────
 app.get("/install", async (c) => {
   try {
