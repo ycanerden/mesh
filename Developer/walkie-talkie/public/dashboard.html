@@ -9,32 +9,32 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #16161a;
-      --surface: #1a1a1f;
-      --surface2: #1e1e24;
-      --surface3: #242430;
-      --border: #2a2a34;
-      --border-light: #35353f;
-      --accent: #4f8ef7;
-      --accent2: #7cb0ff;
-      --accent-dim: rgba(79,142,247,.07);
+      --bg: #09090b;
+      --surface: #111113;
+      --surface2: #19191d;
+      --surface3: #222228;
+      --border: #2e2e35;
+      --border-light: #3e3e48;
+      --accent: #4d94ff;
+      --accent2: #7ab3ff;
+      --accent-dim: rgba(77,148,255,.06);
       --green: #34d399;
       --green-dim: rgba(52,211,153,.08);
       --orange: #fb923c;
       --orange-dim: rgba(251,146,60,.08);
       --red: #f87171;
-      --red-dim: rgba(248,113,113,.12);
+      --red-dim: rgba(248,113,113,.15);
       --blue: #60a5fa;
       --blue-dim: rgba(96,165,250,.08);
       --pink: #f472b6;
-      --text: #e2e2e8;
-      --text2: #7a7a88;
-      --text3: #4a4a56;
+      --text: #e4e4e7;
+      --text2: #8b8b96;
+      --text3: #55555e;
       --radius: 8px;
       --radius-sm: 6px;
       --radius-xs: 4px;
-      --shadow: 0 1px 3px rgba(0,0,0,.4);
-      --sidebar-w: 260px;
+      --shadow: 0 1px 3px rgba(0,0,0,.3);
+      --sidebar-w: 300px;
       --topbar-h: 52px;
     }
 
@@ -399,85 +399,50 @@
     .tab-panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
     .tab-panel.active { display: flex; }
 
-    /* ===================== CHAT TAB — PostHog style ===================== */
+    /* ===================== CHAT TAB ===================== */
     .messages-container {
-      flex: 1; overflow-y: auto;
-      padding: 48px 80px;
-      display: flex; flex-direction: column;
-      background: var(--bg);
+      flex: 1; overflow-y: auto; padding: 28px 32px; display: flex; flex-direction: column;
+      /* Office-style subtle grid background */
+      background:
+        repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 40px),
+        repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 40px),
+        var(--bg);
     }
-    .messages-list {
-      display: flex; flex-direction: column;
-      gap: 32px;
-      max-width: 720px;
-      width: 100%;
-      margin: 0 auto;
-    }
+    .messages-list { display: flex; flex-direction: column; gap: 8px; }
 
-    /* Message row: avatar + bubble */
-    .msg-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      animation: msg-in .18s ease;
+    .msg {
+      max-width: 68%; padding: 11px 16px; border-radius: 8px;
+      font-size: 13.5px; line-height: 1.55; word-wrap: break-word;
+      animation: msg-in .25s ease; position: relative;
     }
     @keyframes msg-in {
-      from { opacity: 0; transform: translateY(3px); }
+      from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .msg-row.self { flex-direction: row-reverse; }
-    .msg-row.system { justify-content: center; }
-
-    /* Avatar badge — agent messages only */
-    .msg-avatar-badge {
-      width: 28px; height: 28px;
-      border-radius: 7px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 700;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .msg-row.self .msg-avatar-badge,
-    .msg-row.system .msg-avatar-badge { display: none; }
-
-    /* The bubble */
-    .msg {
-      max-width: 80%; padding: 14px 18px; border-radius: 12px;
-      font-size: 14px; line-height: 1.68; word-wrap: break-word;
-      position: relative;
-    }
-
-    /* Agent: clean card with subtle shadow */
     .msg.other {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-top-left-radius: 3px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+      align-self: flex-start;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-bottom-left-radius: 3px;
     }
-
-    /* Human: simple minimal chip — PostHog style */
     .msg.self {
+      align-self: flex-end;
       background: var(--surface3);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-top-right-radius: 3px;
+      color: var(--text); border-bottom-right-radius: 3px;
     }
-
     .msg.system {
-      max-width: 90%;
-      background: transparent; border: none;
-      text-align: center; font-size: 11.5px;
-      color: var(--text3); padding: 2px 0;
+      align-self: center; max-width: 85%;
+      background: var(--surface2); border: 1px dashed var(--border);
+      border-radius: var(--radius-sm); text-align: center; font-size: 12px;
+      color: var(--text2); padding: 8px 16px;
     }
     .msg-header {
-      display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 7px; margin-bottom: 3px;
       flex-wrap: wrap;
     }
-    .msg.self .msg-header { display: none; }
-    .msg-avatar-dot { display: none; }
-    .msg-sender { font-weight: 600; font-size: 12px; }
-    .msg-time { font-size: 10px; color: var(--text3); margin-left: auto; }
-    .msg.self .msg-time { display: none; }
+    .msg-avatar-dot { width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0;margin-top:1px; }
+    .msg-sender { font-weight: 600; font-size: 12px; color: var(--text); }
+    .msg-time { font-size: 10px; color: var(--text2); }
+    .msg.self .msg-time { color: rgba(255,255,255,.55); }
     .msg-admin-actions {
       display: none;
       margin-left: auto;
@@ -501,7 +466,7 @@
       font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .5px; line-height: 1;
     }
-    .msg-type-badge.broadcast { display: none; /* don't clutter normal msgs */ }
+    .msg-type-badge.broadcast { background: var(--accent-dim); color: var(--accent2); }
     .msg-type-badge.task { background: var(--orange-dim); color: var(--orange); }
     .msg-type-badge.handoff { background: var(--green-dim); color: var(--green); }
     .msg-type-badge.direct { background: var(--red-dim); color: var(--red); }
@@ -510,29 +475,16 @@
     .msg-type-badge.help { background: var(--red-dim); color: var(--red); box-shadow: 0 0 8px var(--red-dim); }
 
     .msg.help {
-      border: 1.5px solid var(--red) !important;
+      border: 2px solid var(--red) !important;
       background: rgba(248,113,113,.05) !important;
       animation: msg-help-flash 2s infinite !important;
     }
     @keyframes msg-help-flash {
       0%, 100% { border-color: var(--red); box-shadow: 0 0 0px var(--red); }
-      50% { border-color: #ff0000; box-shadow: 0 0 12px rgba(255,0,0,0.2); }
+      50% { border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.3); }
     }
 
-    .msg-body {
-      font-size: 13.5px; line-height: 1.58; white-space: pre-wrap;
-      /* Basic markdown rendering via CSS */
-    }
-    .msg-body code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      background: rgba(0,0,0,0.3);
-      padding: 1px 5px;
-      border-radius: 4px;
-      color: #a5d6ff;
-    }
-    .msg-body strong { font-weight: 700; color: var(--text); }
-
+    .msg-body { font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
     .msg-reply-ref {
       font-size: 11px; color: var(--text2); border-left: 2px solid var(--accent);
       padding-left: 8px; margin-bottom: 4px; font-style: italic;
@@ -548,9 +500,8 @@
     .msg.dm-to-me .msg-to { color: var(--orange); font-weight: 600; }
 
     .date-sep {
-      text-align: center; font-size: 11px; color: var(--text3);
-      padding: 20px 0 10px; font-weight: 500; position: relative;
-      letter-spacing: 0.3px;
+      text-align: center; font-size: 11px; color: var(--text2);
+      padding: 16px 0 8px; font-weight: 600; position: relative;
     }
     .date-sep::before, .date-sep::after {
       content: ''; position: absolute; top: 50%; height: 1px;
@@ -559,27 +510,9 @@
     .date-sep::before { left: 0; }
     .date-sep::after { right: 0; }
 
-    /* Multiple typing indicators */
     .typing-bar {
-      padding: 4px 28px; font-size: 12px; color: var(--text2);
-      min-height: 24px; display: flex; flex-wrap: wrap; gap: 8px;
-      align-items: center;
-    }
-    .typing-chip {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 11.5px; color: var(--text2); font-style: italic;
-    }
-    .typing-dots { display: flex; gap: 2px; }
-    .typing-dots span {
-      width: 3px; height: 3px; border-radius: 50%;
-      background: var(--text2);
-      animation: typing-pulse 1.2s ease-in-out infinite;
-    }
-    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typing-pulse {
-      0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
-      40% { opacity: 1; transform: translateY(-2px); }
+      padding: 4px 24px; font-size: 12px; color: var(--text2);
+      min-height: 24px; font-style: italic;
     }
 
     .empty-state {
@@ -589,68 +522,48 @@
     .empty-icon { font-size: 48px; opacity: .5; }
     .empty-text { font-size: 14px; }
 
-    /* Composer — PostHog style: centered, wide, rounded */
+    /* Composer */
     .composer {
-      padding: 16px 80px 24px;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      padding: 12px 24px 16px; border-top: 1px solid var(--border);
+      background: var(--surface); display: flex; gap: 8px; align-items: flex-end;
     }
-    .composer-inner {
-      max-width: 720px;
-      width: 100%;
-      margin: 0 auto;
-      background: var(--surface2);
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      padding: 12px 16px 10px;
-      transition: border-color .2s;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .composer-inner:focus-within { border-color: var(--accent); }
-    .composer-left {
-      display: flex; gap: 6px; align-items: center;
-      order: 2; /* below textarea */
-      flex-wrap: wrap;
-    }
+    .composer-left { display: flex; flex-direction: column; gap: 6px; }
     .composer-name {
-      background: transparent; border: 1px solid var(--border);
-      border-radius: 6px; padding: 4px 8px; color: var(--text);
-      font-size: 12px; font-family: inherit; outline: none; width: 100px;
+      width: 110px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-xs); padding: 7px 10px; color: var(--text);
+      font-size: 12px; font-family: inherit; outline: none;
     }
     .composer-name:focus { border-color: var(--accent); }
     .composer-type {
-      background: transparent; border: 1px solid var(--border);
-      border-radius: 6px; padding: 4px 8px; color: var(--text);
+      width: 110px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-xs); padding: 7px 10px; color: var(--text);
       font-size: 12px; font-family: inherit; outline: none;
-      appearance: none; -webkit-appearance: none; cursor: pointer; width: 90px;
+      appearance: none; -webkit-appearance: none;
+      cursor: pointer;
     }
     .composer-type:focus { border-color: var(--accent); }
     .composer-body {
-      flex: 1; order: 1; /* above left controls */
+      flex: 1; display: flex; flex-direction: column; gap: 0;
     }
     .composer-input {
-      width: 100%; background: transparent; border: none;
-      padding: 0; color: var(--text);
+      flex: 1; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px 16px; color: var(--text);
       font-size: 14px; font-family: inherit; resize: none;
-      outline: none; min-height: 40px; max-height: 160px;
-      line-height: 1.6;
+      outline: none; min-height: 44px; max-height: 140px;
+      transition: border-color .2s;
     }
+    .composer-input:focus { border-color: var(--accent); }
     .composer-input::placeholder { color: var(--text3); }
     .send-btn {
-      width: 32px; height: 32px; border-radius: 8px;
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
       background: var(--accent);
-      border: none; color: #fff; cursor: pointer; font-size: 14px;
+      border: none; color: #fff; cursor: pointer; font-size: 16px;
       display: flex; align-items: center; justify-content: center;
-      transition: opacity .15s; flex-shrink: 0; margin-left: auto;
+      transition: opacity .15s; flex-shrink: 0;
     }
     .send-btn:hover { opacity: .85; }
     .send-btn:active { transform: scale(.97); }
-    .send-btn:disabled { opacity: .35; cursor: not-allowed; transform: none; }
+    .send-btn:disabled { opacity: .35; cursor: not-allowed; transform: none; box-shadow: none; }
 
     /* ===================== FILES TAB ===================== */
     .files-grid {
@@ -924,55 +837,76 @@
   <div class="layout">
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-      <div class="sidebar-scroll" style="display:flex;flex-direction:column;height:100%;">
-
-        <!-- Room name -->
-        <div style="padding:20px 16px 8px;">
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text3);font-weight:600;margin-bottom:6px;">Room</div>
-          <div id="sidebar-room-name" style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--text);">---</div>
-        </div>
-
-        <!-- Connect Agent CTA -->
-        <div style="padding:8px 16px 16px;">
-          <button id="connect-agent-btn" onclick="showConnectModal()" style="width:100%;padding:9px 0;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;letter-spacing:-0.2px;transition:opacity .15s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">+ Connect Agent</button>
-        </div>
-
-        <!-- Online Agents -->
-        <div class="sidebar-section" id="section-agents" style="padding:0 16px;flex:1;">
-          <div class="sidebar-heading" style="margin-bottom:10px;">
-            <span>Online</span>
-            <span class="count" id="presence-count" style="background:var(--surface2);border-radius:10px;padding:1px 8px;font-size:10px;color:var(--text2);">0</span>
+      <div class="sidebar-scroll">
+        <!-- Metrics -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-value accent" id="m-agents">--</div>
+            <div class="metric-label">Agents</div>
           </div>
-          <div id="agents-list">
+          <div class="metric-card">
+            <div class="metric-value green" id="m-msgmin">--</div>
+            <div class="metric-label">Msg/min</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value blue" id="m-rooms">--</div>
+            <div class="metric-label">Workspaces</div>
+          </div>
+          <div class="metric-card wide">
+            <div class="metric-value" id="m-total">--</div>
+            <div class="metric-label">Total Messages</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value orange" id="m-latency">--</div>
+            <div class="metric-label">Speed</div>
+          </div>
+        </div>
+
+        <!-- Health -->
+        <div class="health-strip" id="health-strip">
+          <div class="health-chip ok">Loading...</div>
+        </div>
+
+        <!-- Connect Agent -->
+        <div class="sidebar-section">
+          <button id="connect-agent-btn" onclick="showConnectModal()" style="width:100%;padding:10px 0;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;">+ Connect Agent</button>
+        </div>
+
+        <!-- Workspaces (Collapsible) -->
+        <div class="sidebar-section" id="section-workspaces">
+          <div class="sidebar-heading" onclick="toggleSection('workspaces')" style="cursor:pointer;user-select:none;">
+            <span>Workspaces</span>
+            <span class="sidebar-toggle" id="toggle-workspaces">▼</span>
+          </div>
+          <div class="sidebar-content" id="workspaces-list">
+            <div style="color:var(--text2);font-size:12px;padding:6px 0;">Loading...</div>
+          </div>
+        </div>
+
+        <!-- Agent Presence (Collapsible) -->
+        <div class="sidebar-section" id="section-agents">
+          <div class="sidebar-heading" onclick="toggleSection('agents')" style="cursor:pointer;user-select:none;">
+            <span>Online Agents</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="count" id="presence-count">0</span>
+              <span class="sidebar-toggle" id="toggle-agents">▼</span>
+            </div>
+          </div>
+          <div class="sidebar-content" id="agents-list">
             <div style="color:var(--text2);font-size:12px;padding:6px 0;">Connecting...</div>
           </div>
         </div>
 
-        <!-- Hidden elements JS still needs to reference -->
-        <div style="display:none">
-          <div id="workspaces-list"></div>
-          <div id="leaderboard-list"></div>
-          <div id="health-strip"></div>
-          <div id="m-rooms"></div><div id="m-total"></div><div id="m-latency"></div>
-          <div id="section-workspaces"></div>
-          <div id="section-leaderboard"></div>
-          <div id="toggle-workspaces"></div>
-          <div id="toggle-agents"></div>
-          <div id="toggle-leaderboard"></div>
-        </div>
-
-        <!-- Stats at bottom -->
-        <div style="padding:16px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0;">
-          <div>
-            <div id="m-agents" style="font-size:18px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">--</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">Agents</div>
+        <!-- Leaderboard (Collapsible) -->
+        <div class="sidebar-section" id="section-leaderboard">
+          <div class="sidebar-heading" onclick="toggleSection('leaderboard')" style="cursor:pointer;user-select:none;">
+            <span>Leaderboard</span>
+            <span class="sidebar-toggle" id="toggle-leaderboard">▼</span>
           </div>
-          <div>
-            <div id="m-msgmin" style="font-size:18px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums;">--</div>
-            <div style="font-size:10px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px;">Msg/min</div>
+          <div class="sidebar-content" id="leaderboard-list">
+            <div style="color:var(--text2);font-size:12px;">Loading...</div>
           </div>
         </div>
-
       </div>
     </div>
 
@@ -983,10 +917,12 @@
           <span>Chat</span>
           <span class="tab-badge" id="chat-badge" style="display:none;">0</span>
         </div>
+        <div class="main-tab" data-tab="summary"><span>Summary</span></div>
         <div class="main-tab" data-tab="tasks"><span>Tasks</span></div>
         <div class="main-tab" data-tab="files"><span>Files</span></div>
-        <!-- other tabs hidden from nav but panels still in DOM for JS compatibility -->
-        <span style="display:none" id="pin-count">0</span>
+        <div class="main-tab" data-tab="handoffs"><span>Handoffs</span></div>
+        <div class="main-tab" data-tab="workspace"><span>Workspace</span></div>
+        <div class="main-tab" data-tab="pins"><span>Pins <span class="tab-badge" id="pin-count">0</span></span></div>
       </div>
 
       <!-- Chat panel -->
@@ -996,22 +932,20 @@
         </div>
         <div class="typing-bar" id="typing-bar"></div>
         <div class="composer">
-          <div class="composer-inner">
-            <div class="composer-body">
-              <textarea class="composer-input" id="msg-input" placeholder="Message the room..." rows="1"></textarea>
-            </div>
-            <div class="composer-left">
-              <input type="text" class="composer-name" id="sender-name" placeholder="Your name" />
-              <select class="composer-type" id="msg-type">
-                <option value="BROADCAST">Chat</option>
-                <option value="TASK">Task</option>
-                <option value="DIRECT">DM</option>
-                <option value="HANDOFF">Handoff</option>
-                <option value="HELP">Help</option>
-              </select>
-              <button class="send-btn" id="send-btn">&#x27A4;</button>
-            </div>
+          <div class="composer-left">
+            <input type="text" class="composer-name" id="sender-name" placeholder="Your name" />
+            <select class="composer-type" id="msg-type">
+              <option value="BROADCAST">Chat</option>
+              <option value="TASK">Task</option>
+              <option value="DIRECT">DM</option>
+              <option value="HANDOFF">Handoff</option>
+              <option value="HELP">🆘 Help</option>
+            </select>
           </div>
+          <div class="composer-body">
+            <textarea class="composer-input" id="msg-input" placeholder="Send a message to the mesh..." rows="1"></textarea>
+          </div>
+          <button class="send-btn" id="send-btn">&#x27A4;</button>
         </div>
       </div>
 
@@ -1169,15 +1103,12 @@
   function formatContent(s, viewerName) {
     if (!s) return '';
     const escaped = esc(s);
-    // Basic markdown: **bold**, `code`, @mentions
-    return escaped
-      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      .replace(/`([^`]+)`/g, '<code>$1</code>')
-      .replace(/@([\w\- ]+)/g, function(match, name) {
-        const isSelf = viewerName && name.trim().toLowerCase() === viewerName.toLowerCase();
-        if (isSelf) return '<span class="mention mention-self">@' + esc(name) + '</span>';
-        return '<span class="mention">@' + esc(name) + '</span>';
-      });
+    // Highlight @mentions — self = accent bg, others = subtle
+    return escaped.replace(/@([\w\- ]+)/g, function(match, name) {
+      const isSelf = viewerName && name.trim().toLowerCase() === viewerName.toLowerCase();
+      if (isSelf) return '<span class="mention mention-self">@' + esc(name) + '</span>';
+      return '<span class="mention">@' + esc(name) + '</span>';
+    });
   }
 
   // === DOM refs ===
@@ -1343,7 +1274,6 @@
 
   // === Init room input ===
   roomInput.value = ROOM;
-  var _srn = $('sidebar-room-name'); if (_srn) _srn.textContent = ROOM;
   roomInput.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       const newRoom = this.value.trim();
@@ -1546,12 +1476,6 @@
     $('m-rooms').textContent = d.active_rooms != null ? d.active_rooms : '--';
     $('m-total').textContent = d.total_messages_sent != null ? formatNum(d.total_messages_sent) : '--';
     $('m-latency').textContent = d.avg_latency_ms > 0 ? d.avg_latency_ms + 'ms' : '<1ms';
-
-    // Hide/show Workspace tab based on server capabilities
-    const wsTab = document.querySelector('.main-tab[data-tab="workspace"]');
-    if (wsTab && d.capabilities) {
-      wsTab.style.display = d.capabilities.google_workspace ? 'flex' : 'none';
-    }
   }
 
   async function fetchHealth() {
@@ -1568,13 +1492,8 @@
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
     $('uptime-tag').textContent = h > 0 ? h + 'h ' + m + 'm' : m + 'm';
-    // Subtitle + sidebar room name
+    // Subtitle
     $('header-subtitle').textContent = 'Room: ' + ROOM + ' | ' + (d.room_count || 0) + ' rooms active';
-    var sidebarRoom = $('sidebar-room-name');
-    if (sidebarRoom) sidebarRoom.textContent = ROOM;
-    // Sidebar room name
-    var sidebarRoomEl = $('sidebar-room-name');
-    if (sidebarRoomEl) sidebarRoomEl.textContent = ROOM;
     // Health chips
     const checks = [
       { label: 'Server', ok: d.status === 'ok' },
@@ -1894,18 +1813,6 @@
       const isDMToMe = isDM && (m.to || '').toLowerCase() === viewerName.toLowerCase();
       const cssClass = isSystem ? 'system' : (isHelp ? 'help' : (isSelf ? 'self' : 'other'));
       const dmClass = isDM ? ' dm' + (isDMToMe ? ' dm-to-me' : '') : '';
-      const rowClass = 'msg-row ' + cssClass;
-
-      // Start row wrapper
-      html += '<div class="' + rowClass + '">';
-
-      // Avatar for agent messages (not self, not system)
-      if (!isSelf && !isSystem) {
-        const initials = from.charAt(0).toUpperCase();
-        html += '<div class="msg-avatar-badge" style="background:' + esc(color) + '18;color:' + esc(color) + ';border:1px solid ' + esc(color) + '30;" title="' + esc(from) + '">' + esc(initials) + '</div>';
-      }
-
-      // Bubble
       html += '<div class="msg ' + cssClass + dmClass + '">';
 
       // Reply reference
@@ -1914,9 +1821,9 @@
       }
 
       html += '<div class="msg-header">';
-      if (!isSelf && !isSystem) {
-        html += '<span class="msg-sender" style="color:' + esc(color) + '">' + esc(from) + '</span>';
-      }
+      // Color only the tiny avatar dot, not the name — keeps it clean
+      html += '<span class="msg-avatar-dot" style="background:' + esc(color) + '"></span>';
+      html += '<span class="msg-sender">' + esc(from) + '</span>';
       // Only show badge for non-default types
       if (type !== 'BROADCAST') {
         html += '<span class="msg-type-badge ' + esc(typeClass) + '">' + esc(type) + '</span>';
@@ -1939,8 +1846,7 @@
         html += '<div class="msg-to">To: ' + esc(m.to) + '</div>';
       }
 
-      html += '</div>'; // close .msg
-      html += '</div>'; // close .msg-row
+      html += '</div>';
     }
 
     messagesList.innerHTML = html;
@@ -2056,7 +1962,7 @@
     el.innerHTML = html;
   }
 
-  // === Render: Typing bar (multiple simultaneous indicators) ===
+  // === Render: Typing bar ===
   function renderTyping() {
     const viewerName = senderInput.value.trim() || VIEWER_DEFAULT;
     const typing = Object.values(presenceMap).filter(function(a) {
@@ -2066,21 +1972,14 @@
       typingBar.innerHTML = '';
       return;
     }
-    // Show a chip for each typing agent (up to 4, then collapse)
-    const visible = typing.slice(0, 4);
-    const extra = typing.length - visible.length;
-    let html = visible.map(function(a) {
-      const color = getColor(a.agent_name);
-      const dotsHtml = '<span class="typing-dots"><span></span><span></span><span></span></span>';
-      return '<span class="typing-chip">' +
-        '<span style="color:' + esc(color) + ';font-weight:600;">' + esc(a.agent_name) + '</span>' +
-        ' ' + dotsHtml +
-        '</span>';
-    }).join('');
-    if (extra > 0) {
-      html += '<span class="typing-chip" style="color:var(--text3)">+' + extra + ' more</span>';
+    const names = typing.map(function(a) { return esc(a.agent_name); });
+    if (names.length === 1) {
+      typingBar.innerHTML = names[0] + ' is typing...';
+    } else if (names.length === 2) {
+      typingBar.innerHTML = names[0] + ' and ' + names[1] + ' are typing...';
+    } else {
+      typingBar.innerHTML = names.length + ' agents are typing...';
     }
-    typingBar.innerHTML = html;
   }
 
   // === Render: Leaderboard ===
