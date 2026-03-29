@@ -51,19 +51,9 @@
       overflow: hidden;
     }
 
-    /* ===================== TOP BAR ===================== */
+    /* ===================== TOP BAR — hidden, nav in sidebar ===================== */
     .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      height: var(--topbar-h);
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 200;
-      backdrop-filter: blur(24px);
+      display: none;
     }
     .topbar-left { display: flex; align-items: center; gap: 14px; }
     .logo {
@@ -114,8 +104,8 @@
     .layout {
       display: grid;
       grid-template-columns: var(--sidebar-w) 1fr;
-      height: calc(100vh - var(--topbar-h));
-      margin-top: var(--topbar-h);
+      height: 100vh;
+      margin-top: 0;
     }
 
     /* ===================== SIDEBAR ===================== */
@@ -128,10 +118,9 @@
     }
     .sidebar-scroll { flex: 1; overflow-y: auto; }
 
-    /* Metric cards */
+    /* Metric cards — hidden for clean UI */
     .metrics-grid {
-      display: grid; grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px; padding: 16px;
+      display: none;
     }
     .metric-card {
       background: var(--surface2); border-radius: var(--radius-sm);
@@ -157,9 +146,9 @@
     .metric-trend.down { color: var(--red); }
     .metric-trend.flat { color: var(--text2); }
 
-    /* Health strip */
+    /* Health strip — hidden for clean UI */
     .health-strip {
-      display: flex; gap: 5px; padding: 0 16px 12px; flex-wrap: wrap;
+      display: none;
     }
     .health-chip {
       font-size: 10px; padding: 3px 9px; border-radius: var(--radius-xs);
