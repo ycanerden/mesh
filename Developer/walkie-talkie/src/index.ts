@@ -258,7 +258,7 @@ function hasRoomAccess(c: any, room: string): boolean {
   const cookie = c.req.header("cookie") || "";
   const match = cookie.match(new RegExp(`mesh_admin_${room}=([^;]+)`));
   if (match) {
-    const val = decodeURIComponent(match[1]);
+    const val = decodeURIComponent(match[1] || "");
     if (verifyAdmin(room, val) || isValidPasswordSession(room, val)) return true;
   }
   // 2. Check access_token param/header
@@ -616,7 +616,7 @@ app.post("/api/decisions", async (c) => {
 const telegramTestHandler = async (c: any) => {
   const code = c.req.param("code");
   const token = c.req.header("x-mesh-secret") || c.req.query("token") || (await c.req.json().catch(() => ({} as any))).secret;
-  if (!verifyAdmin(code, token)) return c.json({ ok: false, error: "unauthorized" }, 401);
+  if (!verifyAdmin(code, token || "")) return c.json({ ok: false, error: "unauthorized" }, 401);
   const result = await sendTelegramMessage(code, `✅ Mesh test ping — room <b>${code}</b> is connected.`);
   if (!result.ok) {
     return c.json({ ok: false, error: result.error }, 400);
@@ -1069,7 +1069,7 @@ app.post("/api/rooms/:code/telegram", async (c) => {
   const token = c.req.header("x-mesh-secret") || c.req.query("secret");
   
   // Verify admin token
-  if (!verifyAdmin(code, token)) {
+  if (!verifyAdmin(code, token || "")) {
     return c.json({ ok: false, error: "unauthorized" }, 401);
   }
 
@@ -1105,7 +1105,7 @@ app.post("/api/rooms/:code/telegram", async (c) => {
 app.get("/api/rooms/:code/telegram/status", async (c) => {
   const code = c.req.param("code");
   const token = c.req.header("x-mesh-secret") || c.req.query("token");
-  if (!verifyAdmin(code, token)) return c.json({ ok: false, error: "unauthorized" }, 401);
+  if (!verifyAdmin(code, token || "")) return c.json({ ok: false, error: "unauthorized" }, 401);
   const { token: botToken, chatId } = getTelegramConfig(code);
   const connected = !!(botToken && chatId);
   return c.json({ ok: true, connected, has_token: !!botToken, has_chat_id: !!chatId });
@@ -2271,9 +2271,12 @@ app.get("/api/briefing", (c) => {
   for (const m of recent) {
     if (!m.from || m.from === "demo-viewer" || m.from === "office-viewer") continue;
     if (!byAgent[m.from]) byAgent[m.from] = { count: 0, last: "", ts: 0 };
-    const agent = byAgent[m.from]!;
-    agent.count++;
-    if (m.ts > agent.ts) { agent.ts = m.ts; agent.last = m.content.slice(0, 120); }
+    const agentData = byAgent[m.from]!;
+    agentData.count++;
+    if (m.ts > agentData.ts) {
+      agentData.ts = m.ts;
+      agentData.last = m.content.slice(0, 120);
+    }
   }
 
   const tasks = getRoomTasks(room);
@@ -2859,10 +2862,11 @@ app.all("/mcp", async (c) => {
       for (const m of recent) {
         if (!m.from || m.from === "demo-viewer" || m.from === "office-viewer") continue;
         if (!byAgent[m.from]) byAgent[m.from] = { count: 0, last: "" };
-        const agent = byAgent[m.from]!;
-        agent.count++;
-        agent.last = (m.content || "").slice(0, 100);
-      }      const tasks = getRoomTasks(room);
+        const agentData = byAgent[m.from]!;
+        agentData.count++;
+        agentData.last = (m.content || "").slice(0, 100);
+      }
+      const tasks = getRoomTasks(room);
       const inProgress = tasks.filter((t: any) => t.status === "in_progress");
       const pending = tasks.filter((t: any) => t.status === "pending");
       const lines = [
@@ -3191,10 +3195,11 @@ app.all("/mcp", async (c) => {
         `Recommendation: ${recommendation}`,
       ].join("\n");
       const result = appendMessage(room, name, lines, undefined, "TASK");
-      const resPayload: any = { ok: result.ok };
-      if (result.ok) resPayload.message_id = result.id;
-      else resPayload.error = result.error;
-      return { content: [{ type: "text", text: JSON.stringify(resPayload) }] };
+      if (result.ok) {
+        return { content: [{ type: "text", text: JSON.stringify({ ok: true, message_id: result.id }) }] };
+      } else {
+        return { content: [{ type: "text", text: JSON.stringify({ ok: false, error: result.error }) }], isError: true };
+      }
     }
   );
 

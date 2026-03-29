@@ -278,7 +278,7 @@ mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     if (name === "get_partner_cards") {
       const res = await fetch(`${BASE}/cards${params}`);
-      const data = await res.json() as { ok: boolean; error?: string; cards?: Array<{name: string; card: any; updated_at: number}> };
+      const data = await res.json() as { ok: boolean; cards?: Array<{name: string; card: any; updated_at: number}>; error?: string };
       if (!data.ok) {
         return { content: [{ type: "text" as const, text: JSON.stringify({ error: data.error }) }], isError: true };
       }
