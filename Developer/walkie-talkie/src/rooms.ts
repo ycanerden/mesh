@@ -705,6 +705,11 @@ export function joinRoom(code: string, name: string): boolean | null {
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
   return true as const;
 }
+
+export function roomExists(code: string): boolean {
+  const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
+  return !!room;
+}
 export function getRoomCount(): number {
   const row = db.prepare("SELECT COUNT(*) as count FROM rooms").get() as { count: number };
   return row.count;
