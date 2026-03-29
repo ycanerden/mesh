@@ -692,11 +692,10 @@ export function joinRoom(code: string, name: string): boolean | null {
 
   const user = db.prepare("SELECT 1 FROM users WHERE room_code = ? AND name = ?").get(code, name);
   if (!user) {
-    const maxRowidRow = db.prepare("SELECT MAX(rowid) as maxRowid FROM messages WHERE room_code = ?").get(code) as { maxRowid: number | null };
-    const initialCursor = maxRowidRow.maxRowid || 0;
-
+    // Set initial last_rowid to -1 so users see all messages when they first call getMessages()
+    // This fixes the bug where new users don't see their own first message
     db.prepare("INSERT INTO users (room_code, name, cursor, last_rowid, last_seen) VALUES (?, ?, ?, ?, ?)")
-      .run(code, name, 0, initialCursor, Date.now());
+      .run(code, name, 0, -1, Date.now());
   } else {
     db.prepare("UPDATE users SET last_seen = ? WHERE room_code = ? AND name = ?")
       .run(Date.now(), code, name);
