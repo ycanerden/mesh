@@ -20,7 +20,7 @@
     body{background:#0d0d0f;font-family:'Inter',system-ui,sans-serif;color:#fafafa;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
     .header{padding:10px 20px;border-bottom:1px solid #27272a;background:#111113;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:10;}
     .header-left{display:flex;align-items:center;gap:10px;}
-    .hlogo{width:22px;height:22px;background:#8b5cf6;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;}
+    .hlogo{width:22px;height:22px;background:#4d94ff;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;}
     .htitle{font-size:13px;font-weight:600;}
     .hsub{font-size:10px;color:#71717a;margin-top:1px;}
     .live-chip{display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;color:#22c55e;letter-spacing:.03em;}
@@ -28,9 +28,9 @@
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
     .nav-links{display:flex;gap:6px;}
     .nlink{font-size:10px;color:#71717a;text-decoration:none;padding:3px 8px;border:1px solid #27272a;border-radius:4px;}
-    .nlink:hover{color:#8b5cf6;border-color:#8b5cf6;}
-    .btn-create{font-size:10px;font-weight:600;color:#fafafa;background:#8b5cf6;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;text-decoration:none;letter-spacing:.01em;}
-    .btn-create:hover{background:#7c3aed;}
+    .nlink:hover{color:#4d94ff;border-color:#4d94ff;}
+    .btn-create{font-size:10px;font-weight:600;color:#fafafa;background:#4d94ff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;text-decoration:none;letter-spacing:.01em;}
+    .btn-create:hover{background:#3b7eff;}
     .btn-create:disabled{opacity:.5;cursor:not-allowed;}
     .btn-embed{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:3px 8px;cursor:pointer;}
     .btn-embed:hover{color:#a1a1aa;border-color:#3f3f46;}
@@ -55,7 +55,7 @@
     .ap-empty{padding:20px 14px;text-align:center;color:#3f3f46;font-size:10px;}
     .btn-activity{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:3px 8px;cursor:pointer;}
     .btn-activity:hover{color:#a1a1aa;border-color:#3f3f46;}
-    .btn-activity.active{color:#8b5cf6;border-color:#8b5cf6;}
+    .btn-activity.active{color:#4d94ff;border-color:#4d94ff;}
     @media(max-width:768px){.activity-panel{display:none;}}
     canvas{image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:-webkit-optimize-contrast;}
     .footer{padding:6px 20px;border-top:1px solid #27272a;background:#111113;display:flex;justify-content:space-between;font-size:10px;color:#52525b;flex-shrink:0;}
@@ -67,8 +67,8 @@
     .embed-box h3{font-size:12px;font-weight:600;margin-bottom:12px;color:#fafafa;}
     .embed-box pre{background:#0d0d0f;border:1px solid #27272a;border-radius:4px;padding:10px;font-size:10px;color:#a1a1aa;overflow-x:auto;word-break:break-all;white-space:pre-wrap;margin-bottom:10px;}
     .embed-actions{display:flex;gap:6px;justify-content:flex-end;}
-    .embed-copy{font-size:10px;font-weight:600;color:#fafafa;background:#8b5cf6;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;}
-    .embed-copy:hover{background:#7c3aed;}
+    .embed-copy{font-size:10px;font-weight:600;color:#fafafa;background:#4d94ff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;}
+    .embed-copy:hover{background:#3b7eff;}
     .embed-close{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:4px 8px;cursor:pointer;}
     .embed-close:hover{color:#a1a1aa;}
     /* decision modal */
@@ -84,8 +84,8 @@
     .decision-checkbox{display:flex;align-items:center;gap:8px;color:#a1a1aa;font-size:10px;}
     .decision-checkbox input{cursor:pointer;}
     .decision-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:6px;}
-    .decision-submit{font-size:10px;font-weight:600;color:#fafafa;background:#8b5cf6;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;}
-    .decision-submit:hover{background:#7c3aed;}
+    .decision-submit{font-size:10px;font-weight:600;color:#fafafa;background:#4d94ff;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;}
+    .decision-submit:hover{background:#3b7eff;}
     .decision-submit:disabled{opacity:.5;cursor:not-allowed;}
     .decision-cancel{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:6px 10px;cursor:pointer;}
     .decision-cancel:hover{color:#a1a1aa;}
@@ -232,7 +232,7 @@ window.addEventListener('resize', resize);
 
 // ── Color palettes per agent (by name hash) ──────────────────────────────────
 const PALETTES = [
-  {body:'#8b5cf6',hi:'#c4b5fd',shadow:'#4c1d95',skin:'#f9c784'},
+  {body:'#4d94ff',hi:'#c4b5fd',shadow:'#4c1d95',skin:'#f9c784'},
   {body:'#22c55e',hi:'#86efac',shadow:'#14532d',skin:'#fbbf24'},
   {body:'#3b82f6',hi:'#93c5fd',shadow:'#1e3a8a',skin:'#f9c784'},
   {body:'#f59e0b',hi:'#fcd34d',shadow:'#78350f',skin:'#fbbf24'},
@@ -463,7 +463,7 @@ function sentinelActivity(name) {
 // What is this agent currently doing?
 function agentActivity(agent) {
   const name = agent.agent_name;
-  if(agent.is_typing) return {text:'typing...', color:'#8b5cf6'};
+  if(agent.is_typing) return {text:'typing...', color:'#4d94ff'};
   // Sentinels always show activity
   if(agent.role==='sentinel') { const s=sentinelActivity(name); if(s) return s; }
   const task = tasks[name];
@@ -703,7 +703,7 @@ function closeDecision(e) {
 }
 
 // ── Activity Timeline ─────────────────────────────────────────────────────
-const ACTIVITY_COLORS = {BROADCAST:'#8b5cf6',TASK:'#22c55e',HANDOFF:'#f59e0b',SYSTEM:'#3f3f46',DM:'#ec4899'};
+const ACTIVITY_COLORS = {BROADCAST:'#4d94ff',TASK:'#22c55e',HANDOFF:'#f59e0b',SYSTEM:'#3f3f46',DM:'#ec4899'};
 const VIEWER_NAMES = ['demo-viewer','office-viewer','team-viewer','Viewer','Scout','Pulse','Archie'];
 
 function toggleActivity() {

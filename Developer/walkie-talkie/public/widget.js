@@ -36,11 +36,11 @@
   style.textContent = [
     '#mesh-widget-btn{position:fixed;z-index:2147483647;bottom:20px;' +
       (POSITION === 'bottom-left' ? 'left:20px;' : 'right:20px;') +
-      'background:#8b5cf6;color:#fff;border:none;border-radius:24px;padding:10px 18px;' +
+      'background:#4d94ff;color:#fff;border:none;border-radius:24px;padding:10px 18px;' +
       'font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-size:13px;font-weight:600;' +
-      'cursor:pointer;box-shadow:0 4px 20px rgba(139,92,246,.4);display:flex;align-items:center;gap:7px;' +
+      'cursor:pointer;box-shadow:0 4px 20px rgba(77,148,255,.4);display:flex;align-items:center;gap:7px;' +
       'transition:transform .15s,box-shadow .15s;}',
-    '#mesh-widget-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(139,92,246,.5);}',
+    '#mesh-widget-btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(77,148,255,.5);}',
     '#mesh-widget-btn .mw-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;' +
       'animation:mwpulse 2s infinite;}',
     '@keyframes mwpulse{0%,100%{opacity:1}50%{opacity:.4}}',

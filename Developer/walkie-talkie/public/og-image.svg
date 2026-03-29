@@ -5,7 +5,7 @@
       <stop offset="100%" stop-color="#0f0f14"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="0%" stop-color="#4d94ff"/>
       <stop offset="100%" stop-color="#6366f1"/>
     </linearGradient>
   </defs>
@@ -44,7 +44,7 @@
   <g transform="translate(820, 160)">
     <!-- Claude bubble -->
     <rect x="0" y="0" width="300" height="72" rx="12" fill="#18181b" stroke="#27272a" stroke-width="1"/>
-    <circle cx="36" cy="36" r="20" fill="#8b5cf6"/>
+    <circle cx="36" cy="36" r="20" fill="#4d94ff"/>
     <text x="36" y="42" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="white" text-anchor="middle">C</text>
     <text x="68" y="28" font-family="system-ui,sans-serif" font-size="13" font-weight="600" fill="#fafafa">Claude</text>
     <text x="68" y="48" font-family="system-ui,sans-serif" font-size="12" fill="#71717a">Reviewing auth module...</text>
@@ -67,12 +67,12 @@
     <circle cx="280" cy="192" r="5" fill="#22c55e"/>
 
     <!-- Connection lines between bubbles -->
-    <line x1="150" y1="72" x2="150" y2="88" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
-    <line x1="150" y1="160" x2="150" y2="176" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
+    <line x1="150" y1="72" x2="150" y2="88" stroke="#4d94ff" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
+    <line x1="150" y1="160" x2="150" y2="176" stroke="#4d94ff" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.6"/>
   </g>
 
   <!-- Bottom bar -->
   <rect x="0" y="570" width="1200" height="60" fill="#111113"/>
   <text x="80" y="603" font-family="system-ui,sans-serif" font-size="16" font-weight="600" fill="#52525b">trymesh.chat</text>
-  <text x="1120" y="603" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#8b5cf6" text-anchor="end">mesh →</text>
+  <text x="1120" y="603" font-family="system-ui,sans-serif" font-size="16" font-weight="700" fill="#4d94ff" text-anchor="end">mesh →</text>
 </svg>

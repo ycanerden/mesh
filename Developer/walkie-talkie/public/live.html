@@ -18,7 +18,7 @@
     .topbar{height:44px;background:#0d0d10;border-bottom:1px solid #1c1c20;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;}
     .topbar-left{display:flex;align-items:center;gap:12px;}
     .logo{font-size:15px;font-weight:800;letter-spacing:-0.4px;color:#fafafa;text-decoration:none;}
-    .logo span{color:#8b5cf6;}
+    .logo span{color:#4d94ff;}
     .live-badge{display:flex;align-items:center;gap:5px;background:#18181b;border:1px solid #27272a;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:#a1a1aa;}
     .live-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite;}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
@@ -26,8 +26,8 @@
     .topbar-right{display:flex;align-items:center;gap:12px;}
     .stat-pill{font-size:11px;color:#71717a;background:#111113;border:1px solid #1c1c20;border-radius:12px;padding:3px 10px;}
     .stat-pill strong{color:#a1a1aa;}
-    .cta-link{font-size:12px;font-weight:600;color:#8b5cf6;text-decoration:none;padding:5px 12px;border:1px solid #8b5cf620;border-radius:6px;transition:all .15s;}
-    .cta-link:hover{background:#8b5cf610;border-color:#8b5cf640;}
+    .cta-link{font-size:12px;font-weight:600;color:#4d94ff;text-decoration:none;padding:5px 12px;border:1px solid #4d94ff20;border-radius:6px;transition:all .15s;}
+    .cta-link:hover{background:#4d94ff10;border-color:#4d94ff40;}
 
     /* Main layout */
     .main{flex:1;display:grid;grid-template-columns:1fr 320px;overflow:hidden;}
@@ -50,7 +50,7 @@
     .msg-from{font-size:13px;font-weight:600;color:#fafafa;}
     .msg-time{font-size:10px;color:#52525b;}
     .msg-text{font-size:13px;color:#a1a1aa;line-height:1.55;word-break:break-word;white-space:pre-wrap;}
-    .msg-text .mention{color:#8b5cf6;font-weight:600;}
+    .msg-text .mention{color:#4d94ff;font-weight:600;}
     .system-line{padding:6px 16px;text-align:center;font-size:11px;color:#3f3f46;}
     .typing-bar{padding:6px 16px;font-size:11px;color:#52525b;min-height:26px;}
 
@@ -83,7 +83,7 @@
     /* Bottom join bar */
     .join-bar{height:38px;background:#0d0d10;border-top:1px solid #1c1c20;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0;}
     .join-text{font-size:12px;color:#52525b;}
-    .join-link{font-size:12px;font-weight:600;color:#8b5cf6;text-decoration:none;}
+    .join-link{font-size:12px;font-weight:600;color:#4d94ff;text-decoration:none;}
     .join-link:hover{text-decoration:underline;}
   </style>
 </head>
@@ -142,7 +142,7 @@
   const ACCESS = params.get('access_token') || '';
   document.getElementById('room-label').textContent = '#' + ROOM;
 
-  const palette = ['#6c5ce7','#00b894','#fdcb6e','#ff7675','#74b9ff','#a29bfe','#55efc4','#fab1a0','#81ecec','#fd79a8','#8b5cf6','#ec4899'];
+  const palette = ['#6c5ce7','#00b894','#fdcb6e','#ff7675','#74b9ff','#a29bfe','#55efc4','#fab1a0','#81ecec','#fd79a8','#4d94ff','#ec4899'];
   const colors = {};
   let ci = 0;
   function getColor(n) { if (!colors[n]) colors[n] = palette[ci++ % palette.length]; return colors[n]; }

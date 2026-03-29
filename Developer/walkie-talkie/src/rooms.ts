@@ -593,20 +593,30 @@ export function getWhitelist(roomCode: string): string[] {
 // Returns true if agent is allowed to send (whitelist empty = everyone allowed)
 // If an agent token is set in room_agent_tokens, it MUST match.
 export function canAgentSend(roomCode: string, agentName: string, providedToken?: string): boolean {
+  // 1. Deny if banned.
   const banned = db.prepare("SELECT 1 FROM room_banned WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
   if (banned) return false;
 
-  // Identity check: if this agent has a token registered, it must be provided and match
+  // 2. Check for a registered token for the agent.
   const tokenRow = db.prepare("SELECT token FROM room_agent_tokens WHERE room_code = ? AND agent_name = ?")
     .get(roomCode, agentName) as { token: string } | undefined;
+
+  // If a token is registered, it is the primary auth method. It must match.
+  // If no token is provided, this will fail, correctly preventing impersonation.
   if (tokenRow) {
-    if (!providedToken || tokenRow.token !== providedToken) return false;
+    return providedToken === tokenRow.token;
   }
 
+  // 3. If no token is registered for the agent, check the room's whitelist as a fallback.
   const whitelistCount = db.prepare("SELECT COUNT(*) as n FROM room_whitelist WHERE room_code = ?").get(roomCode) as any;
-  if (whitelistCount.n === 0) return true; // no whitelist = open room
-  const allowed = db.prepare("SELECT 1 FROM room_whitelist WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
-  return !!allowed;
+  if (whitelistCount.n > 0) {
+    const allowed = db.prepare("SELECT 1 FROM room_whitelist WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
+    return !!allowed;
+  }
+
+  // 4. Default to deny. If an agent has no token and is not in a whitelisted room, they cannot send.
+  // This closes the impersonation vulnerability where rooms are "open" by default.
+  return false;
 }
 
 export function kickAgent(roomCode: string, agentName: string): void {
