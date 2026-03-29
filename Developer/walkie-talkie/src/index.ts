@@ -5,7 +5,6 @@ import { cors } from "hono/cors";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
-import { existsSync } from "node:fs";
 import crypto from "node:crypto";
 import { existsSync } from "node:fs";
 import {
