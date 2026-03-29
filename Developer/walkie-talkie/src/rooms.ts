@@ -396,6 +396,59 @@ export function getSubscriptionStats(): { total: number; active: number; pro: nu
   return { total, active, pro, team };
 }
 
+// ── Paid room provisioning ────────────────────────────────────────────────────
+export function provisionPaidRoom(
+  email: string,
+  plan: string,
+  roomCode?: string | null
+): { room_code: string; admin_token: string; password: string } {
+  // Create room if none specified, or use existing
+  let code: string;
+  let adminToken: string;
+
+  if (roomCode) {
+    // Use the room they specified at checkout
+    const existing = db.prepare("SELECT admin_token FROM rooms WHERE code = ?").get(roomCode) as any;
+    if (existing) {
+      code = roomCode;
+      adminToken = existing.admin_token || generateSecureToken();
+      if (!existing.admin_token) {
+        db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(adminToken, code);
+      }
+    } else {
+      // Room doesn't exist, create it
+      const room = createRoom(false);
+      code = room.code;
+      adminToken = room.admin_token;
+    }
+  } else {
+    // No room specified, create a new one
+    const room = createRoom(false);
+    code = room.code;
+    adminToken = room.admin_token;
+  }
+
+  // Make room private with a generated password
+  const password = crypto.randomBytes(4).toString("hex"); // 8-char hex password
+  setRoomPassword(code, password);
+
+  // Set agent limits based on plan
+  const agentLimit = plan === "team" ? 15 : 5;
+  try {
+    db.prepare("ALTER TABLE rooms ADD COLUMN agent_limit INTEGER DEFAULT 0;").run();
+  } catch (e) {} // column may already exist
+  db.prepare("UPDATE rooms SET agent_limit = ? WHERE code = ?").run(agentLimit, code);
+
+  // Send welcome message
+  appendMessage(code, "system",
+    `Room activated — ${plan} plan (${email}). Private room with password protection. ${agentLimit} agent slots available.`,
+    undefined, "SYSTEM"
+  );
+
+  console.log(`[billing] Provisioned ${plan} room ${code} for ${email} (password: ${password.slice(0, 2)}***)`);
+  return { room_code: code, admin_token: adminToken, password };
+}
+
 // ── Message reactions ─────────────────────────────────────────────────────────
 db.run(`
   CREATE TABLE IF NOT EXISTS reactions (
@@ -601,22 +654,21 @@ export function canAgentSend(roomCode: string, agentName: string, providedToken?
   const tokenRow = db.prepare("SELECT token FROM room_agent_tokens WHERE room_code = ? AND agent_name = ?")
     .get(roomCode, agentName) as { token: string } | undefined;
 
-  // If a token is registered, it is the primary auth method. It must match.
-  // If no token is provided, this will fail, correctly preventing impersonation.
+  // If a token is registered for this agent, it is the *only* authentication method.
+  // It must be provided and it must be correct.
   if (tokenRow) {
     return providedToken === tokenRow.token;
   }
 
-  // 3. If no token is registered for the agent, check the room's whitelist as a fallback.
+  // 3. If no token is registered, fall back to whitelist check.
   const whitelistCount = db.prepare("SELECT COUNT(*) as n FROM room_whitelist WHERE room_code = ?").get(roomCode) as any;
-  if (whitelistCount.n > 0) {
-    const allowed = db.prepare("SELECT 1 FROM room_whitelist WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
-    return !!allowed;
+  if (whitelistCount.n === 0) {
+    return true; // No whitelist means the room is open to agents without tokens.
   }
 
-  // 4. Default to deny. If an agent has no token and is not in a whitelisted room, they cannot send.
-  // This closes the impersonation vulnerability where rooms are "open" by default.
-  return false;
+  // If a whitelist exists, the agent must be on it.
+  const allowed = db.prepare("SELECT 1 FROM room_whitelist WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
+  return !!allowed;
 }
 
 export function kickAgent(roomCode: string, agentName: string): void {

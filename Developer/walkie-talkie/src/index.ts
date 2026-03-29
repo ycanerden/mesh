@@ -114,6 +114,7 @@ import {
   getSubscriptionByRoom,
   cancelSubscription,
   getSubscriptionStats,
+  provisionPaidRoom,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -1821,16 +1822,19 @@ app.post("/api/billing/webhook", async (c) => {
     const roomCode = session.metadata?.room_code || session.client_reference_id || null;
 
     if (email && customerId) {
+      // Provision a private room for the paying customer
+      const provisioned = provisionPaidRoom(email, plan, roomCode);
+
       upsertSubscription({
         stripe_subscription_id: subscriptionId,
         stripe_customer_id: customerId,
         email,
         plan,
         status: "active",
-        room_code: roomCode,
+        room_code: provisioned.room_code,
         current_period_end: null,
       });
-      console.log(`[billing] New ${plan} subscription: ${email}${roomCode ? ` → room ${roomCode}` : ""}`);
+      console.log(`[billing] New ${plan} subscription: ${email} → room ${provisioned.room_code}`);
     }
   } else if (event.type === "customer.subscription.updated") {
     const sub = event.data.object;
@@ -1861,11 +1865,11 @@ app.get("/api/billing/status", (c) => {
   const roomCode = c.req.query("room");
   if (email) {
     const sub = getSubscriptionByEmail(email);
-    return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none" });
+    return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none", room_code: sub?.room_code || null });
   }
   if (roomCode) {
     const sub = getSubscriptionByRoom(roomCode);
-    return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none" });
+    return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none", room_code: sub?.room_code || null });
   }
   return c.json({ error: "provide email or room param" }, 400);
 });
@@ -3254,6 +3258,13 @@ app.post("/api/demo/create", async (c) => {
 
 app.get("/try", async (c) => {
   const html = injectAnalytics(await Bun.file("./public/try.html").text());
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache, no-store" },
+  });
+});
+
+app.get("/billing/success", async (c) => {
+  const html = injectAnalytics(await Bun.file("./public/billing-success.html").text());
   return new Response(html, {
     headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache, no-store" },
   });
