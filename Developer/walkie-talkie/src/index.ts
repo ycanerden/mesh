@@ -3249,7 +3249,7 @@ app.post("/api/demo/create", async (c) => {
     joinRoom(room.code, name);
     updatePresence(room.code, name, "online", hostname, role);
   }
-  return c.json({ ok: true, room: room.code, redirect: `/office?room=${room.code}` });
+  return c.json({ ok: true, room: room.code, redirect: `/try?room=${room.code}` });
 });
 
 app.get("/try", async (c) => {
