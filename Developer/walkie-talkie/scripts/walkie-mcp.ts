@@ -200,6 +200,57 @@ mcp.setRequestHandler(ListToolsRequestSchema, async () => ({
         required: ["filename", "content"],
       },
     },
+    {
+      name: "create_project_room",
+      description: "Create a new project room with a brief, deadline, and list of deliverables. Returns the room code.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          title: { type: "string", description: "Short project title" },
+          brief: { type: "string", description: "Full project brief / assignment description" },
+          deadline: { type: "number", description: "Unix timestamp (ms) for the deadline" },
+          deliverables: {
+            type: "array",
+            description: "List of deliverables to create",
+            items: {
+              type: "object",
+              properties: {
+                title: { type: "string" },
+                description: { type: "string" },
+                assigned_to: { type: "string" },
+              },
+              required: ["title"],
+            },
+          },
+        },
+        required: ["title", "brief"],
+      },
+    },
+    {
+      name: "get_project_status",
+      description: "Get the project brief and deliverable checklist for a project room.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          room_code: { type: "string", description: "The room code to query (defaults to current room)" },
+        },
+      },
+    },
+    {
+      name: "update_deliverable",
+      description: "Update the status, assignment, or content of a deliverable.",
+      inputSchema: {
+        type: "object" as const,
+        properties: {
+          id: { type: "string", description: "Deliverable ID" },
+          status: { type: "string", enum: ["pending", "in_progress", "done", "blocked"], description: "New status" },
+          assigned_to: { type: "string", description: "Agent to assign this deliverable to" },
+          title: { type: "string" },
+          description: { type: "string" },
+        },
+        required: ["id"],
+      },
+    },
   ],
 }));
 
@@ -337,6 +388,55 @@ mcp.setRequestHandler(CallToolRequestSchema, async (request) => {
       });
       const data = await res.json();
       return { content: [{ type: "text" as const, text: data.ok ? `Code update for ${filename} broadcasted to all partners! 🚀` : `Error broadcasting code: ${data.error}` }] };
+    }
+
+    if (name === "create_project_room") {
+      const { title, brief, deadline, deliverables } = args as {
+        title: string; brief: string; deadline?: number;
+        deliverables?: Array<{ title: string; description?: string; assigned_to?: string }>;
+      };
+      const res = await fetch(`${SERVER_URL}/api/rooms/create-project`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, brief, deadline, deliverables }),
+      });
+      const data = await res.json();
+      if (!data.ok) return { content: [{ type: "text" as const, text: `Error: ${data.error}` }], isError: true };
+      return { content: [{ type: "text" as const, text: `Project room created!\nRoom: ${data.room_code}\nURL: ${data.project_url}` }] };
+    }
+
+    if (name === "get_project_status") {
+      const { room_code } = args as { room_code?: string };
+      const code = room_code || ROOM;
+      const res = await fetch(`${SERVER_URL}/api/rooms/${code}/project`);
+      const data = await res.json();
+      if (!data.ok) return { content: [{ type: "text" as const, text: `Error: ${data.error}` }], isError: true };
+      const p = data.project;
+      const lines = [
+        `Project: ${p.project_title}`,
+        `Deadline: ${p.deadline ? new Date(p.deadline).toISOString() : "none"}`,
+        ``,
+        `Brief: ${p.project_brief}`,
+        ``,
+        `Deliverables (${p.deliverables.length}):`,
+        ...p.deliverables.map((d: any) =>
+          `  [${d.status.toUpperCase()}] ${d.title}${d.assigned_to ? ` — @${d.assigned_to}` : ""}`
+        ),
+      ];
+      return { content: [{ type: "text" as const, text: lines.join("\n") }] };
+    }
+
+    if (name === "update_deliverable") {
+      const { id, ...patch } = args as { id: string; status?: string; assigned_to?: string; title?: string; description?: string };
+      const res = await fetch(`${SERVER_URL}/api/rooms/${ROOM}/deliverables/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(patch),
+      });
+      const data = await res.json();
+      if (!data.ok) return { content: [{ type: "text" as const, text: `Error: ${data.error}` }], isError: true };
+      const d = data.deliverable;
+      return { content: [{ type: "text" as const, text: `Updated: [${d.status}] ${d.title}` }] };
     }
 
     return { content: [{ type: "text" as const, text: `Unknown tool: ${name}` }] };

@@ -7,6 +7,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { z } from "zod";
 import crypto from "node:crypto";
 import {
+  db,
   createRoom,
   joinRoom,
   appendMessage,
@@ -38,6 +39,7 @@ import {
   getAvailableAgents,
   getAllAgents,
   getAgentProfile,
+  getAllAgentProfiles,
   updateAgentStatus,
   incrementAgentTasks,
   pinMessage,
@@ -115,6 +117,12 @@ import {
   cancelSubscription,
   getSubscriptionStats,
   provisionPaidRoom,
+  createProjectRoom,
+  getProjectRoom,
+  addDeliverable,
+  updateDeliverable,
+  deleteDeliverable,
+  getDeliverables,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -590,7 +598,7 @@ app.post("/api/decisions", async (c) => {
     // Post decision message to room
     const mentions = notifyList.map(u => `@${u}`).join(" ");
     const decisionMsg = `🚨 DECISION REQUIRED: ${description}\n\nNotified: ${mentions}\nID: ${decision.id}`;
-    appendMessage(room, name, decisionMsg, null, "DECISION");
+    appendMessage(room, name, decisionMsg, undefined, "DECISION");
 
     // Notify via Telegram — rate limited to 10/hour to prevent spam
     if (canSendTelegram(room)) {
@@ -2334,6 +2342,86 @@ app.get("/rooms/new", (c) => {
   });
   response.headers.set("x-admin-token", admin_token);
   return response;
+});
+
+// ── Project Rooms ─────────────────────────────────────────────────────────────
+
+// POST /api/rooms/create-project — create a project room with brief + deliverables
+app.post("/api/rooms/create-project", async (c) => {
+  const ip = c.req.header("x-forwarded-for") ?? "unknown";
+  if (!checkRateLimit(`room_create:${ip}`, 10, 60 * 60 * 1000)) {
+    return c.json({ error: "rate_limit_exceeded" }, 429);
+  }
+  const body = await c.req.json().catch(() => null);
+  if (!body?.title || !body?.brief) {
+    return c.json({ error: "title and brief are required" }, 400);
+  }
+  const code = createProjectRoom({
+    title: body.title,
+    brief: body.brief,
+    deadline: body.deadline ? Number(body.deadline) : undefined,
+    deliverables: Array.isArray(body.deliverables) ? body.deliverables : [],
+  });
+  const rawOrigin = new URL(c.req.url).origin;
+  const proto = c.req.header("x-forwarded-proto") || new URL(c.req.url).protocol.replace(":","");
+  const baseUrl = rawOrigin.replace(/^https?/, proto);
+  return c.json({
+    ok: true,
+    room_code: code,
+    project_url: `${baseUrl}/dashboard?room=${code}`,
+  });
+});
+
+// GET /api/rooms/:code/project — fetch project brief + deliverables
+app.get("/api/rooms/:code/project", (c) => {
+  const code = c.req.param("code");
+  const project = getProjectRoom(code);
+  if (!project) return c.json({ error: "room not found" }, 404);
+  if (project.mode !== "project") return c.json({ error: "not a project room" }, 400);
+  return c.json({ ok: true, project });
+});
+
+// POST /api/rooms/:code/deliverables — add a deliverable
+app.post("/api/rooms/:code/deliverables", async (c) => {
+  const code = c.req.param("code");
+  const body = await c.req.json().catch(() => null);
+  if (!body?.title) return c.json({ error: "title is required" }, 400);
+  const deliverable = addDeliverable(code, {
+    title: body.title,
+    description: body.description,
+    assigned_to: body.assigned_to,
+  });
+  return c.json({ ok: true, deliverable });
+});
+
+// GET /api/rooms/:code/deliverables — list deliverables
+app.get("/api/rooms/:code/deliverables", (c) => {
+  const code = c.req.param("code");
+  const deliverables = getDeliverables(code);
+  return c.json({ ok: true, deliverables });
+});
+
+// PATCH /api/rooms/:code/deliverables/:id — update a deliverable
+app.patch("/api/rooms/:code/deliverables/:id", async (c) => {
+  const id = c.req.param("id");
+  const body = await c.req.json().catch(() => null);
+  if (!body) return c.json({ error: "body required" }, 400);
+  const deliverable = updateDeliverable(id, {
+    title: body.title,
+    description: body.description,
+    status: body.status,
+    assigned_to: body.assigned_to,
+  });
+  if (!deliverable) return c.json({ error: "deliverable not found" }, 404);
+  return c.json({ ok: true, deliverable });
+});
+
+// DELETE /api/rooms/:code/deliverables/:id — remove a deliverable
+app.delete("/api/rooms/:code/deliverables/:id", (c) => {
+  const id = c.req.param("id");
+  const ok = deleteDeliverable(id);
+  if (!ok) return c.json({ error: "deliverable not found" }, 404);
+  return c.json({ ok: true });
 });
 
 // ── One-click demo room ──────────────────────────────────────────────────────
