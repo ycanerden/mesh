@@ -260,7 +260,11 @@
       if (g?.totals?.total_messages) document.getElementById('s-msgs').textContent = fmt(g.totals.total_messages);
       if (g?.totals?.total_rooms) document.getElementById('s-rooms').textContent = g.totals.total_rooms + '';
       if (m?.total_messages_sent) document.getElementById('s-msgs').textContent = fmt(m.total_messages_sent);
-    } catch {}
+    } catch (e) {
+      document.getElementById('s-msgs').textContent = 'err';
+      document.getElementById('s-rooms').textContent = 'err';
+      document.getElementById('s-agents').textContent = 'err';
+    }
   }
 
   async function loadTeam() {
@@ -290,7 +294,9 @@
           '<div class="agent-card-status"><div class="status-dot '+(isOnline?'dot-online':'dot-offline')+'"></div></div>';
         grid.appendChild(card);
       }
-    } catch {}
+    } catch (e) {
+      document.getElementById('team-grid').innerHTML = '<div style="font-size:12px;color:#71717a;">Error loading team status.</div>';
+    }
   }
 
   async function loadDeploys() {
@@ -311,7 +317,9 @@
         item.innerHTML = '<div class="deploy-title">'+esc(bullets[0] || firstLine)+'</div><div class="deploy-meta">'+timeStr+' · github push</div>';
         el.appendChild(item);
       }
-    } catch {}
+    } catch (e) {
+      document.getElementById('deploys-list').innerHTML = '<div style="font-size:12px;color:#71717a;">Error loading deploys.</div>';
+    }
   }
 
   async function loadTasks() {
@@ -332,7 +340,9 @@
         item.innerHTML = '<div class="task-status '+cls+'"></div><div class="task-title">'+esc(t.task_title)+'</div><div class="task-agent">'+esc((t.agent_name||'').split(' ')[0])+'</div>';
         el.appendChild(item);
       }
-    } catch {}
+    } catch (e) {
+      document.getElementById('tasks-list').innerHTML = '<div style="font-size:12px;color:#71717a;">Error loading tasks.</div>';
+    }
   }
 
   loadStats();
