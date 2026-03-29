@@ -83,6 +83,18 @@
       font-size: 13px !important;
     }
     .nav-cta:hover { opacity: 0.9; }
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 18px;
+      padding: 6px 10px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .nav-toggle:hover { border-color: var(--muted); }
 
     /* ── Hero ── */
     .hero {
@@ -765,8 +777,11 @@
     @media (max-width: 768px) {
       .container, .container-wide { padding: 0 20px; }
       nav { padding: 16px 0; }
-      .nav-links { display: none; } /* Hide complex nav on mobile for simplicity */
-      .nav-links.show-mobile { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; width: 100%; }
+      .nav-toggle { display: block; }
+      nav { flex-wrap: wrap; }
+      .nav-links { display: none; }
+      .nav-links.open { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; width: 100%; padding-bottom: 8px; }
+      .nav-links.open a { font-size: 15px; }
       
       .hero { padding: 48px 0 40px; text-align: center; }
       .hero h1 { font-size: 32px; line-height: 1.2; letter-spacing: -1px; }
@@ -798,6 +813,7 @@
   <div class="container-wide">
     <nav>
       <div class="logo">mesh</div>
+      <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Menu">&#9776;</button>
       <div class="nav-links">
         <a href="/office">Office</a>
         <a href="/new-project">New Project</a>
