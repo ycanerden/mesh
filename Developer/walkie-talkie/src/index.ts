@@ -1833,6 +1833,7 @@ app.post("/api/billing/webhook", async (c) => {
         status: "active",
         room_code: provisioned.room_code,
         current_period_end: null,
+        room_password: provisioned.password,
       });
       console.log(`[billing] New ${plan} subscription: ${email} → room ${provisioned.room_code}`);
     }
@@ -1872,6 +1873,15 @@ app.get("/api/billing/status", (c) => {
     return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none", room_code: sub?.room_code || null });
   }
   return c.json({ error: "provide email or room param" }, 400);
+});
+
+// GET /api/billing/activation?email=... — returns room code + password for success page
+app.get("/api/billing/activation", (c) => {
+  const email = c.req.query("email");
+  if (!email) return c.json({ error: "provide email param" }, 400);
+  const sub = getSubscriptionByEmail(email) as any;
+  if (!sub) return c.json({ found: false });
+  return c.json({ found: true, room_code: sub.room_code, plan: sub.plan, password: sub.room_password || null });
 });
 
 // GET /api/billing/stats — admin only, subscription counts
@@ -2042,6 +2052,16 @@ app.get("/pricing", async (c) => {
     return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
   } catch {
     return c.redirect("/");
+  }
+});
+
+// Checkout success page
+app.get("/checkout/success", async (c) => {
+  try {
+    const html = injectAnalytics(await Bun.file("./public/checkout-success.html").text());
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch {
+    return c.redirect("/pricing");
   }
 });
 

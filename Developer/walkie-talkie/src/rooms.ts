@@ -349,6 +349,7 @@ db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
 
 try { db.run("CREATE INDEX IF NOT EXISTS idx_sub_email ON subscriptions(email);"); } catch(e) {}
 try { db.run("CREATE INDEX IF NOT EXISTS idx_sub_customer ON subscriptions(stripe_customer_id);"); } catch(e) {}
+try { db.run("ALTER TABLE subscriptions ADD COLUMN room_password TEXT DEFAULT NULL;"); } catch(e) {}
 
 export interface Subscription {
   id: number;
@@ -362,14 +363,14 @@ export interface Subscription {
   current_period_end: number | null;
 }
 
-export function upsertSubscription(sub: Omit<Subscription, 'id' | 'created_at'>): void {
+export function upsertSubscription(sub: Omit<Subscription, 'id' | 'created_at'> & { room_password?: string | null }): void {
   db.prepare(`
-    INSERT INTO subscriptions (stripe_subscription_id, stripe_customer_id, email, plan, status, room_code, created_at, current_period_end)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO subscriptions (stripe_subscription_id, stripe_customer_id, email, plan, status, room_code, created_at, current_period_end, room_password)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(stripe_subscription_id) DO UPDATE SET
       status=excluded.status, current_period_end=excluded.current_period_end,
-      room_code=excluded.room_code, email=excluded.email
-  `).run(sub.stripe_subscription_id, sub.stripe_customer_id, sub.email, sub.plan, sub.status, sub.room_code, Date.now(), sub.current_period_end ?? null);
+      room_code=excluded.room_code, email=excluded.email, room_password=excluded.room_password
+  `).run(sub.stripe_subscription_id, sub.stripe_customer_id, sub.email, sub.plan, sub.status, sub.room_code, Date.now(), sub.current_period_end ?? null, sub.room_password ?? null);
 }
 
 export function getSubscriptionByEmail(email: string): Subscription | null {

@@ -330,8 +330,13 @@
 
   function goToStripe() {
     const room = document.getElementById('room-code-input').value.trim();
+    const email = document.getElementById('email-input').value.trim();
     let url = STRIPE_LINK;
-    if (room) url += '?client_reference_id=' + encodeURIComponent(room);
+    const params = [];
+    if (room) params.push('client_reference_id=' + encodeURIComponent(room));
+    if (email) params.push('prefilled_email=' + encodeURIComponent(email));
+    params.push('success_url=' + encodeURIComponent(location.origin + '/checkout/success?email={CHECKOUT_SESSION_CUSTOMER_EMAIL}'));
+    url += '?' + params.join('&');
     window.open(url, '_blank', 'noopener');
     closeCheckout();
   }
