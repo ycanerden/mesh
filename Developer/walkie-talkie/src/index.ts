@@ -1086,8 +1086,10 @@ app.delete("/api/messages/:id", async (c) => {
 app.post("/api/webhooks/register", async (c) => {
   const room = c.req.query("room");
   const name = c.req.query("name");
-  const observer = c.req.query("observer") === "1";
+  const token = c.req.query("token") || c.req.header("x-admin-token");
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  // Require admin token to register webhooks (prevents data exfiltration)
+  if (!token || !verifyAdmin(room, token)) return c.json({ error: "unauthorized — admin token required" }, 401);
   const { webhook_url, events } = await c.req.json();
   if (!webhook_url) return c.json({ error: "missing webhook_url" }, 400);
   registerWebhook(room, name, webhook_url, events || "message");
@@ -2683,10 +2685,25 @@ app.get("/master-dashboard", async (c) => {
 app.post("/api/webhooks/github", async (c) => {
   const room = c.req.query("room");
   if (!room) return c.json({ error: "missing room" }, 400);
-  
+
+  // Verify GitHub webhook signature if secret is configured
+  const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
+  if (webhookSecret) {
+    const signature = c.req.header("x-hub-signature-256");
+    if (!signature) return c.json({ error: "missing signature" }, 401);
+    const body = await c.req.text();
+    const expected = "sha256=" + crypto.createHmac("sha256", webhookSecret).update(body).digest("hex");
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+      return c.json({ error: "invalid signature" }, 401);
+    }
+    // Re-parse the body as JSON since we consumed it
+    var payload = JSON.parse(body);
+  } else {
+    var payload = await c.req.json();
+  }
+
   const event = c.req.header("x-github-event");
   try {
-    const payload = await c.req.json();
     let message = "";
     let type: any = "SYSTEM";
 
