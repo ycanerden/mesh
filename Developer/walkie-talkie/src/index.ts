@@ -5,6 +5,7 @@ import { cors } from "hono/cors";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
+import { existsSync } from "node:fs";
 import crypto from "node:crypto";
 import { existsSync } from "node:fs";
 import {
@@ -152,6 +153,10 @@ import {
 const app = new Hono();
 const startTime = Date.now();
 const VERSION = "2.9.0";
+const GOOGLE_BACKEND = (process.env.GOOGLE_BACKEND || "gog").toLowerCase();
+const GOG_BIN = process.env.GOG_BIN || "gog";
+const GOG_ACCOUNT = process.env.GOG_ACCOUNT;
+const GOG_CLIENT = process.env.GOG_CLIENT;
 
 // Agents that should never trigger join notifications (viewers, sentinels, system)
 const SYSTEM_AGENT_NAMES = new Set(["Scout", "Pulse", "Archie", "system"]);
@@ -2895,33 +2900,8 @@ app.get("/api/dashboard-data", (c) => {
   });
 });
 
-// ── MCP endpoint ──────────────────────────────────────────────────────────────
-//
-// Each request is stateless — a new McpServer + transport per call.
-// Room identity comes from ?room= and ?name= query params.
-// The shared room store (rooms.ts) holds all state.
-
-app.all("/mcp", async (c) => {
-  const room = c.req.query("room");
-  const name = c.req.query("name");
-
-  if (!room || !name) {
-    return c.json(
-      { error: "Missing required query params: ?room=CODE&name=YOUR_NAME" },
-      400
-    );
-  }
-
-  // Auto-join room — if room doesn't exist, create it so stale room codes don't cause 404
-  ensureRoom(room);
-  const joined = joinRoom(room, name);
-
-  // Create stateless MCP server for this request
-  const server = new McpServer({
-    name: "mesh",
-    version: "1.0.0",
-  });
-
+// ── MCP shared tool registration ──────────────────────────────────────────────
+function registerMcpTools(server: McpServer, room: string, name: string) {
   // Tool: send_to_partner
   server.tool(
     "send_to_partner",
@@ -3611,6 +3591,36 @@ app.all("/mcp", async (c) => {
       }
     }
   );
+}
+
+// ── MCP endpoint ──────────────────────────────────────────────────────────────
+//
+// Each request is stateless — a new McpServer + transport per call.
+// Room identity comes from ?room= and ?name= query params.
+// The shared room store (rooms.ts) holds all state.
+
+app.all("/mcp", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+
+  if (!room || !name) {
+    return c.json(
+      { error: "Missing required query params: ?room=CODE&name=YOUR_NAME" },
+      400
+    );
+  }
+
+  // Auto-join room — if room doesn't exist, create it so stale room codes don't cause 404
+  ensureRoom(room);
+  const joined = joinRoom(room, name);
+
+  // Create stateless MCP server for this request
+  const server = new McpServer({
+    name: "mesh",
+    version: "1.0.0",
+  });
+
+  registerMcpTools(server, room, name);
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined, // stateless mode
@@ -3618,6 +3628,39 @@ app.all("/mcp", async (c) => {
 
   await server.connect(transport);
   return transport.handleRequest(c.req.raw);
+});
+
+// ── MCP Invoke Endpoint (Direct tool call) ───────────────────────────────────
+app.post("/api/mcp-invoke", async (c) => {
+  try {
+    const { room, name, tool, arguments: args } = await c.req.json();
+
+    if (!room || !name || !tool) {
+      return c.json({ error: "Missing required fields: room, name, tool" }, 400);
+    }
+
+    if (!hasRoomAccess(c, room)) {
+      return c.json({ error: "room_protected", detail: "This room requires a password" }, 403);
+    }
+
+    ensureRoom(room);
+    joinRoom(room, name);
+
+    const server = new McpServer({
+      name: "mesh",
+      version: "1.0.0",
+    });
+
+    registerMcpTools(server, room, name);
+
+    // McpServer.callTool expects arguments to be an object
+    const result = await server.callTool(tool, args || {});
+    return c.json(result);
+  } catch (e: any) {
+    // Handle specific MCP errors if needed, otherwise generic error
+    console.error(`[mcp-invoke] Error calling tool:`, e);
+    return c.json({ error: "tool_execution_failed", detail: e.message }, 500);
+  }
 });
 
 // ── Sentinel Agents: Keep office alive 24/7 ──────────────────────────────────

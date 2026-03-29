@@ -346,6 +346,56 @@
       font-size: 10px; background: var(--accent-dim); color: var(--accent2);
       padding: 1px 7px; border-radius: 10px; font-weight: 700;
     }
+
+    /* Workspace Tab */
+    .workspace-container {
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+    .workspace-hero {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .workspace-hero h2 { font-size: 24px; margin-bottom: 8px; }
+    .workspace-hero p { color: var(--text2); font-size: 14px; }
+    
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .workspace-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all .2s;
+    }
+    .workspace-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .workspace-card-icon { font-size: 32px; }
+    .workspace-card-title { font-size: 16px; font-weight: 600; }
+    .workspace-card-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+    .workspace-card-btn {
+      margin-top: auto;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .workspace-card-btn:hover { opacity: .9; }
+
     .tab-panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
     .tab-panel.active { display: flex; }
 
@@ -869,6 +919,10 @@
         </div>
         <div class="main-tab" data-tab="summary"><span>Summary</span></div>
         <div class="main-tab" data-tab="tasks"><span>Tasks</span></div>
+        <div class="main-tab" data-tab="files"><span>Files</span></div>
+        <div class="main-tab" data-tab="handoffs"><span>Handoffs</span></div>
+        <div class="main-tab" data-tab="workspace"><span>Workspace</span></div>
+        <div class="main-tab" data-tab="pins"><span>Pins <span class="tab-badge" id="pin-count">0</span></span></div>
       </div>
 
       <!-- Chat panel -->
@@ -934,6 +988,37 @@
       <!-- Handoffs panel -->
       <div class="tab-panel" id="panel-handoffs">
         <div class="handoffs-list" id="handoffs-container" style="overflow-y:auto;"></div>
+      </div>
+
+      <!-- Workspace panel -->
+      <div class="tab-panel" id="panel-workspace">
+        <div class="workspace-container" style="overflow-y:auto;">
+          <div class="workspace-hero">
+            <h2>Google Workspace</h2>
+            <p>Create documents, slides, and sheets directly in your shared workspace.</p>
+          </div>
+          <div class="workspace-grid">
+            <div class="workspace-card">
+              <div class="workspace-card-icon">📄</div>
+              <div class="workspace-card-title">Google Doc</div>
+              <div class="workspace-card-desc">Start a new document for requirements, notes, or technical specs.</div>
+              <button class="workspace-card-btn" onclick="showWorkspaceModal('doc')">Create Doc</button>
+            </div>
+            <div class="workspace-card">
+              <div class="workspace-card-icon">📊</div>
+              <div class="workspace-card-title">Google Slides</div>
+              <div class="workspace-card-desc">Generate a presentation deck for pitches or status updates.</div>
+              <button class="workspace-card-btn" onclick="showWorkspaceModal('slides')">Create Slides</button>
+            </div>
+            <div class="workspace-card">
+              <div class="workspace-card-icon">📈</div>
+              <div class="workspace-card-title">Google Sheet</div>
+              <div class="workspace-card-desc">Create a spreadsheet for project tracking or data analysis.</div>
+              <button class="workspace-card-btn" onclick="showWorkspaceModal('sheets')">Create Sheet</button>
+            </div>
+          </div>
+          <div id="workspace-results" style="margin-top:32px;"></div>
+        </div>
       </div>
 
       <!-- Pins panel -->
@@ -1245,6 +1330,88 @@
       btn.style.color = 'var(--green)';
       setTimeout(() => { btn.textContent = 'Invite'; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
     });
+  };
+
+  window.showWorkspaceModal = function(type) {
+    const typeNames = { doc: 'Google Doc', slides: 'Google Slides', sheets: 'Google Sheet' };
+    const toolNames = { doc: 'google.create_doc', slides: 'google.create_slides', sheets: 'google.create_sheet' };
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    modal.innerHTML = `
+      <div class="card" style="width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;">
+        <h3 style="margin-bottom:16px;">Create ${typeNames[type]}</h3>
+        <div style="margin-bottom:20px;">
+          <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;">Document Title</label>
+          <input type="text" id="ws-title" placeholder="e.g. Project Plan" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);outline:none;">
+        </div>
+        <div style="display:flex;gap:10px;">
+          <button id="ws-cancel" style="flex:1;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;">Cancel</button>
+          <button id="ws-submit" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;">Create</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    const input = modal.querySelector('#ws-title');
+    input.focus();
+    
+    modal.querySelector('#ws-cancel').onclick = () => modal.remove();
+    modal.querySelector('#ws-submit').onclick = async () => {
+      const title = input.value.trim();
+      if (!title) { input.focus(); return; }
+      
+      const btn = modal.querySelector('#ws-submit');
+      const originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+      
+      try {
+        const res = await fetch('/api/mcp-invoke', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            room: ROOM,
+            name: $('sender-name').value.trim() || 'User',
+            tool: toolNames[type],
+            arguments: { title }
+          })
+        });
+        const data = await res.json();
+        modal.remove();
+        
+        if (data.isError) {
+          alert('Error: ' + (data.content?.[0]?.text || 'Failed to create document'));
+        } else {
+          const result = JSON.parse(data.content[0].text);
+          if (result.url) {
+            const resultsEl = $('workspace-results');
+            const link = document.createElement('div');
+            link.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;animation:msg-in .2s ease;';
+            link.innerHTML = `
+              <div style="display:flex;align-items:center;gap:12px;">
+                <span style="font-size:20px;">${type === 'doc' ? '📄' : type === 'slides' ? '📊' : '📈'}</span>
+                <div>
+                  <div style="font-size:13px;font-weight:600;">${esc(title)}</div>
+                  <div style="font-size:11px;color:var(--text3);">${typeNames[type]}</div>
+                </div>
+              </div>
+              <a href="${result.url}" target="_blank" style="background:var(--surface3);color:var(--text);text-decoration:none;font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid var(--border);">Open</a>
+            `;
+            resultsEl.prepend(link);
+          }
+        }
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        alert('Network error: ' + e.message);
+      }
+    };
+    
+    input.onkeydown = (e) => {
+      if (e.key === 'Enter') modal.querySelector('#ws-submit').click();
+      if (e.key === 'Escape') modal.remove();
+    };
   };
 
   // === Auto-scroll detection ===
