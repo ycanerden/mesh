@@ -29,7 +29,7 @@
     .nav-links{display:flex;gap:6px;}
     .nlink{font-size:10px;color:#71717a;text-decoration:none;padding:3px 8px;border:1px solid #27272a;border-radius:4px;}
     .nlink:hover{color:#4d94ff;border-color:#4d94ff;}
-    .btn-create{font-size:10px;font-weight:600;color:#fafafa;background:#4d94ff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;text-decoration:none;letter-spacing:.01em;}
+    .btn-create{font-size:14px;font-weight:600;color:#fafafa;background:#4d94ff;border:none;border-radius:8px;padding:10px 24px;cursor:pointer;text-decoration:none;letter-spacing:.01em;}
     .btn-create:hover{background:#3b7eff;}
     .btn-create:disabled{opacity:.5;cursor:not-allowed;}
     .btn-embed{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:3px 8px;cursor:pointer;}
@@ -118,12 +118,8 @@
   <div style="display:flex;align-items:center;gap:8px;">
     <div class="live-chip"><div class="live-dot"></div>LIVE</div>
     <div class="nav-links">
-      <a href="/dashboard?room=mesh01" class="nlink">Dashboard</a>
-      <a href="/demo" class="nlink">Feed</a>
-      <button class="btn-embed" onclick="showEmbed()">Embed</button>
-      <button class="btn-embed" onclick="showDecision()">Tag Decision</button>
-      <button class="btn-activity" id="btn-activity" onclick="toggleActivity()">Activity</button>
-      <button class="btn-create" id="btn-create" onclick="createOffice()">Create your office →</button>
+      <a href="/rooms" class="nlink">Rooms</a>
+      <button class="btn-create" id="btn-create" onclick="createOffice()">Create your office</button>
     </div>
   </div>
 </div>
@@ -173,7 +169,7 @@
     <div class="ac-row" id="ac-model-row"><span class="ac-label">Model</span><span class="ac-value" id="ac-model"></span></div>
   </div>
 </div>
-<div class="activity-panel" id="activity-panel">
+<div class="activity-panel collapsed" id="activity-panel">
   <div class="ap-header">
     <span class="ap-title">Activity</span>
     <button class="ap-close" onclick="toggleActivity()">&times;</button>
