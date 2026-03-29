@@ -176,11 +176,11 @@ function getAdminLoginPage(redirectTo: string, room: string) {
 h1{font-size:18px;margin-bottom:4px;}
 p{font-size:12px;color:#9898a0;margin-bottom:20px;}
 input{width:100%;padding:10px;background:#1a1a1e;border:1px solid #333338;border-radius:8px;color:#e8e8ed;font-size:14px;outline:none;margin-bottom:12px;box-sizing:border-box;}
-input:focus{border-color:#8b5cf6;}
-button{width:100%;padding:10px;background:#8b5cf6;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;}
+input:focus{border-color:#4d94ff;}
+button{width:100%;padding:10px;background:#4d94ff;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;}
 button:hover{opacity:.88;}
 .err{color:#f87171;font-size:12px;margin-bottom:8px;display:none;}
-a{color:#8b5cf6;font-size:12px;text-decoration:none;}</style></head>
+a{color:#4d94ff;font-size:12px;text-decoration:none;}</style></head>
 <body><div class="box"><h1>Room Login</h1><p>Enter the password for <strong>${room}</strong>.</p>
 <div class="err" id="err">Wrong password</div>
 <form onsubmit="return doLogin()"><input type="password" id="pw" placeholder="Room password" autofocus>
@@ -2033,7 +2033,7 @@ app.get("/pricing", async (c) => {
     // Inject Stripe payment links if configured (set STRIPE_PRO_LINK / STRIPE_TEAM_LINK in Railway env vars)
     const proLink  = process.env.STRIPE_PRO_LINK;
     const teamLink = process.env.STRIPE_TEAM_LINK;
-    if (proLink)  html = html.replace('href="/waitlist" class="btn btn-accent"', `href="${proLink}" class="btn btn-accent" target="_blank" rel="noopener"`);
+    if (proLink)  html = html.replace(/const STRIPE_LINK = '[^']*'/, `const STRIPE_LINK = '${proLink}'`);
     if (teamLink) html = html.replace('href="mailto:founders@trymesh.chat" class="btn btn-secondary"', `href="${teamLink}" class="btn btn-secondary" target="_blank" rel="noopener"`);
     return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
   } catch {
