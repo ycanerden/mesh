@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>Mesh — Join the Waitlist</title>
-  <meta name="description" content="Join the waitlist for Mesh Pro: persistent rooms, unlimited agents, and GitHub integrations.">
+  <title>Mesh — Stay Updated</title>
+  <meta name="description" content="Get notified about new Mesh features and team plans. The Room plan is already live at $9/mo.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -18,7 +18,7 @@
       --border: #27272a;
       --text: #fafafa;
       --muted: #a1a1aa;
-      --accent: #8b5cf6;
+      --accent: #4d94ff;
       --green: #22c55e;
       --radius: 12px;
     }
@@ -76,23 +76,6 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
-    .input-group {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    input[type="email"] {
-      flex: 1;
-      padding: 14px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
     input[type="email"]:focus {
       border-color: var(--accent);
     }
@@ -124,6 +107,33 @@
       margin-top: 20px;
     }
 
+    .error-msg {
+      display: none;
+      padding: 16px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 16px;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+      appearance: none;
+    }
+    select:focus { border-color: var(--accent); }
+    select option { background: var(--bg); color: var(--text); }
+
     .footer {
       text-align: center;
       padding: 40px 0;
@@ -152,21 +162,27 @@
   <div class="container">
     <a href="/" class="logo">mesh</a>
     
-    <h1>Pro is coming.</h1>
-    <p class="subtitle">Persistent rooms, unlimited agents, dedicated server isolation, and GitHub webhooks. Join the waitlist to get early access to Mesh Pro.</p>
+    <h1>Stay in the loop.</h1>
+    <p class="subtitle">Get notified about new features, team plans, and enterprise access. The Room plan ($9/mo) is already live — <a href="/pricing" style="color:var(--accent);text-decoration:none;">grab it now</a>.</p>
 
     <div class="form-box">
       <form id="waitlist-form" onsubmit="submitForm(event)">
-        <div class="input-group">
-          <input type="email" id="email" placeholder="Enter your email address" required>
-          <button type="submit" id="submit-btn">Join Waitlist</button>
-        </div>
-        <p style="font-size:12px; color:var(--muted); margin-top:12px;">We'll only email you when Pro is ready.</p>
+        <input type="email" id="email" placeholder="Enter your email address" required style="width:100%; margin-bottom:12px; padding:14px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:15px; outline:none;">
+        <select id="use-case">
+          <option value="" disabled selected>What brings you here? (optional)</option>
+          <option value="multi-agent">Running multiple AI agents</option>
+          <option value="team">Team using AI tools together</option>
+          <option value="automation">Automation / pipelines</option>
+          <option value="personal">Personal projects</option>
+          <option value="other">Other</option>
+        </select>
+        <button type="submit" id="submit-btn" style="width:100%;">Join Waitlist</button>
+        <p style="font-size:12px; color:var(--muted); margin-top:12px;">We'll only email you about major updates. No spam.</p>
       </form>
       <div id="success-msg" class="success-msg">
         You're on the list! We'll be in touch when Pro is ready.
       </div>
-      <div id="error-msg" style="display:none; margin-top:12px; padding:10px 14px; background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3); border-radius:8px; font-size:13px; color:#f87171;"></div>
+      <div id="error-msg" class="error-msg"></div>
     </div>
   </div>
 
@@ -179,32 +195,49 @@
   <script>
     async function submitForm(e) {
       e.preventDefault();
-      const email = document.getElementById('email').value;
+      const email = document.getElementById('email').value.trim();
+      const useCase = document.getElementById('use-case').value;
       const btn = document.getElementById('submit-btn');
       const form = document.getElementById('waitlist-form');
       const success = document.getElementById('success-msg');
+      const errorEl = document.getElementById('error-msg');
 
       if (!email) return;
 
-      const errorMsg = document.getElementById('error-msg');
       btn.disabled = true;
       btn.textContent = 'Joining...';
-      errorMsg.style.display = 'none';
+      errorEl.style.display = 'none';
 
       try {
         const res = await fetch('/api/waitlist', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
+          body: JSON.stringify({ email, use_case: useCase || undefined })
         });
-        if (!res.ok) throw new Error('Server error');
+
+        if (res.status === 429) {
+          errorEl.textContent = 'Too many attempts. Try again later.';
+          errorEl.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Join Waitlist';
+          return;
+        }
+
+        if (!res.ok) {
+          throw new Error('Server error');
+        }
+
+        const data = await res.json();
         form.style.display = 'none';
+        if (data.duplicate) {
+          success.textContent = "You're already on the list. We'll be in touch.";
+        }
         success.style.display = 'block';
       } catch (err) {
         btn.disabled = false;
         btn.textContent = 'Join Waitlist';
-        errorMsg.textContent = 'Something went wrong. Please try again.';
-        errorMsg.style.display = 'block';
+        errorEl.textContent = 'Something went wrong. Please try again.';
+        errorEl.style.display = 'block';
       }
     }
   </script>

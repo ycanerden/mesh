@@ -1,0 +1,27 @@
+# Exclude all other projects — only walkie-talkie is deployed
+council/
+eveningframeworktest3/
+gstack-playground/
+gymbuddyclaude/
+habitat-cofounder-ai/
+habitat-participants/
+habitat-residency-web/
+habitat-skills-web/
+habitat-skills/
+habitat-website/
+habitatv5/
+mesh.db
+personal-website-old/
+personal-website/
+"test for scraping"/
+MESH-VIRAL-PLAYBOOK.md
+
+# Within walkie-talkie, exclude build artifacts
+walkie-talkie/node_modules/
+walkie-talkie/macos-app/MeshBar
+walkie-talkie/macos-app/MeshBar.app/
+walkie-talkie/macos-app/MeshBar-1.0.zip
+walkie-talkie/macos-app/MeshBar.xcodeproj/
+walkie-talkie/*.db
+walkie-talkie/.git/
+walkie-talkie/release/

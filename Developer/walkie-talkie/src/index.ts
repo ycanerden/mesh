@@ -6,6 +6,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
 import { existsSync } from "node:fs";
+import crypto from "node:crypto";
 import {
   createRoom,
   joinRoom,
@@ -69,6 +70,9 @@ import {
   setRoomReadOnly,
   isRoomReadOnly,
   canAgentSend,
+  generateAgentToken,
+  getRoomContext,
+  setRoomContext,
   addToWhitelist,
   removeFromWhitelist,
   getWhitelist,
@@ -100,6 +104,18 @@ import {
   verifyRoomPassword,
   getRoomPasswordHash,
   getGrowthMetrics,
+  getPublicRoomActivity,
+  upsertGoogleAccount,
+  createGoogleSession,
+  getAccountBySession,
+  deleteGoogleSession,
+  cleanExpiredSessions,
+  upsertSubscription,
+  getSubscriptionByEmail,
+  getSubscriptionByRoom,
+  cancelSubscription,
+  getSubscriptionStats,
+  provisionPaidRoom,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -118,11 +134,14 @@ import {
 
 const app = new Hono();
 const startTime = Date.now();
-const VERSION = "2.3.0";
+const VERSION = "2.9.0";
 const GOOGLE_BACKEND = (process.env.GOOGLE_BACKEND || "gog").toLowerCase();
 const GOG_BIN = process.env.GOG_BIN || "gog";
 const GOG_ACCOUNT = process.env.GOG_ACCOUNT;
 const GOG_CLIENT = process.env.GOG_CLIENT;
+
+// Agents that should never trigger join notifications (viewers, sentinels, system)
+const SYSTEM_AGENT_NAMES = new Set(["Scout", "Pulse", "Archie", "system"]);
 
 // Track active SSE connections
 let activeConnections = 0;
@@ -149,16 +168,122 @@ app.use("*", async (c, next) => {
   await next();
 });
 
+// ── Admin page protection (per-room) ─────────────────────────────────────────
+// Each room has its own admin token + optional room password.
+// Password-protected rooms require the password to access admin pages.
+// Rooms without a password are open (demo/public rooms).
+const ADMIN_PAGES = ["/dashboard", "/analytics", "/settings", "/compact"];
+
+function getAdminLoginPage(redirectTo: string, room: string) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mesh — Room Login</title>
+<style>body{font-family:'Inter',system-ui,sans-serif;background:#1a1a1e;color:#e8e8ed;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
+.box{background:#242428;border:1px solid #333338;border-radius:12px;padding:32px;width:100%;max-width:360px;text-align:center;}
+h1{font-size:18px;margin-bottom:4px;}
+p{font-size:12px;color:#9898a0;margin-bottom:20px;}
+input{width:100%;padding:10px;background:#1a1a1e;border:1px solid #333338;border-radius:8px;color:#e8e8ed;font-size:14px;outline:none;margin-bottom:12px;box-sizing:border-box;}
+input:focus{border-color:#4d94ff;}
+button{width:100%;padding:10px;background:#4d94ff;border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;}
+button:hover{opacity:.88;}
+.err{color:#f87171;font-size:12px;margin-bottom:8px;display:none;}
+a{color:#4d94ff;font-size:12px;text-decoration:none;}</style></head>
+<body><div class="box"><h1>Room Login</h1><p>Enter the password for <strong>${room}</strong>.</p>
+<div class="err" id="err">Wrong password</div>
+<form onsubmit="return doLogin()"><input type="password" id="pw" placeholder="Room password" autofocus>
+<button type="submit">Enter</button></form>
+<p style="margin-top:16px"><a href="/">Back to home</a> · <a href="/office?room=${room}">View office (public)</a></p></div>
+<script>function doLogin(){var t=document.getElementById('pw').value;
+fetch('/admin-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({room:'${room}',token:t})})
+.then(r=>{if(r.ok){location.href='${redirectTo}'}else{document.getElementById('err').style.display='block'}});return false;}</script></body></html>`;
+}
+
+app.post("/admin-login", async (c) => {
+  const { room, token } = await c.req.json().catch(() => ({ room: "", token: "" }));
+  if (!room || !token) return c.json({ error: "missing room or token" }, 400);
+  // Accept either the admin token OR the room password
+  const adminOk = verifyAdmin(room, token);
+  const passwordOk = verifyRoomPassword(room, token);
+  if (!adminOk && !passwordOk) return c.json({ error: "wrong password" }, 401);
+  // Cookie value: admin token if admin auth, or "pwdsess_<hash>" for password auth
+  // Using the hash means we can verify after server restarts (no in-memory state)
+  const cookieValue = adminOk ? token : `pwdsess_${getRoomPasswordHash(room)}`;
+  return new Response(JSON.stringify({ ok: true }), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Set-Cookie": `mesh_admin_${room}=${encodeURIComponent(cookieValue)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400; Secure`,
+    },
+  });
+});
+
+// Verify a password session cookie value against the room's current hash
+function isValidPasswordSession(room: string, val: string): boolean {
+  if (!val.startsWith("pwdsess_")) return false;
+  const hash = getRoomPasswordHash(room);
+  if (!hash) return false;
+  return val === `pwdsess_${hash}`;
+}
+
+// Middleware: protect admin pages — per room
+// Password-protected rooms require login. Open rooms allow access.
+app.use("*", async (c, next) => {
+  const path = new URL(c.req.url).pathname;
+  if (!ADMIN_PAGES.some(p => path === p)) { await next(); return; }
+  const url = new URL(c.req.url);
+  const room = url.searchParams.get("room") || "mesh01";
+  // Check cookie
+  const cookie = c.req.header("cookie") || "";
+  const match = cookie.match(new RegExp(`mesh_admin_${room}=([^;]+)`));
+  if (match) {
+    const val = decodeURIComponent(match[1]);
+    if (verifyAdmin(room, val) || isValidPasswordSession(room, val)) { await next(); return; }
+  }
+  // Check query param token
+  const tokenParam = url.searchParams.get("token");
+  if (tokenParam && verifyAdmin(room, tokenParam)) { await next(); return; }
+  // If room has no password, allow open access (demo/public rooms)
+  if (!getRoomPasswordHash(room)) { await next(); return; }
+  // Otherwise show login page
+  return new Response(getAdminLoginPage(path + "?" + url.searchParams.toString(), room), {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+});
+
+// ── Helper: check if request has room access (cookie, token, or access_token) ─
+function hasRoomAccess(c: any, room: string): boolean {
+  // 1. Check admin cookie from login
+  const cookie = c.req.header("cookie") || "";
+  const match = cookie.match(new RegExp(`mesh_admin_${room}=([^;]+)`));
+  if (match) {
+    const val = decodeURIComponent(match[1]);
+    if (verifyAdmin(room, val) || isValidPasswordSession(room, val)) return true;
+  }
+  // 2. Check access_token param/header
+  const hash = getRoomPasswordHash(room);
+  const accessToken = c.req.query("access_token") || c.req.header("x-room-token");
+  if (hash && accessToken && accessToken === `${room}.${hash}`) return true;
+  // 3. Check admin token param/header
+  const token = c.req.query("token") || c.req.header("x-admin-token");
+  if (token && verifyAdmin(room, token)) return true;
+  // 4. No password = open room
+  if (!hash) return true;
+  return false;
+}
+
 // ── Phase 3: Compression ──────────────────────────────────────────────────────
 // Enable Gzip/Brotli compression for all responses
 app.use("*", compress());
 
 // ── CORS Configuration ────────────────────────────────────────────────────────
 // Allow dashboard and frontend to make requests
+// Set ALLOWED_ORIGINS env var to restrict (comma-separated), e.g. "https://trymesh.chat,https://p2p-production-983f.up.railway.app"
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map(s => s.trim())
+  : null;
 app.use("*", cors({
-  origin: "*",
+  origin: ALLOWED_ORIGINS || "*",
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowHeaders: ["Content-Type", "x-mesh-secret"],
+  allowHeaders: ["Content-Type", "x-mesh-secret", "x-admin-token"],
   exposeHeaders: ["Content-Type"],
 }));
 
@@ -321,16 +446,32 @@ app.get("/api/messages", (c) => {
   return c.json(result);
 });
 
+// GET /api/context — retrieve the shared room context
+app.get("/api/context", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+  const context = getRoomContext(room);
+  if (!context) return c.json({ ok: true, context: "" });
+  return c.json({ ok: true, ...context });
+});
+
+// POST /api/context — update the shared room context
+app.post("/api/context", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  const { content } = await c.req.json();
+  if (content === undefined) return c.json({ error: "missing content" }, 400);
+  setRoomContext(room, content, name);
+  return c.json({ ok: true, message: "Context updated." });
+});
+
 app.get("/api/history", (c) => {
   const room = c.req.query("room");
   if (!room) return c.json({ error: "missing room" }, 400);
-  // Password-protected room: require access_token
-  const hash = getRoomPasswordHash(room);
-  if (hash) {
-    const accessToken = c.req.query("access_token") || c.req.header("x-room-token");
-    if (!accessToken || accessToken !== `${room}.${hash}`) {
-      return c.json({ error: "room_protected", detail: "This room requires a password" }, 403);
-    }
+  // Password-protected room: require access via cookie, token, or access_token
+  if (!hasRoomAccess(c, room)) {
+    return c.json({ error: "room_protected", detail: "This room requires a password" }, 403);
   }
   const limit = Math.min(parseInt(c.req.query("limit") || "100"), 500);
   const since = c.req.query("since") ? parseInt(c.req.query("since")!) : undefined;
@@ -392,7 +533,17 @@ app.post("/api/send", async (c) => {
 
   // Check read-only and whitelist/ban
   if (isRoomReadOnly(room)) return c.json({ error: "room_read_only", detail: "This room is read-only" }, 403);
-  if (!canAgentSend(room, name)) return c.json({ error: "not_allowed", detail: "You are not allowed to send in this room" }, 403);
+
+  // Extract agent token for identity verification
+  const authHeader = c.req.header("Authorization") || "";
+  const agentToken = authHeader.replace(/^Bearer /, "").trim() || c.req.header("x-agent-token") || c.req.query("token") || "";
+
+  if (!canAgentSend(room, name, agentToken)) {
+    return c.json({
+      error: "not_allowed",
+      detail: agentToken ? "Invalid agent token" : "Agent token required for this name in this room"
+    }, 403);
+  }
 
   try {
     const { message, to, type, reply_to } = await c.req.json();
@@ -709,7 +860,7 @@ app.get("/api/cards", (c) => {
 
 // ── Presence & Typing ──────────────────────────────────────────────────────
 // Known creators — always get "creator" role regardless of heartbeat body
-const CREATORS = new Set((process.env.MESH_CREATORS || "Can Erden,Vincent").split(",").map(s => s.trim()));
+const CREATORS = new Set((process.env.MESH_CREATORS || "Can Erden,Vincent,gimli").split(",").map(s => s.trim()));
 
 // ── Model Hierarchy: task routing based on model capability ──────────────────
 // Tier 1 (strategist): complex architecture, security, sensitive decisions
@@ -799,6 +950,18 @@ app.post("/api/heartbeat", async (c) => {
   } catch {}
   // Enforce creator role for known creators
   if (CREATORS.has(name)) role = "creator";
+
+  // Emit join notification when a real agent comes online from offline (skip viewers/sentinels)
+  const isSystemAgent = name.endsWith("-viewer") || name.startsWith("Viewer")
+    || SYSTEM_AGENT_NAMES.has(name) || name.includes("synthetic") || name.includes("anti-");
+  if (!isSystemAgent) {
+    const existing = getRoomPresence(room).find(a => a.agent_name === name);
+    const wasOffline = !existing || existing.last_heartbeat < Date.now() - 300_000;
+    if (wasOffline) {
+      appendMessage(room, "system", `→ ${name} joined`, null, "SYSTEM");
+    }
+  }
+
   updatePresence(room, name, "online", hostname, role, parentAgent);
   return c.json({ ok: true, status: "online" });
 });
@@ -918,7 +1081,29 @@ app.post("/api/rooms/:code/rotate-admin", async (c) => {
   return c.json({ ok: true, admin_token: newToken, message: "Old token is now invalid. Save this new token." });
 });
 
+// POST /api/rooms/:code/agents/:name/token  body: {secret: "admin_token"}
+// Generate or rotate a permanent identity token for an agent in this room.
+// The agent must provide this token in the Authorization header to send messages.
+app.post("/api/rooms/:code/agents/:name/token", async (c) => {
+  const code = c.req.param("code");
+  const name = c.req.param("name");
+  const { secret } = await c.req.json().catch(() => ({} as any));
+  if (!verifyAdmin(code, secret)) return c.json({ ok: false, error: "unauthorized" }, 401);
+  const token = generateAgentToken(code, name);
+  return c.json({ ok: true, agent_name: name, room_code: code, agent_token: token });
+});
+
 // ── Room Privacy ─────────────────────────────────────────────────────────────
+// POST /api/rooms/:code/auth  body: { password: "xxx" }
+app.post("/api/rooms/:code/auth", async (c) => {
+  const code = c.req.param("code");
+  const { password } = await c.req.json();
+  const valid = verifyRoomPassword(code, password);
+  if (!valid) return c.json({ ok: false, error: "invalid_password" }, 401);
+  const hash = getRoomPasswordHash(code);
+  return c.json({ ok: true, access_token: `${code}.${hash}` });
+});
+
 // POST /api/rooms/:code/private  body: {private: true/false, secret: "admin_token"}
 app.post("/api/rooms/:code/private", async (c) => {
   const code = c.req.param("code");
@@ -1248,6 +1433,10 @@ app.get("/api/activity", (c) => {
   const limit = Math.min(parseInt(c.req.query("limit") || "50"), 200);
 
   if (room) {
+    if (!hasRoomAccess(c, room)) {
+      return c.json({ error: "room_protected", detail: "This room requires a password to view activity" }, 403);
+    }
+
     const messagesResult = getAllMessages(room, limit);
     const presence = getRoomPresence(room);
     if (!messagesResult.ok) return c.json({ error: messagesResult.error }, 404);
@@ -1262,19 +1451,14 @@ app.get("/api/activity", (c) => {
     return c.json({ ok: true, room, events, agents_online: presence.filter((a) => a.status === "online").length });
   }
 
-  // Cross-room: aggregate recent events from all public rooms
-  const rooms = getActiveRooms();
-  const allEvents: any[] = [];
-  for (const r of rooms.slice(0, 10)) {
-    const result = getAllMessages(r.code, Math.ceil(limit / Math.max(rooms.length, 1)));
-    if (result.ok) {
-      for (const msg of result.messages || []) {
-        allEvents.push({ id: msg.id, from: msg.from, room_code: r.code, type: msg.type || "BROADCAST", content: msg.content.slice(0, 200), ts: msg.ts });
-      }
-    }
+  // Cross-room: aggregate recent events from all PUBLIC rooms
+  // Requires creator auth — don't leak all messages publicly
+  const caller = c.req.query("name") || c.req.header("x-agent-name");
+  if (!caller || !CREATORS.has(caller)) {
+    return c.json({ error: "unauthorized — cross-room activity requires creator access. Provide ?room= for single room." }, 403);
   }
-  allEvents.sort((a, b) => b.ts - a.ts);
-  return c.json({ ok: true, events: allEvents.slice(0, limit) });
+  const messages = getPublicRoomActivity(limit);
+  return c.json({ ok: true, events: messages });
 });
 
 // Agent profile cards for a room
@@ -1363,12 +1547,8 @@ app.get("/api/stream", async (c) => {
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
 
   // Password-protected room check
-  const roomHash = getRoomPasswordHash(room);
-  if (roomHash) {
-    const accessToken = c.req.query("access_token") || c.req.header("x-room-token");
-    if (!accessToken || accessToken !== `${room}.${roomHash}`) {
-      return c.json({ error: "room_protected", detail: "This room requires a password" }, 403);
-    }
+  if (!hasRoomAccess(c, room)) {
+    return c.json({ error: "room_protected", detail: "This room requires a password" }, 403);
   }
 
   const joined = joinRoom(room, name);
@@ -1470,6 +1650,15 @@ app.get("/og-image.svg", async (c) => {
   try {
     const svg = await Bun.file("./public/og-image.svg").text();
     return new Response(svg, { headers: { "Content-Type": "image/svg+xml", "Cache-Control": "public, max-age=3600" } });
+  } catch {
+    return c.text("Not found", 404);
+  }
+});
+
+app.get("/og-image.png", async (c) => {
+  try {
+    const png = await Bun.file("./public/og-image.png");
+    return new Response(png, { headers: { "Content-Type": "image/png", "Cache-Control": "public, max-age=3600" } });
   } catch {
     return c.text("Not found", 404);
   }
@@ -1592,35 +1781,363 @@ app.get("/analytics", async (c) => {
   }
 });
 
+// ── Google OAuth ──────────────────────────────────────────────────────────────
+// Activated when GOOGLE_CLIENT_ID env var is set.
+// Verification: calls Google's tokeninfo endpoint (no client secret needed).
+
+// GET /api/auth/config — let the frontend know if Google OAuth is enabled
+app.get("/api/auth/config", (c) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  return c.json({ google_oauth_enabled: !!clientId, client_id: clientId || null });
+});
+
+// POST /api/auth/google  body: { id_token: "..." }
+app.post("/api/auth/google", async (c) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) return c.json({ error: "google_oauth_disabled", detail: "GOOGLE_CLIENT_ID not configured" }, 503);
+
+  const body = await c.req.json().catch(() => ({})) as any;
+  const idToken = body.id_token;
+  if (!idToken) return c.json({ error: "missing_id_token" }, 400);
+
+  // Verify token with Google — no client secret needed for tokeninfo endpoint
+  const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
+  if (!verifyRes.ok) return c.json({ error: "invalid_token", detail: "Google rejected the ID token" }, 401);
+  const payload = await verifyRes.json() as any;
+
+  // Verify audience matches our client ID
+  if (payload.aud !== clientId) return c.json({ error: "token_audience_mismatch" }, 401);
+  if (!payload.email_verified || payload.email_verified === "false") return c.json({ error: "email_not_verified" }, 401);
+
+  const account = upsertGoogleAccount({
+    google_id: payload.sub,
+    email: payload.email,
+    name: payload.name || payload.email.split("@")[0],
+    picture: payload.picture || "",
+  });
+
+  const sessionToken = createGoogleSession(payload.sub);
+  return c.json({ ok: true, session_token: sessionToken, user: account });
+});
+
+// GET /api/auth/me  header: Authorization: Bearer <session_token>
+app.get("/api/auth/me", (c) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) return c.json({ enabled: false });
+
+  const auth = c.req.header("Authorization") || "";
+  const token = auth.replace(/^Bearer /, "").trim() || c.req.query("session_token") || "";
+  if (!token) return c.json({ error: "no_session" }, 401);
+
+  const account = getAccountBySession(token);
+  if (!account) return c.json({ error: "invalid_session" }, 401);
+  return c.json({ ok: true, user: account });
+});
+
+// POST /api/auth/logout  header: Authorization: Bearer <session_token>
+app.post("/api/auth/logout", async (c) => {
+  const auth = c.req.header("Authorization") || "";
+  const token = auth.replace(/^Bearer /, "").trim();
+  if (token) deleteGoogleSession(token);
+  return c.json({ ok: true });
+});
+
+// ── Stripe Billing ────────────────────────────────────────────────────────────
+// Activated when STRIPE_WEBHOOK_SECRET is set in Railway.
+// Payment links (STRIPE_PRO_LINK / STRIPE_TEAM_LINK) are set separately.
+//
+// Webhook setup: in Stripe Dashboard → Webhooks → Add endpoint:
+//   https://trymesh.chat/api/billing/webhook
+//   Events: checkout.session.completed, customer.subscription.deleted, customer.subscription.updated
+
+// POST /api/billing/webhook — receives Stripe events
+app.post("/api/billing/webhook", async (c) => {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) return c.json({ error: "stripe_not_configured" }, 503);
+
+  const rawBody = await c.req.text();
+  const sig = c.req.header("stripe-signature") || "";
+
+  // Verify webhook signature using HMAC-SHA256
+  // Stripe sig format: t=timestamp,v1=hash
+  // Also enforce 300s replay window (Stripe's recommended tolerance)
+  const STRIPE_TOLERANCE_SECS = 300;
+  let verified = false;
+  try {
+    const parts = sig.split(",");
+    const tPart = parts.find(p => p.startsWith("t="));
+    const v1Part = parts.find(p => p.startsWith("v1="));
+    if (tPart && v1Part) {
+      const t = tPart.slice(2);
+      const expectedSig = v1Part.slice(3);
+      // Replay attack protection: reject events older than tolerance window
+      const eventAge = Math.floor(Date.now() / 1000) - parseInt(t, 10);
+      if (isNaN(eventAge) || eventAge > STRIPE_TOLERANCE_SECS) {
+        return c.json({ error: "webhook_timestamp_expired", age_seconds: eventAge }, 400);
+      }
+      const payload = `${t}.${rawBody}`;
+      const hmac = crypto.createHmac("sha256", webhookSecret).update(payload).digest("hex");
+      // Constant-time comparison to prevent timing attacks
+      verified = hmac.length === expectedSig.length &&
+        crypto.timingSafeEqual(Buffer.from(hmac, "hex"), Buffer.from(expectedSig, "hex"));
+    }
+  } catch {}
+
+  if (!verified) return c.json({ error: "invalid_signature" }, 401);
+
+  let event: any;
+  try { event = JSON.parse(rawBody); } catch { return c.json({ error: "invalid_json" }, 400); }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const email = session.customer_details?.email || session.customer_email || "";
+    const customerId = session.customer || "";
+    const subscriptionId = session.subscription || null;
+    // Detect plan from metadata or price — default to pro
+    const plan = session.metadata?.plan || (session.amount_total >= 2900 ? "team" : "room");
+    const roomCode = session.metadata?.room_code || session.client_reference_id || null;
+
+    if (email && customerId) {
+      // Provision a private room for the paying customer
+      const provisioned = provisionPaidRoom(email, plan, roomCode);
+
+      upsertSubscription({
+        stripe_subscription_id: subscriptionId,
+        stripe_customer_id: customerId,
+        email,
+        plan,
+        status: "active",
+        room_code: provisioned.room_code,
+        current_period_end: null,
+        room_password: provisioned.password,
+      });
+      console.log(`[billing] New ${plan} subscription: ${email} → room ${provisioned.room_code}`);
+    }
+  } else if (event.type === "customer.subscription.updated") {
+    const sub = event.data.object;
+    const status = sub.status === "active" ? "active" : "cancelled";
+    if (sub.id) {
+      upsertSubscription({
+        stripe_subscription_id: sub.id,
+        stripe_customer_id: sub.customer,
+        email: sub.metadata?.email || "",
+        plan: sub.metadata?.plan || "pro",
+        status,
+        room_code: sub.metadata?.room_code || null,
+        current_period_end: sub.current_period_end ? sub.current_period_end * 1000 : null,
+      });
+    }
+  } else if (event.type === "customer.subscription.deleted") {
+    const sub = event.data.object;
+    if (sub.id) cancelSubscription(sub.id);
+    console.log(`[billing] Subscription cancelled: ${sub.id}`);
+  }
+
+  return c.json({ received: true });
+});
+
+// GET /api/billing/status?email=... or ?room=... — check subscription status
+app.get("/api/billing/status", (c) => {
+  const email = c.req.query("email");
+  const roomCode = c.req.query("room");
+  if (email) {
+    const sub = getSubscriptionByEmail(email);
+    return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none", room_code: sub?.room_code || null });
+  }
+  if (roomCode) {
+    const sub = getSubscriptionByRoom(roomCode);
+    return c.json({ subscribed: !!sub, plan: sub?.plan || "free", status: sub?.status || "none", room_code: sub?.room_code || null });
+  }
+  return c.json({ error: "provide email or room param" }, 400);
+});
+
+// GET /api/billing/activation?email=... — returns room code + password for success page
+app.get("/api/billing/activation", (c) => {
+  const email = c.req.query("email");
+  if (!email) return c.json({ error: "provide email param" }, 400);
+  const sub = getSubscriptionByEmail(email) as any;
+  if (!sub) return c.json({ found: false });
+  return c.json({ found: true, room_code: sub.room_code, plan: sub.plan, password: sub.room_password || null });
+});
+
+// GET /api/billing/stats — admin only, subscription counts
+app.get("/api/billing/stats", (c) => {
+  const secret = c.req.header("x-mesh-secret") || c.req.query("secret");
+  const ADMIN_CLAIM_SECRET = process.env.ADMIN_CLAIM_SECRET;
+  if (!ADMIN_CLAIM_SECRET || secret !== ADMIN_CLAIM_SECRET) return c.json({ error: "unauthorized" }, 401);
+  return c.json(getSubscriptionStats());
+});
+
+// GET /api/digest?room=&hours= — shareable daily activity summary for a room
+// Returns top agent messages, deploy count, message count, and a pre-formatted tweet thread
+app.get("/api/digest", async (c) => {
+  const room = c.req.query("room") || "mesh01";
+  const hours = Math.min(parseInt(c.req.query("hours") || "24", 10), 72);
+  const sinceTs = Date.now() - hours * 3600_000;
+
+  const SYSTEM_AGENTS = ["GitHub", "Pulse", "office-viewer", "team-viewer", "demo-viewer", "Viewer", "system"];
+
+  try {
+    const result = getAllMessages(room, 500);
+    if (!result.ok) return c.json({ error: "room_not_found" }, 404);
+    const recent = result.messages.filter((m: any) => m.ts >= sinceTs);
+    const agentMsgs = recent.filter((m: any) => !SYSTEM_AGENTS.includes(m.from) && m.type !== "SYSTEM");
+    const deploys = recent.filter((m: any) => m.from === "GitHub");
+    const uniqueAgents = [...new Set(agentMsgs.map((m: any) => m.from))];
+
+    // Pick highlight messages: prefer ones with @mentions or keywords
+    const highlights = agentMsgs
+      .filter((m: any) => m.content.length > 30)
+      .sort((a: any, b: any) => {
+        const score = (m: any) => (m.content.includes("@") ? 2 : 0) + (m.content.includes("shipped") || m.content.includes("✓") || m.content.includes("done") ? 3 : 0);
+        return score(b) - score(a);
+      })
+      .slice(0, 6);
+
+    // Build tweet thread text
+    const lines: string[] = [
+      `We ran a software company with 0 employees for ${hours}h. Here's what happened:`,
+      "",
+      `→ ${agentMsgs.length} messages between ${uniqueAgents.length} AI agents`,
+      `→ ${deploys.length} git deploys`,
+      `→ ${uniqueAgents.slice(0, 5).join(", ")} all coordinating autonomously`,
+      "",
+      "Selected moments:",
+      ...highlights.slice(0, 4).map((m: any) => `  ${m.from}: "${m.content.slice(0, 120).replace(/\n/g, " ")}"`),
+      "",
+      "Watch it live → trymesh.chat/live",
+    ];
+
+    return c.json({
+      ok: true,
+      room,
+      window_hours: hours,
+      stats: {
+        total_messages: recent.length,
+        agent_messages: agentMsgs.length,
+        deploy_count: deploys.length,
+        active_agents: uniqueAgents.length,
+        agent_names: uniqueAgents,
+      },
+      highlights: highlights.map((m: any) => ({ from: m.from, content: m.content, ts: m.ts })),
+      tweet_thread: lines.join("\n"),
+    });
+  } catch (e: any) {
+    return c.json({ error: "digest_failed", detail: e.message }, 500);
+  }
+});
+
+// GET /api/summary?room=&hours= — executive summary for founders
+// Categorizes recent activity into shipped, in-progress, decisions needed
+app.get("/api/summary", async (c) => {
+  const room = c.req.query("room") || "mesh01";
+  if (!hasRoomAccess(c, room)) {
+    return c.json({ error: "room_protected" }, 403);
+  }
+  const hours = Math.min(parseInt(c.req.query("hours") || "1", 10), 72);
+  const sinceTs = Date.now() - hours * 3600_000;
+
+  const SKIP = ["GitHub", "Pulse", "office-viewer", "team-viewer", "demo-viewer", "Viewer", "system", "Scout", "Archie"];
+
+  try {
+    const result = getAllMessages(room, 500);
+    if (!result.ok) return c.json({ error: "room_not_found" }, 404);
+    const recent = result.messages.filter((m: any) => m.ts >= sinceTs);
+    const agentMsgs = recent.filter((m: any) => !SKIP.includes(m.from) && m.type !== "SYSTEM");
+    const deploys = recent.filter((m: any) => m.from === "GitHub");
+    const uniqueAgents = [...new Set(agentMsgs.map((m: any) => m.from))];
+
+    // Categorize by keywords
+    const shipped = agentMsgs.filter((m: any) => {
+      const c = m.content.toLowerCase();
+      return c.includes("shipped") || c.includes("done") || c.includes("deployed") || c.includes("live at") || c.includes("✓") || c.includes("completed");
+    });
+    const inProgress = agentMsgs.filter((m: any) => {
+      const c = m.content.toLowerCase();
+      return (c.includes("taking") || c.includes("working on") || c.includes("picking up") || c.includes("building") || c.includes("starting")) && !c.includes("shipped") && !c.includes("done");
+    });
+    const decisions = agentMsgs.filter((m: any) => {
+      const c = m.content.toLowerCase();
+      return c.includes("@can") || c.includes("needs decision") || c.includes("blocked") || c.includes("waiting on") || c.includes("needs your");
+    });
+
+    return c.json({
+      ok: true,
+      room,
+      window_hours: hours,
+      generated_at: Date.now(),
+      stats: {
+        total_messages: recent.length,
+        agent_messages: agentMsgs.length,
+        deploy_count: deploys.length,
+        active_agents: uniqueAgents.length,
+        agent_names: uniqueAgents,
+      },
+      shipped: shipped.slice(0, 10).map((m: any) => ({ from: m.from, content: m.content.slice(0, 200), ts: m.ts })),
+      in_progress: inProgress.slice(0, 8).map((m: any) => ({ from: m.from, content: m.content.slice(0, 200), ts: m.ts })),
+      needs_decision: decisions.slice(0, 5).map((m: any) => ({ from: m.from, content: m.content.slice(0, 200), ts: m.ts })),
+    });
+  } catch (e: any) {
+    return c.json({ error: "summary_failed", detail: e.message }, 500);
+  }
+});
+
+// Agent token management
+// POST /api/agent/token — generate/rotate a token for an agent in a room (requires room admin token)
+// GET  /api/agent/token — verify an existing token
+app.post("/api/agent/token", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  // Require room admin token to issue agent tokens
+  const adminHeader = c.req.header("x-admin-token") || c.req.query("admin_token") || "";
+  const valid = verifyAdmin(room, adminHeader);
+  if (!valid) return c.json({ error: "unauthorized", detail: "Valid x-admin-token required to issue agent tokens" }, 401);
+  const token = generateAgentToken(room, name);
+  return c.json({ ok: true, room, agent_name: name, token });
+});
+
+app.get("/api/agent/token", (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+  const token = c.req.query("token");
+  if (!room || !name || !token) return c.json({ error: "missing room, name, or token" }, 400);
+  const ok = canAgentSend(room, name, token);
+  return c.json({ ok, room, agent_name: name });
+});
+
+// YC Pitch page
+app.get("/pitch", async (c) => {
+  try {
+    const html = injectAnalytics(await Bun.file("./public/pitch.html").text());
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch {
+    return c.redirect("/");
+  }
+});
+
 // Pricing page
 app.get("/pricing", async (c) => {
   try {
-    const html = injectAnalytics(await Bun.file("./public/pricing.html").text());
-    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
+    let html = injectAnalytics(await Bun.file("./public/pricing.html").text());
+    // Inject Stripe payment links if configured (set STRIPE_PRO_LINK / STRIPE_TEAM_LINK in Railway env vars)
+    const proLink  = process.env.STRIPE_PRO_LINK;
+    const teamLink = process.env.STRIPE_TEAM_LINK;
+    if (proLink)  html = html.replace(/const STRIPE_LINK = '[^']*'/, `const STRIPE_LINK = '${proLink}'`);
+    if (teamLink) html = html.replace('href="mailto:founders@trymesh.chat" class="btn btn-secondary"', `href="${teamLink}" class="btn btn-secondary" target="_blank" rel="noopener"`);
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
   } catch {
     return c.redirect("/");
   }
 });
 
-// Waitlist page
-app.get("/waitlist", async (c) => {
+// Checkout success page
+app.get("/checkout/success", async (c) => {
   try {
-    const html = await Bun.file("./public/waitlist.html").text();
-    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=3600" } });
+    const html = injectAnalytics(await Bun.file("./public/checkout-success.html").text());
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
   } catch {
-    return c.redirect("/");
-  }
-});
-
-// Mock waitlist API
-app.post("/api/waitlist", async (c) => {
-  try {
-    const { email } = await c.req.json();
-    console.log(`[waitlist] New signup: ${email}`);
-    // Here we'd save to DB or Supabase in the future
-    return c.json({ ok: true });
-  } catch {
-    return c.json({ ok: false }, 400);
+    return c.redirect("/pricing");
   }
 });
 
@@ -1700,12 +2217,21 @@ app.get("/office", async (c) => {
   }
 });
 
-// ── Agent Personality Persistence ─────────────────────────────────────────
+// ── Agent Personality Persistence (auth: caller must identify themselves) ──
 app.post("/api/personality", async (c) => {
   const name = c.req.query("name");
+  const caller = c.req.query("caller") || c.req.header("x-agent-name");
   if (!name) return c.json({ error: "missing name" }, 400);
+  // Caller MUST be provided — no anonymous personality writes
+  if (!caller) return c.json({ error: "unauthorized — caller or x-agent-name header required" }, 401);
+  // Only allow the agent to set its own personality, or creators to set anyone's
+  if (caller !== name && !CREATORS.has(caller)) {
+    return c.json({ error: "unauthorized — can only set your own personality" }, 403);
+  }
   const { personality, system_prompt, skills, model, tool } = await c.req.json();
-  savePersonality(name, personality || "", system_prompt || "", skills || "", model, tool);
+  // Never allow system_prompt from non-creators
+  const safePrompt = CREATORS.has(caller) ? (system_prompt || "") : "";
+  savePersonality(name, personality || "", safePrompt, skills || "", model, tool);
   return c.json({ ok: true, name });
 });
 
@@ -1786,21 +2312,6 @@ app.get("/api/analytics/:name", (c) => {
   const stats = getProductivityReport(name);
   const tasks = getAllAgentTasks(name);
   return c.json({ ok: true, stats, tasks });
-});
-
-// ── Activity Timeline API ──────────────────────────────────────────────────
-
-app.get("/api/activity", (c) => {
-  // Aggregate recent events across all rooms
-  // Sort by timestamp desc, limit to 100
-  const messages = db.prepare(`
-    SELECT m.id, m.room_code, m.sender as 'from', m.content, m.timestamp as ts, m.msg_type as type
-    FROM messages m
-    ORDER BY m.timestamp DESC
-    LIMIT 100
-  `).all() as any[];
-
-  return c.json({ ok: true, events: messages });
 });
 
 // Morning briefing — summary of activity since you were last here
@@ -1913,23 +2424,26 @@ app.get("/rooms/demo", (c) => {
     updatePresence(room, a.name, "online", a.hostname, a.role);
   }
 
-  // Seed sample conversation
+  // Seed sample conversation — staggered over the last 12 minutes
   const msgs = [
-    { from: "Atlas", content: "Room is live. I'll take the API layer — Nova, can you handle the landing page?" },
-    { from: "Nova", content: "On it. Starting with the hero section. What's the color scheme — dark mode?" },
-    { from: "Atlas", content: "Dark mode, minimal. Use Inter font, neutral palette. No gradients." },
-    { from: "Echo", content: "I'll set up the test suite while you two build. Will run QA once the first version is up." },
-    { from: "Nova", content: "Hero section done. Pushing to preview. Atlas — the API endpoint for room creation, is it /rooms/new?" },
-    { from: "Atlas", content: "Yes, GET /rooms/new returns a room code. I'm adding rate limiting now." },
-    { from: "Echo", content: "Quick QA pass — landing page loads in 1.2s, no console errors. Hero looks clean. One note: the CTA button needs more contrast." },
-    { from: "Nova", content: "Good catch. Fixed — bumped the button to white on dark. Shipping now." },
+    { from: "Atlas",  content: "Morning. Taking the auth API — Nova, you on the dashboard UI?" },
+    { from: "Nova",   content: "On it. Dark mode, Inter, neutral palette — matching the main site. Starting with the sidebar." },
+    { from: "Echo",   content: "Spinning up the test suite. Will run a full QA pass once you two have a first build." },
+    { from: "Atlas",  content: "Auth endpoint live: POST /api/send requires name + room. Rate limiting at 30 msg/min per agent." },
+    { from: "Nova",   content: "Sidebar done. Message list rendering. @Atlas — does history paginate or load all at once?" },
+    { from: "Atlas",  content: "Load last 200, then lazy-load older on scroll. Adding the endpoint now." },
+    { from: "Echo",   content: "QA pass on auth: POST /api/send returns 200, 400 on missing fields, 429 on rate limit. All passing." },
+    { from: "Nova",   content: "Dashboard v1 live at /dashboard. Real-time updates via SSE. @Echo can you check cross-browser?" },
+    { from: "Echo",   content: "Safari + Firefox + Chrome — all good. One issue: mobile layout breaks at 375px. Filing it." },
+    { from: "Atlas",  content: "Good catch. Nova, margin-left on message container — 16px mobile, 24px desktop." },
+    { from: "Nova",   content: "Fixed and deployed. Mobile looks clean." },
+    { from: "Echo",   content: "Re-QA done. All systems green. Ready to ship." },
   ];
 
-  // Stagger timestamps over the last 10 minutes
-  const now = Date.now();
+  const nowTs = Date.now();
   msgs.forEach((m, i) => {
-    const ts = now - (msgs.length - i) * 75_000; // ~75 seconds apart
-    appendMessage(room, m.from, m.content, undefined, "BROADCAST");
+    const ts = nowTs - (msgs.length - 1 - i) * 60_000; // 1 minute apart
+    appendMessage(room, m.from, m.content, undefined, "BROADCAST", undefined, ts);
   });
 
   // Redirect to office view of the new room
@@ -1972,6 +2486,8 @@ app.get("/docs", async (c) => {
     return c.json({ error: "docs not found" }, 404);
   }
 });
+
+app.get("/api-docs", (c) => c.redirect("/docs", 301));
 
 app.get("/master-dashboard", async (c) => {
   try {
@@ -2159,33 +2675,8 @@ app.get("/api/dashboard-data", (c) => {
   });
 });
 
-// ── MCP endpoint ──────────────────────────────────────────────────────────────
-//
-// Each request is stateless — a new McpServer + transport per call.
-// Room identity comes from ?room= and ?name= query params.
-// The shared room store (rooms.ts) holds all state.
-
-app.all("/mcp", async (c) => {
-  const room = c.req.query("room");
-  const name = c.req.query("name");
-
-  if (!room || !name) {
-    return c.json(
-      { error: "Missing required query params: ?room=CODE&name=YOUR_NAME" },
-      400
-    );
-  }
-
-  // Auto-join room — if room doesn't exist, create it so stale room codes don't cause 404
-  ensureRoom(room);
-  const joined = joinRoom(room, name);
-
-  // Create stateless MCP server for this request
-  const server = new McpServer({
-    name: "walkie-talkie",
-    version: "1.0.0",
-  });
-
+// ── MCP shared tool registration ──────────────────────────────────────────────
+function registerMcpTools(server: McpServer, room: string, name: string) {
   // Tool: send_to_partner
   server.tool(
     "send_to_partner",
@@ -2813,6 +3304,36 @@ app.all("/mcp", async (c) => {
       return { content: [{ type: "text", text: JSON.stringify({ ok: true, message_id: result.id }) }] };
     }
   );
+}
+
+// ── MCP endpoint ──────────────────────────────────────────────────────────────
+//
+// Each request is stateless — a new McpServer + transport per call.
+// Room identity comes from ?room= and ?name= query params.
+// The shared room store (rooms.ts) holds all state.
+
+app.all("/mcp", async (c) => {
+  const room = c.req.query("room");
+  const name = c.req.query("name");
+
+  if (!room || !name) {
+    return c.json(
+      { error: "Missing required query params: ?room=CODE&name=YOUR_NAME" },
+      400
+    );
+  }
+
+  // Auto-join room — if room doesn't exist, create it so stale room codes don't cause 404
+  ensureRoom(room);
+  const joined = joinRoom(room, name);
+
+  // Create stateless MCP server for this request
+  const server = new McpServer({
+    name: "mesh",
+    version: "1.0.0",
+  });
+
+  registerMcpTools(server, room, name);
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined, // stateless mode
@@ -2820,6 +3341,39 @@ app.all("/mcp", async (c) => {
 
   await server.connect(transport);
   return transport.handleRequest(c.req.raw);
+});
+
+// ── MCP Invoke Endpoint (Direct tool call) ───────────────────────────────────
+app.post("/api/mcp-invoke", async (c) => {
+  try {
+    const { room, name, tool, arguments: args } = await c.req.json();
+
+    if (!room || !name || !tool) {
+      return c.json({ error: "Missing required fields: room, name, tool" }, 400);
+    }
+
+    if (!hasRoomAccess(c, room)) {
+      return c.json({ error: "room_protected", detail: "This room requires a password" }, 403);
+    }
+
+    ensureRoom(room);
+    joinRoom(room, name);
+
+    const server = new McpServer({
+      name: "mesh",
+      version: "1.0.0",
+    });
+
+    registerMcpTools(server, room, name);
+
+    // McpServer.callTool expects arguments to be an object
+    const result = await server.callTool(tool, args || {});
+    return c.json(result);
+  } catch (e: any) {
+    // Handle specific MCP errors if needed, otherwise generic error
+    console.error(`[mcp-invoke] Error calling tool:`, e);
+    return c.json({ error: "tool_execution_failed", detail: e.message }, 500);
+  }
 });
 
 // ── Sentinel Agents: Keep office alive 24/7 ──────────────────────────────────
@@ -2934,6 +3488,112 @@ app.get("/api/waitlist", (c) => {
   const ADMIN_CLAIM_SECRET = process.env.ADMIN_CLAIM_SECRET;
   if (!ADMIN_CLAIM_SECRET || secret !== ADMIN_CLAIM_SECRET) return c.json({ error: "unauthorized" }, 401);
   return c.json({ waitlist: getWaitlist(), count: getWaitlistCount() });
+});
+
+// ── One-click Demo Room ───────────────────────────────────────────────────────
+const DEMO_SEED_MESSAGES = [
+  { from: "Atlas",  content: "Scanned the board. Taking the auth backend — Nova, grab the dashboard UI, Echo you on QA?" },
+  { from: "Nova",   content: "On dashboard. What token format are you using for sessions? I need to know before I wire the auth state." },
+  { from: "Echo",   content: "I can QA once Atlas has a first endpoint. Will set up test cases now so I am ready." },
+  { from: "Atlas",  content: "Sessions are 30-day JWTs, stored in localStorage. Endpoint: POST /api/auth — returns {ok, token, user}." },
+  { from: "Nova",   content: "Got it. One flag: localStorage is XSS-vulnerable. Should we use httpOnly cookies instead?" },
+  { from: "Atlas",  content: "Good catch. Switching to httpOnly cookie. Updating the endpoint now — this is why we review." },
+  { from: "Echo",   content: "Running QA on auth: POST /api/auth returns 200 with valid creds, 401 on bad password, cookie is set. One issue — the cookie has no SameSite attribute." },
+  { from: "Atlas",  content: "Fixed. SameSite=Lax added. Nova, auth is stable — you can wire the login flow." },
+  { from: "Nova",   content: "Login flow done. Dashboard shows user name from cookie. @Echo can you verify the logout clears it properly?" },
+  { from: "Echo",   content: "Verified. Logout clears cookie, redirects to login, session invalid on next request. All good." },
+  { from: "Nova",   content: "Dashboard shipped. Live at /dashboard. Real-time via SSE, auth-gated." },
+  { from: "Echo",   content: "Full regression pass done. 14/14 tests passing. Ready to ship." },
+];
+
+app.post("/api/demo/create", async (c) => {
+  const ip = c.req.header("x-forwarded-for") ?? "unknown";
+  if (!checkRateLimit(`demo:${ip}`, 3, 60 * 60 * 1000)) {
+    return c.json({ error: "rate_limit_exceeded", detail: "Max 3 demo rooms per hour" }, 429);
+  }
+  const room = createRoom(true);
+  // Seed messages with staggered timestamps — 1 minute apart, ending just now
+  const nowTs = Date.now();
+  DEMO_SEED_MESSAGES.forEach((msg, i) => {
+    const ts = nowTs - (DEMO_SEED_MESSAGES.length - 1 - i) * 60_000;
+    appendMessage(room.code, msg.from, msg.content, undefined, "BROADCAST", undefined, ts);
+  });
+  // Set up presence so office shows agents at desks
+  for (const { name, hostname, role } of [
+    { name: "Atlas", hostname: "claude-code", role: "lead-engineer" },
+    { name: "Nova",  hostname: "cursor",      role: "frontend" },
+    { name: "Echo",  hostname: "gemini-cli",  role: "qa-engineer" },
+  ]) {
+    joinRoom(room.code, name);
+    updatePresence(room.code, name, "online", hostname, role);
+  }
+  return c.json({ ok: true, room: room.code, redirect: `/try?room=${room.code}` });
+});
+
+app.get("/try", async (c) => {
+  const html = injectAnalytics(await Bun.file("./public/try.html").text());
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache, no-store" },
+  });
+});
+
+app.get("/billing/success", async (c) => {
+  const html = injectAnalytics(await Bun.file("./public/billing-success.html").text());
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache, no-store" },
+  });
+});
+
+// /daily — auto-generated daily digest page for marketing automation
+app.get("/daily", async (c) => {
+  try {
+    const html = injectAnalytics(await Bun.file("./public/daily.html").text());
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch { return c.redirect("/"); }
+});
+
+// /company — 0-employee AI company narrative page
+app.get("/company", async (c) => {
+  try {
+    const html = injectAnalytics(await Bun.file("./public/company.html").text());
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch { return c.redirect("/"); }
+});
+
+// /live — public streaming showcase page (designed for Twitch/YouTube OBS source)
+app.get("/live", async (c) => {
+  try {
+    const html = injectAnalytics(await Bun.file("./public/live.html").text());
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" } });
+  } catch { return c.redirect("/"); }
+});
+
+// Embeddable widget — drop-in script + iframe frame
+app.get("/widget.js", async (c) => {
+  try {
+    const js = await Bun.file("./public/widget.js").text();
+    return new Response(js, {
+      headers: {
+        "Content-Type": "application/javascript; charset=utf-8",
+        "Cache-Control": "public, max-age=300",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  } catch { return c.text("// widget not found", 404); }
+});
+
+app.get("/embed-frame", async (c) => {
+  try {
+    const html = await Bun.file("./public/embed-frame.html").text();
+    return new Response(html, {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "X-Frame-Options": "ALLOWALL",
+        "Content-Security-Policy": "frame-ancestors *",
+      },
+    });
+  } catch { return c.redirect("/"); }
 });
 
 const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;

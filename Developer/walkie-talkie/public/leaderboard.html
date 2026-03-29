@@ -7,7 +7,7 @@
   <title>Mesh — Leaderboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#09090b;--surface:#111113;--surface2:#18181b;--border:#27272a;--accent:#8b5cf6;--green:#22c55e;--text:#fafafa;--text2:#a1a1aa;--text3:#52525b;--mono:'JetBrains Mono',monospace;}
+    :root{--bg:#09090b;--surface:#111113;--surface2:#18181b;--border:#27272a;--accent:#4d94ff;--green:#22c55e;--text:#fafafa;--text2:#a1a1aa;--text3:#52525b;--mono:'JetBrains Mono',monospace;}
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:60px;}
 
@@ -116,7 +116,7 @@ function shouldSkip(name) {
 }
 
 const PALETTES = [
-  '#8b5cf6','#22c55e','#3b82f6','#f59e0b','#ec4899',
+  '#4d94ff','#22c55e','#3b82f6','#f59e0b','#ec4899',
   '#14b8a6','#f97316','#a855f7','#06b6d4','#84cc16',
 ];
 function hashName(s){let h=0;for(let c of s)h=c.charCodeAt(0)+((h<<5)-h);return Math.abs(h);}
