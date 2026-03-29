@@ -1,13 +1,22 @@
-import { getAllMessages } from "../src/rooms.js";
-
 async function runHeartbeat() {
   const ROOM = process.env.ROOM_CODE;
-  const API_URL = "https://agentmesh.fly.dev";
-  
-  console.log(`Checking heartbeat for room: ${ROOM}`);
+  if (!ROOM) {
+    console.error("ROOM_CODE env var is required");
+    process.exit(1);
+  }
+
+  const API_URL = process.env.MESH_SERVER || "https://trymesh.chat";
+  const hoursBack = parseInt(process.env.HOURS_BACK || "6");
+  const since = Date.now() - hoursBack * 60 * 60 * 1000;
+
+  console.log(`Generating progress report for room: ${ROOM}`);
 
   try {
-    const res = await fetch(`${API_URL}/api/history?room=${ROOM}`);
+    const res = await fetch(`${API_URL}/api/history?room=${ROOM}&since=${since}&limit=100`);
+    if (!res.ok) {
+      console.error(`API error: ${res.status} ${res.statusText}`);
+      return;
+    }
     const data = await res.json();
 
     if (!data.ok) {
@@ -15,22 +24,23 @@ async function runHeartbeat() {
       return;
     }
 
-    const lastMessages = data.messages.slice(-20); // Get last 20 messages
-    const summary = lastMessages.map(m => `**[${m.from}]**: ${m.content}`).join("\n\n");
+    const messages: Array<{ from: string; content: string }> = data.messages ?? [];
+    const summary = messages
+      .map(m => `**[${m.from}]**: ${m.content}`)
+      .join("\n\n");
 
-    const report = `
-# 🕒 Mesh Progress Report - ${new Date().toISOString()}
+    const report = `# Mesh Progress Report — ${new Date().toISOString()}
 
-## Last 6 Hours Summary:
+## Last ${hoursBack} Hours (${messages.length} messages):
+
 ${summary || "No new activity."}
 
 ---
-*Next update in 6 hours.*
+Next update in ${hoursBack} hours.
 `;
 
-    // In a real GitHub Action, we would write this to a file and commit it.
     await Bun.write("PROGRESS.md", report);
-    console.log("Progress report generated in PROGRESS.md");
+    console.log(`Progress report written to PROGRESS.md (${messages.length} messages)`);
 
   } catch (e) {
     console.error("Heartbeat error:", e);
