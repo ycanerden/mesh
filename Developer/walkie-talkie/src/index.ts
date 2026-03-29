@@ -1284,6 +1284,16 @@ app.get("/", async (c) => {
   }
 });
 
+// V2 landing page — CLI-first, Zed/Ghostty style (preview at /v2)
+app.get("/v2", async (c) => {
+  try {
+    const html = injectAnalytics(await Bun.file("./public/v2.html").text());
+    return c.html(html);
+  } catch (e) {
+    return c.redirect("/");
+  }
+});
+
 // Setup wizard — guided onboarding for any AI tool
 app.get("/setup", async (c) => {
   try {
