@@ -51,9 +51,18 @@
       overflow: hidden;
     }
 
-    /* ===================== TOP BAR — hidden, nav in sidebar ===================== */
+    /* ===================== TOP BAR — compact inside sidebar area ===================== */
     .topbar {
-      display: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      height: var(--topbar-h);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: fixed;
+      top: 0; left: 0; width: var(--sidebar-w);
+      z-index: 200;
     }
     .topbar-left { display: flex; align-items: center; gap: 14px; }
     .logo {
@@ -107,6 +116,7 @@
       height: 100vh;
       margin-top: 0;
     }
+    .sidebar { padding-top: var(--topbar-h); }
 
     /* ===================== SIDEBAR ===================== */
     .sidebar {
