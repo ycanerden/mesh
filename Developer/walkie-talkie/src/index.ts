@@ -123,6 +123,7 @@ import {
   updateDeliverable,
   deleteDeliverable,
   getDeliverables,
+  roomExists,
 } from "./rooms.js";
 import {
   createRoomGroup,
@@ -354,6 +355,7 @@ setInterval(() => {
 app.get("/api/status", (c) => {
   const room = c.req.query("room");
   const name = c.req.query("name");
+  const observer = ["1", "true", "yes"].includes((c.req.query("observer") || "").toLowerCase());
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
   joinRoom(room, name);
   const result = getRoomStatus(room, name);
@@ -1494,12 +1496,16 @@ app.get("/api/stream", async (c) => {
     return c.json({ error: "room_protected", detail: "This room requires a password" }, 403);
   }
 
-  const joined = joinRoom(room, name);
-  if (joined === null) {
-    return c.json({ error: "room_expired_or_not_found" }, 404);
+  if (observer) {
+    if (!roomExists(room)) return c.json({ error: "room_expired_or_not_found" }, 404);
+  } else {
+    const joined = joinRoom(room, name);
+    if (joined === null) {
+      return c.json({ error: "room_expired_or_not_found" }, 404);
+    }
   }
 
-  console.log(`[sse] ${name} connected to room ${room}`);
+  console.log(`[sse] ${name} connected to room ${room}${observer ? " (observer)" : ""}`);
   activeConnections++;
 
   return streamSSE(c, async (stream) => {
@@ -1546,6 +1552,64 @@ app.get("/api/stream", async (c) => {
     while (true) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
+  });
+});
+
+// ── Digest (S3 fallback) ─────────────────────────────────────────────────────
+app.get("/api/digest", (c) => {
+  const room = c.req.query("room");
+  if (!room) return c.json({ error: "missing room" }, 400);
+
+  const roomHash = getRoomPasswordHash(room);
+  if (roomHash) {
+    const accessToken = c.req.query("access_token") || c.req.header("x-room-token");
+    if (!accessToken || accessToken !== `${room}.${roomHash}`) {
+      return c.json({ error: "room_protected", detail: "This room requires a password" }, 403);
+    }
+  }
+
+  if (!roomExists(room)) return c.json({ error: "room_expired_or_not_found" }, 404);
+
+  const limit = Math.min(parseInt(c.req.query("limit") || "50"), 200);
+  const since = c.req.query("since") ? parseInt(c.req.query("since")!) : undefined;
+  const viewer = c.req.query("viewer") || c.req.query("name") || undefined;
+
+  const result = getAllMessages(room, limit, since, viewer);
+  if (!(result as any).ok) {
+    return c.json({ error: (result as any).error || "messages_not_found" }, 404);
+  }
+
+  const messages = (result as any).messages || [];
+  const byAgent: Record<string, { count: number; last: string; last_ts: number }> = {};
+  for (const m of messages) {
+    if (!m.from) continue;
+    if (!byAgent[m.from]) byAgent[m.from] = { count: 0, last: "", last_ts: 0 };
+    byAgent[m.from].count += 1;
+    if (m.ts > byAgent[m.from].last_ts) {
+      byAgent[m.from].last_ts = m.ts;
+      byAgent[m.from].last = (m.content || "").slice(0, 160);
+    }
+  }
+
+  const tasks = getRoomTasks(room);
+  const inProgress = tasks.filter((t: any) => t.status === "in_progress");
+  const pending = tasks.filter((t: any) => t.status === "pending");
+  const done = tasks.filter((t: any) => t.status === "done");
+
+  return c.json({
+    ok: true,
+    room,
+    since: since || null,
+    total_messages: messages.length,
+    agents: Object.entries(byAgent)
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([name, data]) => ({ name, count: data.count, last: data.last, last_ts: data.last_ts })),
+    tasks: {
+      in_progress: inProgress,
+      pending,
+      done,
+    },
+    sample: messages.slice(-10),
   });
 });
 
