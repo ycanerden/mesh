@@ -712,15 +712,15 @@ export function getRoomCount(): number {
 export function getActiveRooms(): { code: string; agent_count: number; message_count: number; last_active: number }[] {
   const rows = db.prepare(`
     SELECT r.code,
-      COUNT(DISTINCT p.agent_name) as agent_count,
-      COUNT(DISTINCT m.id) as message_count,
+      COUNT(DISTINCT CASE WHEN p.agent_name NOT IN ('Pulse','Scout','Archie','Viewer','demo-viewer','office-viewer','team-viewer') THEN p.agent_name END) as agent_count,
+      COUNT(DISTINCT CASE WHEN m.sender NOT IN ('Pulse','Scout','Archie','Viewer','system') THEN m.id END) as message_count,
       MAX(COALESCE(p.last_heartbeat, 0)) as last_active
     FROM rooms r
     LEFT JOIN presence p ON p.room_code = r.code
     LEFT JOIN messages m ON m.room_code = r.code
     WHERE r.is_private = 0
     GROUP BY r.code
-    HAVING message_count >= 5 OR agent_count >= 2
+    HAVING message_count >= 1 OR agent_count >= 1
     ORDER BY last_active DESC
     LIMIT 30
   `).all() as any[];

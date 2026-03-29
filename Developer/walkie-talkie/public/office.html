@@ -474,7 +474,7 @@ function agentActivity(agent) {
   }
   const msg = recentMsg(name);
   if(msg) return {text: msg.content.slice(0,24), color:'#a1a1aa'};
-  return {text:'idle', color:'#52525b'};
+  return null;
 }
 
 // ── Render loop ───────────────────────────────────────────────────────────────
