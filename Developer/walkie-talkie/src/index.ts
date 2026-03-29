@@ -296,9 +296,9 @@ app.use("*", compress());
 // Set ALLOWED_ORIGINS env var to restrict (comma-separated), e.g. "https://trymesh.chat,https://p2p-production-983f.up.railway.app"
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map(s => s.trim())
-  : null;
+  : ["https://trymesh.chat"];
 app.use("*", cors({
-  origin: ALLOWED_ORIGINS || "*",
+  origin: ALLOWED_ORIGINS,
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: ["Content-Type", "x-mesh-secret", "x-admin-token"],
   exposeHeaders: ["Content-Type"],
@@ -328,7 +328,7 @@ if (SECRET) {
 // ── Rate limiting ─────────────────────────────────────────────────────────────
 // Persistent SQLite-backed rate limiter (survives restarts)
 function checkRateLimit(key: string, max: number, windowMs: number, name?: string): boolean {
-  if (name && (CREATORS.has(name) || isExemptFromRateLimit(name))) return true;
+  if (name && isExemptFromRateLimit(name)) return true;
   return checkRateLimitPersistent(key, max, windowMs);
 }
 
@@ -786,8 +786,7 @@ app.post("/api/admin/kick", async (c) => {
 // Creator-level cleanup — uses MESH_CREATORS env for auth (no admin_token needed)
 app.post("/api/admin/cleanup", async (c) => {
   const room = c.req.query("room");
-  const callerName = c.req.query("name");
-  if (!room || !callerName || !CREATORS.has(callerName)) return c.json({ error: "unauthorized — creators only" }, 401);
+  if (!room || !verifyCreator(c)) return c.json({ error: "unauthorized — creators only" }, 401);
   const { remove } = await c.req.json();
   if (!Array.isArray(remove)) return c.json({ error: "provide {remove: [\"name1\", ...]}" }, 400);
   const removed: string[] = [];
@@ -801,8 +800,7 @@ app.post("/api/admin/cleanup", async (c) => {
 // Creator-level admin reset — generates a new admin token for a room
 app.post("/api/admin/reset-token", async (c) => {
   const room = c.req.query("room");
-  const callerName = c.req.query("name");
-  if (!room || !callerName || !CREATORS.has(callerName)) return c.json({ error: "unauthorized — creators only" }, 401);
+  if (!room || !verifyCreator(c)) return c.json({ error: "unauthorized — creators only" }, 401);
   const newToken = resetAdminToken(room);
   if (!newToken) return c.json({ error: "room not found" }, 404);
   return c.json({ ok: true, room, admin_token: newToken, message: "New admin token set. Save it securely." });
@@ -886,6 +884,18 @@ app.get("/api/cards", (c) => {
 // ── Presence & Typing ──────────────────────────────────────────────────────
 // Known creators — always get "creator" role regardless of heartbeat body
 const CREATORS = new Set((process.env.MESH_CREATORS || "Can Erden,Vincent,gimli").split(",").map(s => s.trim()));
+
+// Creator admin secret — required for creator-level API calls
+// Set via: railway variables set MESH_ADMIN_SECRET="<random-64-char-hex>"
+const ADMIN_SECRET = process.env.MESH_ADMIN_SECRET || "";
+
+function verifyCreator(c: any): boolean {
+  const name = c.req.query("name");
+  const secret = c.req.header("x-mesh-secret") || c.req.query("secret");
+  if (!name || !CREATORS.has(name)) return false;
+  if (!ADMIN_SECRET) return false; // no secret configured = deny all creator endpoints
+  return secret === ADMIN_SECRET;
+}
 
 // ── Model Hierarchy: task routing based on model capability ──────────────────
 // Tier 1 (strategist): complex architecture, security, sensitive decisions
@@ -1076,8 +1086,10 @@ app.delete("/api/messages/:id", async (c) => {
 app.post("/api/webhooks/register", async (c) => {
   const room = c.req.query("room");
   const name = c.req.query("name");
-  const observer = c.req.query("observer") === "1";
+  const token = c.req.query("token") || c.req.header("x-admin-token");
   if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+  // Require admin token to register webhooks (prevents data exfiltration)
+  if (!token || !verifyAdmin(room, token)) return c.json({ error: "unauthorized — admin token required" }, 401);
   const { webhook_url, events } = await c.req.json();
   if (!webhook_url) return c.json({ error: "missing webhook_url" }, 400);
   registerWebhook(room, name, webhook_url, events || "message");
@@ -1487,8 +1499,7 @@ app.get("/api/activity", (c) => {
 
   // Cross-room: aggregate recent events from all PUBLIC rooms
   // Requires creator auth — don't leak all messages publicly
-  const caller = c.req.query("name") || c.req.header("x-agent-name");
-  if (!caller || !CREATORS.has(caller)) {
+  if (!verifyCreator(c)) {
     return c.json({ error: "unauthorized — cross-room activity requires creator access. Provide ?room= for single room." }, 403);
   }
   const messages = getPublicRoomActivity(limit);
@@ -2109,13 +2120,17 @@ app.get("/api/billing/status", (c) => {
   return c.json({ error: "provide email or room param" }, 400);
 });
 
-// GET /api/billing/activation?email=... — returns room code + password for success page
+// GET /api/billing/activation?email=...&session_id=... — returns room code + password for success page
+// Requires Stripe checkout session ID to prevent unauthorized access
 app.get("/api/billing/activation", (c) => {
   const email = c.req.query("email");
+  const sessionId = c.req.query("session_id");
   if (!email) return c.json({ error: "provide email param" }, 400);
   const sub = getSubscriptionByEmail(email) as any;
   if (!sub) return c.json({ found: false });
-  return c.json({ found: true, room_code: sub.room_code, plan: sub.plan, password: sub.room_password || null });
+  // Only return password if a valid session_id is provided (from Stripe checkout redirect)
+  const includePassword = sessionId && sub.stripe_session_id && sessionId === sub.stripe_session_id;
+  return c.json({ found: true, room_code: sub.room_code, plan: sub.plan, password: includePassword ? (sub.room_password || null) : "***hidden***" });
 });
 
 // GET /api/billing/stats — admin only, subscription counts
@@ -2386,13 +2401,13 @@ app.post("/api/personality", async (c) => {
   if (!name) return c.json({ error: "missing name" }, 400);
   // Caller MUST be provided — no anonymous personality writes
   if (!caller) return c.json({ error: "unauthorized — caller or x-agent-name header required" }, 401);
-  // Only allow the agent to set its own personality, or creators to set anyone's
-  if (caller !== name && !CREATORS.has(caller)) {
+  // Only allow the agent to set its own personality, or creators (with secret) to set anyone's
+  if (caller !== name && !verifyCreator(c)) {
     return c.json({ error: "unauthorized — can only set your own personality" }, 403);
   }
   const { personality, system_prompt, skills, model, tool } = await c.req.json();
   // Never allow system_prompt from non-creators
-  const safePrompt = CREATORS.has(caller) ? (system_prompt || "") : "";
+  const safePrompt = verifyCreator(c) ? (system_prompt || "") : "";
   savePersonality(name, personality || "", safePrompt, skills || "", model, tool);
   return c.json({ ok: true, name });
 });
@@ -2670,10 +2685,25 @@ app.get("/master-dashboard", async (c) => {
 app.post("/api/webhooks/github", async (c) => {
   const room = c.req.query("room");
   if (!room) return c.json({ error: "missing room" }, 400);
-  
+
+  // Verify GitHub webhook signature if secret is configured
+  const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
+  if (webhookSecret) {
+    const signature = c.req.header("x-hub-signature-256");
+    if (!signature) return c.json({ error: "missing signature" }, 401);
+    const body = await c.req.text();
+    const expected = "sha256=" + crypto.createHmac("sha256", webhookSecret).update(body).digest("hex");
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+      return c.json({ error: "invalid signature" }, 401);
+    }
+    // Re-parse the body as JSON since we consumed it
+    var payload = JSON.parse(body);
+  } else {
+    var payload = await c.req.json();
+  }
+
   const event = c.req.header("x-github-event");
   try {
-    const payload = await c.req.json();
     let message = "";
     let type: any = "SYSTEM";
 

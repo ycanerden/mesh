@@ -29,7 +29,7 @@ function seedDefaultRooms() {
     if (!exists) {
       const token = generateSecureToken();
       db.prepare("INSERT INTO rooms (code, last_activity, admin_token, is_demo) VALUES (?, ?, ?, ?)").run(code, Date.now(), token, 0);
-      console.log(`[seed] Created default room: ${code} admin_token=${token}`);
+      console.log(`[seed] Created default room: ${code} admin_token=***REDACTED***`);
     }
   }
 }
@@ -59,7 +59,7 @@ try { db.run("ALTER TABLE rooms ADD COLUMN room_password_hash TEXT DEFAULT NULL;
   for (const row of rows) {
     const token = generateSecureToken();
     db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, row.code);
-    console.log(`[migration] Set admin token for room ${row.code}: ${token}`);
+    console.log(`[migration] Set admin token for room ${row.code}: ***REDACTED***`);
   }
 }
 
