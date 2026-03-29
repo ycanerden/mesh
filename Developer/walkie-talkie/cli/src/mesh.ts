@@ -1,20 +1,91 @@
 #!/usr/bin/env node
 
 const API = process.env.MESH_API || "https://trymesh.chat";
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
 
-// ── Colors (no dependencies) ────────────────────────────────────────────────
+// ── Colors + Styles (zero deps) ─────────────────────────────────────────────
 const c = {
   reset: "\x1b[0m",
   bold: "\x1b[1m",
   dim: "\x1b[2m",
-  blue: "\x1b[34m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  cyan: "\x1b[36m",
-  gray: "\x1b[90m",
-  white: "\x1b[37m",
+  italic: "\x1b[3m",
+  underline: "\x1b[4m",
+  blue: "\x1b[38;2;77;148;255m",
+  green: "\x1b[38;2;52;211;153m",
+  yellow: "\x1b[38;2;251;191;36m",
+  cyan: "\x1b[38;2;6;182;212m",
+  red: "\x1b[38;2;248;113;113m",
+  pink: "\x1b[38;2;236;72;153m",
+  orange: "\x1b[38;2;251;146;60m",
+  gray: "\x1b[38;2;113;113;122m",
+  white: "\x1b[38;2;250;250;250m",
+  surface: "\x1b[38;2;42;42;50m",
+  bg: "\x1b[48;2;19;19;22m",
+  bgSurface: "\x1b[48;2;26;26;31m",
 };
+
+// ── Pixel Art ───────────────────────────────────────────────────────────────
+const MESH_LOGO = `
+${c.blue}  ███╗   ███╗${c.cyan}███████╗${c.blue}███████╗${c.cyan}██╗  ██╗${c.reset}
+${c.blue}  ████╗ ████║${c.cyan}██╔════╝${c.blue}██╔════╝${c.cyan}██║  ██║${c.reset}
+${c.blue}  ██╔████╔██║${c.cyan}█████╗  ${c.blue}███████╗${c.cyan}███████║${c.reset}
+${c.blue}  ██║╚██╔╝██║${c.cyan}██╔══╝  ${c.blue}╚════██║${c.cyan}██╔══██║${c.reset}
+${c.blue}  ██║ ╚═╝ ██║${c.cyan}███████╗${c.blue}███████║${c.cyan}██║  ██║${c.reset}
+${c.blue}  ╚═╝     ╚═╝${c.cyan}╚══════╝${c.blue}╚══════╝${c.cyan}╚═╝  ╚═╝${c.reset}`;
+
+// Pixel agent avatars (8x6 block characters)
+const AGENTS: Record<string, { art: string; color: string }> = {
+  default: {
+    color: c.orange,
+    art: `  ████
+  █${c.white}▀▀${c.orange}█
+  █${c.dim}▄▄${c.orange}█
+  ▐██▌
+   ██
+  ▐▌▐▌`,
+  },
+};
+
+function getAgentArt(name: string): string {
+  const agent = AGENTS[name.toLowerCase()] || AGENTS.default;
+  return agent.color + agent.art + c.reset;
+}
+
+// ── Animations ──────────────────────────────────────────────────────────────
+const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+const DOTS = ["⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"];
+
+class Spinner {
+  private i = 0;
+  private interval: ReturnType<typeof setInterval> | null = null;
+  private msg: string;
+
+  constructor(msg: string) {
+    this.msg = msg;
+  }
+
+  start() {
+    process.stdout.write("\x1b[?25l"); // hide cursor
+    this.interval = setInterval(() => {
+      const frame = SPINNER_FRAMES[this.i % SPINNER_FRAMES.length];
+      process.stdout.write(`\r  ${c.blue}${frame}${c.reset} ${c.dim}${this.msg}${c.reset}`);
+      this.i++;
+    }, 80);
+    return this;
+  }
+
+  stop(finalMsg?: string) {
+    if (this.interval) clearInterval(this.interval);
+    process.stdout.write("\r\x1b[K"); // clear line
+    process.stdout.write("\x1b[?25h"); // show cursor
+    if (finalMsg) console.log(`  ${c.green}*${c.reset} ${finalMsg}`);
+  }
+}
+
+function formatDuration(ms: number): string {
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms / 1000).toFixed(1)}s`;
+}
 
 // ── API helpers ─────────────────────────────────────────────────────────────
 async function api(path: string, opts?: RequestInit) {
@@ -26,32 +97,70 @@ async function api(path: string, opts?: RequestInit) {
   return res.json();
 }
 
-async function apiText(path: string) {
-  const res = await fetch(`${API}${path}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.text();
+// ── Pretty Box ──────────────────────────────────────────────────────────────
+function box(content: string, title?: string): string {
+  const lines = content.split("\n");
+  const width = Math.max(...lines.map(l => stripAnsi(l).length), title ? stripAnsi(title).length + 4 : 0, 40);
+  const top = title
+    ? `  ${c.surface}╭─ ${c.reset}${c.bold}${title}${c.reset}${c.surface} ${"─".repeat(Math.max(0, width - stripAnsi(title).length - 3))}╮${c.reset}`
+    : `  ${c.surface}╭${"─".repeat(width + 2)}╮${c.reset}`;
+  const bot = `  ${c.surface}╰${"─".repeat(width + 2)}╯${c.reset}`;
+  const mid = lines.map(l => {
+    const pad = width - stripAnsi(l).length;
+    return `  ${c.surface}│${c.reset} ${l}${" ".repeat(Math.max(0, pad))} ${c.surface}│${c.reset}`;
+  }).join("\n");
+  return `${top}\n${mid}\n${bot}`;
+}
+
+function stripAnsi(s: string): string {
+  return s.replace(/\x1b\[[0-9;]*m/g, "");
 }
 
 // ── Commands ────────────────────────────────────────────────────────────────
 
 async function join(room: string, name: string) {
-  const data = await api(`/api/join?room=${room}&name=${encodeURIComponent(name)}`, {
-    method: "POST",
-  });
-  console.log(`${c.green}Joined${c.reset} ${c.bold}${room}${c.reset} as ${c.cyan}${name}${c.reset}`);
-  console.log(`${c.dim}MCP URL: ${API}/mcp?room=${room}&name=${encodeURIComponent(name)}${c.reset}`);
+  const start = Date.now();
+  const spinner = new Spinner("Connecting to room...").start();
+
+  await api(`/api/join?room=${room}&name=${encodeURIComponent(name)}`, { method: "POST" });
+  spinner.stop(`Joined ${c.bold}${room}${c.reset} as ${c.cyan}${name}${c.reset} ${c.dim}(${formatDuration(Date.now() - start)})${c.reset}`);
+
+  console.log(box(
+    `${c.dim}MCP URL:${c.reset}\n${c.blue}${API}/mcp?room=${room}&name=${encodeURIComponent(name)}${c.reset}`,
+    "Connection"
+  ));
   console.log();
-  // Start watching after joining
+
   await watch(room);
 }
 
 async function watch(room: string) {
-  console.log(`${c.dim}Watching ${c.bold}${room}${c.reset}${c.dim} — Ctrl+C to exit${c.reset}`);
-  console.log(`${c.dim}${"─".repeat(60)}${c.reset}`);
+  console.log(`  ${c.green}●${c.reset} ${c.bold}Live${c.reset} ${c.dim}— watching ${room} — Ctrl+C to exit${c.reset}`);
+  console.log(`  ${c.surface}${"─".repeat(56)}${c.reset}`);
 
   let lastTs = 0;
 
-  // Poll for messages (SSE would be better but this works for v1)
+  // Initial load
+  try {
+    const data = await api(`/api/messages?room=${room}&limit=15`);
+    const messages = data.messages || [];
+    if (messages.length > 0) {
+      console.log(`  ${c.dim}── last ${messages.length} messages ──${c.reset}`);
+      for (const msg of messages) {
+        if (msg.ts > lastTs) lastTs = msg.ts;
+        printMessage(msg);
+      }
+      console.log(`  ${c.surface}${"─".repeat(56)}${c.reset}`);
+      console.log(`  ${c.green}●${c.reset} ${c.dim}Everything is live${c.reset}`);
+    }
+  } catch (e: any) {
+    if (e.message?.includes("404")) {
+      console.error(`  ${c.red}*${c.reset} Room "${room}" not found.`);
+      process.exit(1);
+    }
+  }
+
+  // Poll every 2 seconds
   const poll = async () => {
     try {
       const data = await api(`/api/messages?room=${room}&since=${lastTs}`);
@@ -60,94 +169,84 @@ async function watch(room: string) {
         if (msg.ts > lastTs) lastTs = msg.ts;
         printMessage(msg);
       }
-    } catch (e: any) {
-      if (e.message?.includes("404")) {
-        console.error(`${c.yellow}Room "${room}" not found.${c.reset}`);
-        process.exit(1);
-      }
-    }
+    } catch {}
   };
 
-  // Initial load — get recent messages
-  try {
-    const data = await api(`/api/messages?room=${room}&limit=20`);
-    const messages = data.messages || [];
-    if (messages.length > 0) {
-      console.log(`${c.dim}── Recent messages ──${c.reset}`);
-      for (const msg of messages) {
-        if (msg.ts > lastTs) lastTs = msg.ts;
-        printMessage(msg);
-      }
-      console.log(`${c.dim}── Live ──${c.reset}`);
-    }
-  } catch (e: any) {
-    if (e.message?.includes("404")) {
-      console.error(`${c.yellow}Room "${room}" not found.${c.reset}`);
-      process.exit(1);
-    }
-  }
-
-  // Poll every 2 seconds
   setInterval(poll, 2000);
-
-  // Keep alive
   await new Promise(() => {});
 }
 
 function printMessage(msg: any) {
   const time = new Date(msg.ts).toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
+    hour: "2-digit", minute: "2-digit", hour12: false,
   });
   const name = msg.from || "unknown";
-  const content = (msg.content || "").replace(/\n/g, "\n    ");
-
-  // Color agent names consistently
+  const content = (msg.content || "").replace(/\n/g, `\n       ${" ".repeat(name.length)} `);
   const nameColor = getNameColor(name);
-  console.log(`${c.gray}${time}${c.reset} ${nameColor}${name}${c.reset}  ${content}`);
+
+  if (msg.type === "SYSTEM" || name === "system") {
+    console.log(`  ${c.dim}     ${content}${c.reset}`);
+  } else {
+    console.log(`  ${c.gray}${time}${c.reset} ${nameColor}${c.bold}${name}${c.reset}  ${content}`);
+  }
 }
 
 function getNameColor(name: string): string {
-  const colors = [c.blue, c.green, c.yellow, c.cyan];
+  const colors = [c.blue, c.green, c.yellow, c.cyan, c.pink, c.orange];
   let hash = 0;
   for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
   return colors[Math.abs(hash) % colors.length];
 }
 
 async function send(room: string, name: string, message: string) {
+  const start = Date.now();
+  const spinner = new Spinner("Sending...").start();
+
   await api(`/api/send?room=${room}&name=${encodeURIComponent(name)}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message }),
   });
-  console.log(`${c.green}Sent${c.reset} to ${c.bold}${room}${c.reset}`);
+
+  spinner.stop(`Sent to ${c.bold}${room}${c.reset} ${c.dim}(${formatDuration(Date.now() - start)})${c.reset}`);
 }
 
 async function status(room: string, name?: string) {
+  const start = Date.now();
+  const spinner = new Spinner("Fetching room status...").start();
   const queryName = name || defaultName;
   const data = await api(`/api/status?room=${room}&name=${encodeURIComponent(queryName)}`);
+  spinner.stop(`Baked for ${formatDuration(Date.now() - start)}`);
+
   if (!data.ok) {
-    console.error(`${c.yellow}Room "${room}" not found.${c.reset}`);
+    console.error(`  ${c.red}*${c.reset} Room "${room}" not found.`);
     process.exit(1);
   }
 
-  console.log(`${c.bold}Room: ${room}${c.reset}`);
-  console.log(`${c.dim}${"─".repeat(40)}${c.reset}`);
-  console.log(`Messages: ${data.message_count || 0}`);
-  console.log(`Agents:   ${data.agent_count || 0}`);
-
-  if (data.agents?.length) {
-    console.log();
-    console.log(`${c.bold}Online:${c.reset}`);
-    for (const agent of data.agents) {
-      const statusIcon = agent.status === "online" ? `${c.green}●${c.reset}` : `${c.gray}○${c.reset}`;
-      console.log(`  ${statusIcon} ${agent.name}`);
-    }
-  }
+  console.log();
+  console.log(box(
+    [
+      `${c.bold}${room}${c.reset}`,
+      ``,
+      `${c.dim}Messages${c.reset}  ${c.bold}${data.message_count || 0}${c.reset}`,
+      `${c.dim}Agents${c.reset}    ${c.bold}${data.agent_count || 0}${c.reset}`,
+      ...(data.agents?.length ? [
+        ``,
+        `${c.dim}Online:${c.reset}`,
+        ...data.agents.map((a: any) =>
+          `  ${a.status === "online" ? `${c.green}●${c.reset}` : `${c.gray}○${c.reset}`} ${a.name}`
+        ),
+      ] : []),
+    ].join("\n"),
+    "Room Status"
+  ));
 }
 
-async function init(isPrivate: boolean) {
+async function init() {
+  const start = Date.now();
+  console.log();
+
+  const spinner = new Spinner("Creating room...").start();
   const res = await fetch(`${API}/rooms/new`);
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
   const data = await res.json();
@@ -155,74 +254,78 @@ async function init(isPrivate: boolean) {
   const room = data.room || data.code;
   const token = adminToken || data.admin_token;
 
-  console.log(`${c.green}Room created!${c.reset}`);
+  spinner.stop(`Room created ${c.dim}(${formatDuration(Date.now() - start)})${c.reset}`);
   console.log();
-  console.log(`  ${c.bold}Room code:${c.reset}   ${room}`);
-  if (token) {
-    console.log(`  ${c.bold}Admin token:${c.reset} ${token}`);
-    console.log(`  ${c.dim}(save this — you'll need it to manage the room)${c.reset}`);
+
+  // Show the pixel agent
+  const artLines = getAgentArt("default").split("\n");
+  const infoLines = [
+    `${c.bold}${c.white}${room}${c.reset}`,
+    ``,
+    `${c.dim}Your room is ready.${c.reset}`,
+    token ? `${c.dim}Admin:${c.reset} ${c.gray}${token.slice(0, 12)}...${c.reset}` : "",
+    ``,
+    `${c.dim}Join:${c.reset}   ${c.blue}mesh join ${room}${c.reset}`,
+    `${c.dim}Watch:${c.reset}  ${c.blue}mesh watch ${room}${c.reset}`,
+    `${c.dim}Web:${c.reset}    ${c.blue}${API}/try?room=${room}${c.reset}`,
+  ].filter(Boolean);
+
+  // Side by side: art + info
+  const maxArt = artLines.length;
+  const maxInfo = infoLines.length;
+  const rows = Math.max(maxArt, maxInfo);
+  for (let i = 0; i < rows; i++) {
+    const art = i < maxArt ? artLines[i] : "      ";
+    const info = i < maxInfo ? infoLines[i] : "";
+    console.log(`  ${art}    ${info}`);
   }
+
   console.log();
-  console.log(`  ${c.bold}Join:${c.reset}    mesh join ${room}`);
-  console.log(`  ${c.bold}Watch:${c.reset}   mesh watch ${room}`);
-  console.log(`  ${c.bold}Web:${c.reset}     ${API}/try?room=${room}`);
+  console.log(box(
+    `${c.cyan}{\n  "mesh": {\n    "url": "${API}/mcp?room=${room}&name=YOUR_AGENT_NAME"\n  }\n}${c.reset}`,
+    "MCP Config"
+  ));
+
+  if (token) {
+    console.log();
+    console.log(`  ${c.yellow}*${c.reset} ${c.dim}Save your admin token — you need it to manage the room${c.reset}`);
+    console.log(`  ${c.gray}${token}${c.reset}`);
+  }
+
   console.log();
-  console.log(`  ${c.bold}MCP config (add to settings.json):${c.reset}`);
-  console.log(`  ${c.cyan}{`);
-  console.log(`    "mesh": {`);
-  console.log(`      "url": "${API}/mcp?room=${room}&name=YOUR_AGENT_NAME"`);
-  console.log(`    }`);
-  console.log(`  }${c.reset}`);
 }
 
 async function connect(room: string, name: string) {
-  console.log(`${c.bold}MCP URL:${c.reset}`);
-  console.log(`${API}/mcp?room=${room}&name=${encodeURIComponent(name)}`);
   console.log();
-  console.log(`${c.bold}Add to your agent's MCP config:${c.reset}`);
+  console.log(box(
+    `${c.cyan}{\n  "mesh": {\n    "url": "${API}/mcp?room=${room}&name=${encodeURIComponent(name)}"\n  }\n}${c.reset}`,
+    "MCP Config"
+  ));
   console.log();
-  console.log(`${c.cyan}{`);
-  console.log(`  "mesh": {`);
-  console.log(`    "url": "${API}/mcp?room=${room}&name=${encodeURIComponent(name)}"`);
-  console.log(`  }`);
-  console.log(`}${c.reset}`);
+  console.log(`  ${c.dim}Add to your Claude Code / Cursor / Gemini settings${c.reset}`);
+  console.log();
 }
 
 function help() {
-  console.log(`
-${c.bold}mesh${c.reset} v${VERSION} — TeamSpeak for AI agents
-
-${c.bold}Usage:${c.reset}
-  mesh join <room> [--name <name>]    Join a room and start watching
-  mesh watch <room>                   Tail a room (like docker logs -f)
-  mesh send <room> "message"          Send a message to a room
-  mesh status <room>                  Show room info and online agents
-  mesh init                           Create a new room
-  mesh connect <room> [--name <name>] Print MCP connection URL
-  mesh dashboard [room]               Open web dashboard in browser
-
-${c.bold}Examples:${c.reset}
-  ${c.dim}# Join the Mesh HQ and watch agents work${c.reset}
-  mesh join mesh01 --name "my-agent"
-
-  ${c.dim}# Create your own room${c.reset}
-  mesh init
-
-  ${c.dim}# Watch a room in a tmux pane${c.reset}
-  mesh watch mesh01
-
-  ${c.dim}# Send a message${c.reset}
-  mesh send mesh01 "deploy is done"
-
-  ${c.dim}# Get MCP config for your agent${c.reset}
-  mesh connect mesh01 --name atlas
-
-${c.bold}Environment:${c.reset}
-  MESH_API    API endpoint (default: https://trymesh.chat)
-  MESH_NAME   Default agent/user name
-
-${c.dim}https://trymesh.chat${c.reset}
-`);
+  console.log(MESH_LOGO);
+  console.log(`  ${c.dim}v${VERSION} — TeamSpeak for AI agents${c.reset}`);
+  console.log();
+  console.log(`  ${c.bold}Usage${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}join${c.reset} ${c.gray}<room>${c.reset}           ${c.dim}Join a room and start watching${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}watch${c.reset} ${c.gray}<room>${c.reset}          ${c.dim}Tail a room (like docker logs -f)${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}send${c.reset} ${c.gray}<room> "msg"${c.reset}     ${c.dim}Send a message${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}status${c.reset} ${c.gray}<room>${c.reset}         ${c.dim}Room info + online agents${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}init${c.reset}                  ${c.dim}Create a new room${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}connect${c.reset} ${c.gray}<room>${c.reset}        ${c.dim}Print MCP config${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}dashboard${c.reset}             ${c.dim}Open web UI${c.reset}`);
+  console.log();
+  console.log(`  ${c.bold}Examples${c.reset}`);
+  console.log(`  ${c.gray}$ mesh join mesh01 --name atlas${c.reset}`);
+  console.log(`  ${c.gray}$ mesh init${c.reset}`);
+  console.log(`  ${c.gray}$ mesh watch mesh01${c.reset}`);
+  console.log();
+  console.log(`  ${c.dim}${API}${c.reset}`);
+  console.log();
 }
 
 // ── CLI parser ──────────────────────────────────────────────────────────────
@@ -242,48 +345,43 @@ const defaultName = process.env.MESH_NAME || `user-${Math.random().toString(36).
     switch (command) {
       case "join": {
         const room = args[1];
-        if (!room) { console.error("Usage: mesh join <room> [--name <name>]"); process.exit(1); }
-        const name = getFlag("--name") || defaultName;
-        await join(room, name);
+        if (!room) { console.error("  Usage: mesh join <room> [--name <name>]"); process.exit(1); }
+        await join(room, getFlag("--name") || defaultName);
         break;
       }
       case "watch": {
         const room = args[1];
-        if (!room) { console.error("Usage: mesh watch <room>"); process.exit(1); }
+        if (!room) { console.error("  Usage: mesh watch <room>"); process.exit(1); }
         await watch(room);
         break;
       }
       case "send": {
         const room = args[1];
         const message = args[2];
-        if (!room || !message) { console.error("Usage: mesh send <room> \"message\" [--name <name>]"); process.exit(1); }
-        const name = getFlag("--name") || defaultName;
-        await send(room, name, message);
+        if (!room || !message) { console.error("  Usage: mesh send <room> \"message\" [--name <name>]"); process.exit(1); }
+        await send(room, getFlag("--name") || defaultName, message);
         break;
       }
       case "status": {
         const room = args[1];
-        if (!room) { console.error("Usage: mesh status <room>"); process.exit(1); }
-        await status(room);
+        if (!room) { console.error("  Usage: mesh status <room>"); process.exit(1); }
+        await status(room, getFlag("--name"));
         break;
       }
       case "init":
-      case "create": {
-        const isPrivate = args.includes("--private");
-        await init(isPrivate);
+      case "create":
+        await init();
         break;
-      }
       case "connect": {
         const room = args[1];
-        if (!room) { console.error("Usage: mesh connect <room> [--name <name>]"); process.exit(1); }
-        const name = getFlag("--name") || defaultName;
-        await connect(room, name);
+        if (!room) { console.error("  Usage: mesh connect <room> [--name <name>]"); process.exit(1); }
+        await connect(room, getFlag("--name") || defaultName);
         break;
       }
       case "dashboard": {
         const room = args[1];
         const url = room ? `${API}/dashboard?room=${room}` : API;
-        console.log(`Opening ${url}...`);
+        console.log(`  ${c.blue}*${c.reset} Opening ${url}`);
         const { exec } = await import("child_process");
         const cmd = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
         exec(`${cmd} ${url}`);
@@ -292,7 +390,7 @@ const defaultName = process.env.MESH_NAME || `user-${Math.random().toString(36).
       case "version":
       case "--version":
       case "-v":
-        console.log(`mesh v${VERSION}`);
+        console.log(`  ${c.blue}mesh${c.reset} v${VERSION}`);
         break;
       case "help":
       case "--help":
@@ -301,11 +399,12 @@ const defaultName = process.env.MESH_NAME || `user-${Math.random().toString(36).
         help();
         break;
       default:
-        console.error(`Unknown command: ${command}\nRun 'mesh help' for usage.`);
+        console.error(`  ${c.red}*${c.reset} Unknown command: ${command}`);
+        console.error(`  ${c.dim}Run 'mesh help' for usage${c.reset}`);
         process.exit(1);
     }
   } catch (e: any) {
-    console.error(`${c.yellow}Error:${c.reset} ${e.message}`);
+    console.error(`  ${c.red}*${c.reset} ${e.message}`);
     process.exit(1);
   }
 })();
