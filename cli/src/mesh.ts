@@ -6,7 +6,7 @@ import { createInterface } from "readline";
 import { promisify } from "util";
 
 const API = process.env.MESH_API || "https://trymesh.chat";
-const VERSION = "1.5.0";
+const VERSION = "1.6.0";
 const execFileAsync = promisify(execFile);
 
 // ── Colors + Styles (zero deps) ─────────────────────────────────────────────
@@ -914,20 +914,24 @@ async function invite(room: string) {
   console.log();
   console.log(box(
     [
-      `${c.bold}${c.white}${room}${c.reset}`,
+      `${c.bold}${c.white}Room: ${room}${c.reset}`,
       ``,
-      `${c.bold}For teammates (CLI):${c.reset}`,
-      `${c.white}npx mesh-rooms join ${room}${c.reset}`,
-      ``,
-      `${c.bold}For AI agents (MCP config):${c.reset}`,
-      `${c.cyan}{\n  "mcpServers": {\n    "mesh": {\n      "url": "${API}/mcp?room=${room}&name=AGENT_NAME"\n    }\n  }\n}${c.reset}`,
-      ``,
-      `${c.bold}Web links:${c.reset}`,
-      `${c.blue}${API}/try?room=${room}${c.reset}       ${c.dim}Try it${c.reset}`,
-      `${c.blue}${API}/office?room=${room}${c.reset}    ${c.dim}Live office${c.reset}`,
-      `${c.blue}${API}/dashboard?room=${room}${c.reset} ${c.dim}Dashboard${c.reset}`,
+      `${c.bold}For a friend ${c.dim}(they run this in their terminal):${c.reset}`,
+      `${c.white}npx mesh-rooms${c.reset}`,
+      `${c.dim}Then pick "Join" and enter room code: ${c.white}${room}${c.reset}`,
+      `${c.dim}It auto-configures their Claude Code / Codex.${c.reset}`,
     ].join("\n"),
-    "Invite to Mesh"
+    "Invite a human"
+  ));
+
+  console.log();
+  console.log(box(
+    [
+      `${c.bold}Watch the room:${c.reset}  ${c.white}npx mesh-rooms watch${c.reset}`,
+      `${c.bold}Chat:${c.reset}            ${c.white}npx mesh-rooms chat${c.reset}`,
+      `${c.bold}Web:${c.reset}             ${c.blue}${API}/office?room=${room}${c.reset}`,
+    ].join("\n"),
+    "For you"
   ));
   console.log();
 }
@@ -1159,17 +1163,12 @@ async function interactive() {
   console.log();
   console.log(box(
     [
-      `${c.bold}Watch the room:${c.reset}`,
-      `${c.white}npx mesh-rooms watch${c.reset}`,
+      `${c.bold}Watch your agents:${c.reset}  ${c.white}npx mesh-rooms watch${c.reset}`,
+      `${c.bold}Chat yourself:${c.reset}      ${c.white}npx mesh-rooms chat${c.reset}`,
+      `${c.bold}Web:${c.reset}                ${c.blue}${API}/office?room=${room}${c.reset}`,
       ``,
-      `${c.bold}Chat in the room:${c.reset}`,
-      `${c.white}npx mesh-rooms chat${c.reset}`,
-      ``,
-      `${c.bold}Invite a friend:${c.reset}`,
-      `${c.white}npx mesh-rooms join ${room}${c.reset}`,
-      ``,
-      `${c.bold}Web:${c.reset}`,
-      `${c.blue}${API}/office?room=${room}${c.reset}`,
+      `${c.bold}Invite a friend:${c.reset}    ${c.dim}send them${c.reset} ${c.white}npx mesh-rooms${c.reset}`,
+      `                    ${c.dim}room code:${c.reset} ${c.bold}${room}${c.reset}`,
     ].join("\n"),
     "What's next"
   ));
