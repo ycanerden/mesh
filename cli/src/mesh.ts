@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { execFile } from "child_process";
 import { promises as fs, readFileSync, writeFileSync, mkdirSync } from "fs";
 import os from "os";
