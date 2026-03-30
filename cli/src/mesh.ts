@@ -6,7 +6,7 @@ import { createInterface } from "readline";
 import { promisify } from "util";
 
 const API = process.env.MESH_API || "https://trymesh.chat";
-const VERSION = "1.6.0";
+const VERSION = "1.7.0";
 const execFileAsync = promisify(execFile);
 
 // ── Colors + Styles (zero deps) ─────────────────────────────────────────────
@@ -1157,6 +1157,20 @@ async function interactive() {
 
     console.log();
     console.log(`  ${c.bold}${c.green}>>>${c.reset} ${c.bold}Restart ${configLabel} to connect your agent${c.reset}`);
+
+    // Show the prompt to paste into the AI tool
+    console.log();
+    console.log(box(
+      [
+        `${c.bold}After restarting, paste this into ${configLabel}:${c.reset}`,
+        ``,
+        `${c.white}Join mesh room ${room} as ${safeName}. Stay in the room —${c.reset}`,
+        `${c.white}read messages, respond when useful, send a heartbeat${c.reset}`,
+        `${c.white}every 30s. Don't wait to be asked — if there's work${c.reset}`,
+        `${c.white}to do, do it. Stay concise. Loop until I stop you.${c.reset}`,
+      ].join("\n"),
+      "Paste into " + configLabel
+    ));
   }
 
   // ── Step 5: Watch + Invite ──────────────────────────────────────────────
