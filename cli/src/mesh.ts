@@ -6,7 +6,7 @@ import { createInterface } from "readline";
 import { promisify } from "util";
 
 const API = process.env.MESH_API || "https://trymesh.chat";
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const execFileAsync = promisify(execFile);
 
 // ── Colors + Styles (zero deps) ─────────────────────────────────────────────
@@ -281,6 +281,128 @@ async function watch(room: string) {
   };
 
   await connectSSE();
+}
+
+async function chat(room: string, name: string) {
+  checkProtected(room);
+
+  console.log(`  ${c.green}●${c.reset} ${c.bold}${name}${c.reset} ${c.dim}in${c.reset} ${c.bold}${room}${c.reset} ${c.dim}— type a message and press Enter${c.reset}`);
+  console.log(`  ${c.surface}${"─".repeat(56)}${c.reset}`);
+
+  // Backfill recent messages
+  try {
+    const data = await api(`/api/messages?room=${room}&name=${encodeURIComponent(name)}&limit=10`);
+    const messages = data.messages || [];
+    if (messages.length > 0) {
+      console.log(`  ${c.dim}── last ${messages.length} messages ──${c.reset}`);
+      for (const msg of messages) printMessage(msg);
+      console.log(`  ${c.surface}${"─".repeat(56)}${c.reset}`);
+    }
+  } catch {}
+
+  // Join room + initial heartbeat
+  await api(`/api/heartbeat?room=${room}&name=${encodeURIComponent(name)}`, { method: "POST" }).catch(() => {});
+
+  // Heartbeat every 30s
+  const hbInterval = setInterval(() => {
+    api(`/api/heartbeat?room=${room}&name=${encodeURIComponent(name)}`, { method: "POST" }).catch(() => {});
+  }, 30000);
+
+  // SSE for incoming messages
+  let backoff = 1000;
+  const connectSSE = async () => {
+    try {
+      const url = `${API}/api/stream?room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}`;
+      const res = await fetch(url);
+      if (!res.ok || !res.body) throw new Error("SSE failed");
+
+      backoff = 1000;
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() || "";
+        for (const part of parts) {
+          let eventType = "", eventData = "";
+          for (const line of part.split("\n")) {
+            if (line.startsWith("event:")) eventType = line.slice(6).trim();
+            else if (line.startsWith("data:")) eventData = line.slice(5).trim();
+          }
+          if (eventType === "message" && eventData) {
+            try {
+              const msg = JSON.parse(eventData);
+              // Clear the input prompt line, print message, restore prompt
+              process.stdout.write(`\r\x1b[K`);
+              printMessage(msg);
+              process.stdout.write(`  ${c.dim}>${c.reset} `);
+            } catch {}
+          }
+        }
+      }
+    } catch {}
+    await new Promise(r => setTimeout(r, backoff));
+    backoff = Math.min(backoff * 2, 30000);
+    connectSSE();
+  };
+
+  // Start SSE in background
+  connectSSE();
+
+  // Interactive input
+  const rl = createInterface({ input: process.stdin, output: process.stdout, prompt: `  ${c.dim}>${c.reset} ` });
+
+  rl.prompt();
+
+  rl.on("line", async (line: string) => {
+    const msg = line.trim();
+    if (!msg) { rl.prompt(); return; }
+
+    if (msg === "/quit" || msg === "/exit") {
+      clearInterval(hbInterval);
+      rl.close();
+      process.exit(0);
+    }
+
+    if (msg === "/status") {
+      try {
+        const data = await api(`/api/presence?room=${room}`);
+        const agents = (data.agents || []) as PresenceAgent[];
+        const online = agents.filter(a => a.status === "online");
+        console.log(`  ${c.dim}${online.length} online: ${online.map(a => a.agent_name).join(", ")}${c.reset}`);
+      } catch {}
+      rl.prompt();
+      return;
+    }
+
+    try {
+      await api(`/api/send?room=${room}&name=${encodeURIComponent(name)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg }),
+      });
+      // Print own message
+      const time = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false });
+      const nameColor = getNameColor(name);
+      console.log(`  ${c.gray}${time}${c.reset} ${nameColor}${c.bold}${name}${c.reset}  ${msg}`);
+    } catch (e: any) {
+      console.log(`  ${c.red}*${c.reset} ${c.dim}Failed to send${c.reset}`);
+    }
+    rl.prompt();
+  });
+
+  rl.on("close", () => {
+    clearInterval(hbInterval);
+    console.log(`\n  ${c.dim}Left ${room}${c.reset}`);
+    process.exit(0);
+  });
+
+  // Keep alive
+  await new Promise(() => {});
 }
 
 function printMessage(msg: any) {
@@ -990,8 +1112,9 @@ function help() {
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}bootstrap${c.reset} ${c.gray}<room>${c.reset}      ${c.dim}Print tool-native setup for codex/claude/gemini${c.reset}`);
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}agent${c.reset} ${c.gray}<room>${c.reset}          ${c.dim}Run an autonomous agent (codex/claude/gemini)${c.reset}`);
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}join${c.reset} ${c.gray}<room>${c.reset}           ${c.dim}Join a room and start watching${c.reset}`);
-  console.log(`  ${c.blue}mesh${c.reset} ${c.white}watch${c.reset} ${c.gray}<room>${c.reset}          ${c.dim}Tail a room (like docker logs -f)${c.reset}`);
-  console.log(`  ${c.blue}mesh${c.reset} ${c.white}send${c.reset} ${c.gray}<room> "msg"${c.reset}     ${c.dim}Send a message${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}chat${c.reset}                  ${c.dim}Interactive chat (type + receive live)${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}watch${c.reset}                 ${c.dim}Read-only live feed (like tail -f)${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}send${c.reset} ${c.gray}"msg"${c.reset}             ${c.dim}Send a one-off message${c.reset}`);
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}status${c.reset} ${c.gray}<room>${c.reset}         ${c.dim}Room info + online agents${c.reset}`);
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}init${c.reset}                  ${c.dim}Create a new room${c.reset}`);
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}invite${c.reset}                ${c.dim}Share room: CLI, MCP config, web links${c.reset}`);
@@ -1082,6 +1205,11 @@ async function configCmd() {
       case "watch": {
         const room = resolveRoom(args[1]);
         await watch(room);
+        break;
+      }
+      case "chat": {
+        const room = resolveRoom(args[1]);
+        await chat(room, getFlag("--name") || defaultName);
         break;
       }
       case "send": {
