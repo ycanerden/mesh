@@ -6,7 +6,7 @@ import { createInterface } from "readline";
 import { promisify } from "util";
 
 const API = process.env.MESH_API || "https://trymesh.chat";
-const VERSION = "1.2.0";
+const VERSION = "1.3.0";
 const execFileAsync = promisify(execFile);
 
 // ── Colors + Styles (zero deps) ─────────────────────────────────────────────
@@ -226,58 +226,57 @@ async function watch(room: string) {
   // Connect to SSE stream with auto-reconnect
   let backoff = 1000;
 
-  const connectSSE = async () => {
-    try {
-      const url = `${API}/api/stream?room=${encodeURIComponent(room)}&name=${encodeURIComponent(watcherName)}&observer=1`;
-      const res = await fetch(url);
-
-      if (!res.ok) {
-        throw new Error(`SSE HTTP ${res.status}`);
+  const processSSE = (chunk: string) => {
+    const parts = chunk.split("\n\n");
+    for (const part of parts) {
+      let eventType = "", eventData = "";
+      for (const line of part.split("\n")) {
+        if (line.startsWith("event:")) eventType = line.slice(6).trim();
+        else if (line.startsWith("data:")) eventData = line.slice(5).trim();
       }
-      if (!res.body) {
-        throw new Error("No response body");
+      if (eventType === "message" && eventData) {
+        try { printMessage(JSON.parse(eventData)); } catch {}
       }
-
-      console.log(`  ${c.green}●${c.reset} ${c.dim}Connected via SSE${c.reset}`);
-      backoff = 1000; // reset on successful connect
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split("\n\n");
-        buffer = parts.pop() || "";
-
-        for (const part of parts) {
-          let eventType = "";
-          let eventData = "";
-          for (const line of part.split("\n")) {
-            if (line.startsWith("event:")) eventType = line.slice(6).trim();
-            else if (line.startsWith("data:")) eventData = line.slice(5).trim();
-          }
-          if (eventType === "message" && eventData) {
-            try {
-              const msg = JSON.parse(eventData);
-              printMessage(msg);
-            } catch {}
-          }
-          // ping events are just keepalives — ignore
-        }
-      }
-    } catch (e: any) {
-      // Silently reconnect
     }
+  };
 
-    // Reconnect with exponential backoff
-    console.log(`  ${c.yellow}●${c.reset} ${c.dim}Reconnecting in ${backoff / 1000}s...${c.reset}`);
-    await new Promise(r => setTimeout(r, backoff));
-    backoff = Math.min(backoff * 2, 30000);
-    connectSSE();
+  const connectSSE = async () => {
+    while (true) {
+      try {
+        const url = `${API}/api/stream?room=${encodeURIComponent(room)}&name=${encodeURIComponent(watcherName)}&observer=1`;
+        const controller = new AbortController();
+        const res = await fetch(url, {
+          signal: controller.signal,
+          headers: { "Accept": "text/event-stream", "Cache-Control": "no-cache" },
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.body) throw new Error("No body");
+
+        console.log(`  ${c.green}●${c.reset} ${c.dim}Connected via SSE${c.reset}`);
+        backoff = 1000;
+
+        // Use async iterator over the body stream
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        for await (const chunk of res.body as any) {
+          buffer += decoder.decode(chunk, { stream: true });
+          // Only process complete SSE frames (ending with \n\n)
+          const lastDouble = buffer.lastIndexOf("\n\n");
+          if (lastDouble !== -1) {
+            processSSE(buffer.slice(0, lastDouble));
+            buffer = buffer.slice(lastDouble + 2);
+          }
+        }
+      } catch (e: any) {
+        // Connection lost — reconnect
+      }
+
+      console.log(`  ${c.yellow}●${c.reset} ${c.dim}Reconnecting in ${backoff / 1000}s...${c.reset}`);
+      await new Promise(r => setTimeout(r, backoff));
+      backoff = Math.min(backoff * 2, 30000);
+    }
   };
 
   await connectSSE();
@@ -311,43 +310,45 @@ async function chat(room: string, name: string) {
   // SSE for incoming messages
   let backoff = 1000;
   const connectSSE = async () => {
-    try {
-      const url = `${API}/api/stream?room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}`;
-      const res = await fetch(url);
-      if (!res.ok || !res.body) throw new Error("SSE failed");
+    while (true) {
+      try {
+        const url = `${API}/api/stream?room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}`;
+        const res = await fetch(url, {
+          headers: { "Accept": "text/event-stream", "Cache-Control": "no-cache" },
+        });
+        if (!res.ok || !res.body) throw new Error("SSE failed");
 
-      backoff = 1000;
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
+        backoff = 1000;
+        const decoder = new TextDecoder();
+        let buffer = "";
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const parts = buffer.split("\n\n");
-        buffer = parts.pop() || "";
-        for (const part of parts) {
-          let eventType = "", eventData = "";
-          for (const line of part.split("\n")) {
-            if (line.startsWith("event:")) eventType = line.slice(6).trim();
-            else if (line.startsWith("data:")) eventData = line.slice(5).trim();
-          }
-          if (eventType === "message" && eventData) {
-            try {
-              const msg = JSON.parse(eventData);
-              // Clear the input prompt line, print message, restore prompt
-              process.stdout.write(`\r\x1b[K`);
-              printMessage(msg);
-              process.stdout.write(`  ${c.dim}>${c.reset} `);
-            } catch {}
+        for await (const chunk of res.body as any) {
+          buffer += decoder.decode(chunk, { stream: true });
+          const lastDouble = buffer.lastIndexOf("\n\n");
+          if (lastDouble !== -1) {
+            const complete = buffer.slice(0, lastDouble);
+            buffer = buffer.slice(lastDouble + 2);
+            for (const part of complete.split("\n\n")) {
+              let eventType = "", eventData = "";
+              for (const line of part.split("\n")) {
+                if (line.startsWith("event:")) eventType = line.slice(6).trim();
+                else if (line.startsWith("data:")) eventData = line.slice(5).trim();
+              }
+              if (eventType === "message" && eventData) {
+                try {
+                  const msg = JSON.parse(eventData);
+                  process.stdout.write(`\r\x1b[K`);
+                  printMessage(msg);
+                  process.stdout.write(`  ${c.dim}>${c.reset} `);
+                } catch {}
+              }
+            }
           }
         }
-      }
-    } catch {}
-    await new Promise(r => setTimeout(r, backoff));
-    backoff = Math.min(backoff * 2, 30000);
-    connectSSE();
+      } catch {}
+      await new Promise(r => setTimeout(r, backoff));
+      backoff = Math.min(backoff * 2, 30000);
+    }
   };
 
   // Start SSE in background
