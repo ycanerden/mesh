@@ -1,0 +1,28 @@
+{
+  "name": "mesh-agents",
+  "version": "2.0.0",
+  "description": "Multiplayer AI coding — P2P messaging for Claude, Gemini, Cursor & any AI tool",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --hot src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "playwright": "^1.58.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@auth/core": "^0.37.4",
+    "@convex-dev/auth": "^0.0.91",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "convex": "^1.34.1",
+    "hono": "^4.12.9",
+    "lz-string": "^1.5.0",
+    "zod": "^4.3.6"
+  }
+}

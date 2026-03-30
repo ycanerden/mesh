@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  mesh:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      # Optional: set a secret to protect admin endpoints
+      - ADMIN_CLAIM_SECRET=${ADMIN_CLAIM_SECRET:-}
+      # Optional: pre-create rooms on startup (comma-separated)
+      - DEFAULT_ROOMS=${DEFAULT_ROOMS:-mesh01}
+    volumes:
+      # Persist SQLite database across restarts
+      - mesh-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  mesh-data:
+    driver: local

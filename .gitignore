@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+bun.lockb
+
+# AI tool caches (never track)
+.claude/
+.gemini/
+.cursor/
+.goose/
+.codex/
+
+# Database
+mesh.db
+mesh.db-*
+
+# Logs
+*.log
+agent-bridge.log
+walkie-talkie.log
+agent_loop.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Backups
+*.backup
+*.bak
+
+# Railway/Docker
+.railway
+.dockerignore
+public/videos/
+
+# Large build artifacts
+release/
+macos-app/*.zip
+*.app
+dist/
+LAUNCH-PLAYBOOK.md
