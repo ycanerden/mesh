@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 import { execFile } from "child_process";
-import { promises as fs } from "fs";
+import { promises as fs, readFileSync, writeFileSync, mkdirSync } from "fs";
 import os from "os";
 import path from "path";
 import { createInterface } from "readline";
 import { promisify } from "util";
 
 const API = process.env.MESH_API || "https://trymesh.chat";
-const VERSION = "0.4.0";
+const VERSION = "1.0.0";
 const execFileAsync = promisify(execFile);
 
 // ── Colors + Styles (zero deps) ─────────────────────────────────────────────
@@ -114,6 +114,38 @@ function formatDuration(ms: number): string {
   return `${(ms / 1000).toFixed(1)}s`;
 }
 
+// ── Persistent Config ──────────────────────────────────────────────────────
+type MeshConfig = {
+  defaultRoom?: string;
+  defaultName?: string;
+  apiUrl?: string;
+  rooms?: Record<string, { adminToken?: string; createdAt?: string }>;
+};
+
+const CONFIG_DIR = path.join(os.homedir(), ".config", "mesh");
+const CONFIG_PATH = path.join(CONFIG_DIR, "config.json");
+
+function loadConfig(): MeshConfig {
+  try {
+    return JSON.parse(readFileSync(CONFIG_PATH, "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+function saveConfig(config: MeshConfig) {
+  mkdirSync(CONFIG_DIR, { recursive: true });
+  writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+}
+
+function getConfigRoom(): string | undefined {
+  return loadConfig().defaultRoom;
+}
+
+function getConfigName(): string | undefined {
+  return loadConfig().defaultName;
+}
+
 // ── API helpers ─────────────────────────────────────────────────────────────
 async function api(path: string, opts?: RequestInit) {
   const res = await fetch(`${API}${path}`, opts);
@@ -172,24 +204,19 @@ async function join(room: string, name: string) {
 
 async function watch(room: string) {
   checkProtected(room);
+  const watcherName = `watcher-${Math.random().toString(36).slice(2, 6)}`;
+
   console.log(`  ${c.green}●${c.reset} ${c.bold}Live${c.reset} ${c.dim}— watching ${room} — Ctrl+C to exit${c.reset}`);
   console.log(`  ${c.surface}${"─".repeat(56)}${c.reset}`);
 
-  let lastTs = 0;
-  let typingNames = new Set<string>();
-
-  // Initial load
+  // Backfill recent messages from REST
   try {
-    const data = await api(`/api/messages?room=${room}&limit=15`);
+    const data = await api(`/api/messages?room=${room}&name=${encodeURIComponent(watcherName)}&limit=15`);
     const messages = data.messages || [];
     if (messages.length > 0) {
       console.log(`  ${c.dim}── last ${messages.length} messages ──${c.reset}`);
-      for (const msg of messages) {
-        if (msg.ts > lastTs) lastTs = msg.ts;
-        printMessage(msg);
-      }
+      for (const msg of messages) printMessage(msg);
       console.log(`  ${c.surface}${"─".repeat(56)}${c.reset}`);
-      console.log(`  ${c.green}●${c.reset} ${c.dim}Everything is live${c.reset}`);
     }
   } catch (e: any) {
     if (e.message?.includes("404")) {
@@ -198,45 +225,64 @@ async function watch(room: string) {
     }
   }
 
-  // Poll every 2 seconds
-  const poll = async () => {
+  // Connect to SSE stream with auto-reconnect
+  let backoff = 1000;
+
+  const connectSSE = async () => {
     try {
-      const data = await api(`/api/messages?room=${room}&since=${lastTs}`);
-      const messages = data.messages || [];
-      for (const msg of messages) {
-        if (msg.ts > lastTs) lastTs = msg.ts;
-        printMessage(msg);
+      const url = `${API}/api/stream?room=${encodeURIComponent(room)}&name=${encodeURIComponent(watcherName)}&observer=1`;
+      const res = await fetch(url);
+
+      if (!res.ok) {
+        throw new Error(`SSE HTTP ${res.status}`);
       }
-    } catch {}
-  };
+      if (!res.body) {
+        throw new Error("No response body");
+      }
 
-  const pollPresence = async () => {
-    try {
-      const data = await api(`/api/presence?room=${room}`);
-      const agents = (data.agents || []) as PresenceAgent[];
-      const nextTyping = new Set(
-        agents
-          .filter((agent) => agent.is_typing && agent.status !== "offline")
-          .map((agent) => agent.agent_name)
-          .filter(Boolean)
-      );
+      console.log(`  ${c.green}●${c.reset} ${c.dim}Connected via SSE${c.reset}`);
+      backoff = 1000; // reset on successful connect
 
-      const changed =
-        nextTyping.size !== typingNames.size ||
-        [...nextTyping].some((name) => !typingNames.has(name));
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
 
-      if (changed) {
-        typingNames = nextTyping;
-        if (typingNames.size > 0) {
-          printSystemLine(`… ${formatTypingNames([...typingNames])}`);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() || "";
+
+        for (const part of parts) {
+          let eventType = "";
+          let eventData = "";
+          for (const line of part.split("\n")) {
+            if (line.startsWith("event:")) eventType = line.slice(6).trim();
+            else if (line.startsWith("data:")) eventData = line.slice(5).trim();
+          }
+          if (eventType === "message" && eventData) {
+            try {
+              const msg = JSON.parse(eventData);
+              printMessage(msg);
+            } catch {}
+          }
+          // ping events are just keepalives — ignore
         }
       }
-    } catch {}
+    } catch (e: any) {
+      // Silently reconnect
+    }
+
+    // Reconnect with exponential backoff
+    console.log(`  ${c.yellow}●${c.reset} ${c.dim}Reconnecting in ${backoff / 1000}s...${c.reset}`);
+    await new Promise(r => setTimeout(r, backoff));
+    backoff = Math.min(backoff * 2, 30000);
+    connectSSE();
   };
 
-  setInterval(poll, 2000);
-  setInterval(pollPresence, 2000);
-  await new Promise(() => {});
+  await connectSSE();
 }
 
 function printMessage(msg: any) {
@@ -680,7 +726,7 @@ async function init() {
 
   console.log();
   console.log(box(
-    `${c.cyan}{\n  "mesh": {\n    "url": "${API}/mcp?room=${room}&name=YOUR_AGENT_NAME"\n  }\n}${c.reset}`,
+    `${c.cyan}{\n  "mcpServers": {\n    "mesh": {\n      "url": "${API}/mcp?room=${room}&name=YOUR_AGENT_NAME"\n    }\n  }\n}${c.reset}`,
     "MCP Config — paste into settings.json"
   ));
 
@@ -702,13 +748,21 @@ async function init() {
     console.log(`  ${c.gray}${token}${c.reset}`);
   }
 
+  // Save to persistent config
+  const config = loadConfig();
+  config.defaultRoom = room;
+  if (!config.rooms) config.rooms = {};
+  config.rooms[room] = { adminToken: token || undefined, createdAt: new Date().toISOString() };
+  saveConfig(config);
+  console.log(`  ${c.dim}Saved to ~/.config/mesh/config.json${c.reset}`);
+
   console.log();
 }
 
 async function connect(room: string, name: string) {
   console.log();
   console.log(box(
-    `${c.cyan}{\n  "mesh": {\n    "url": "${API}/mcp?room=${room}&name=${encodeURIComponent(name)}"\n  }\n}${c.reset}`,
+    `${c.cyan}{\n  "mcpServers": {\n    "mesh": {\n      "url": "${API}/mcp?room=${room}&name=${encodeURIComponent(name)}"\n    }\n  }\n}${c.reset}`,
     "MCP Config"
   ));
   console.log();
@@ -891,7 +945,9 @@ function help() {
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}status${c.reset} ${c.gray}<room>${c.reset}         ${c.dim}Room info + online agents${c.reset}`);
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}init${c.reset}                  ${c.dim}Create a new room${c.reset}`);
   console.log(`  ${c.blue}mesh${c.reset} ${c.white}connect${c.reset} ${c.gray}<room>${c.reset}        ${c.dim}Print MCP config${c.reset}`);
+  console.log(`  ${c.blue}mesh${c.reset} ${c.white}config${c.reset}                 ${c.dim}Show/set saved room, name, API${c.reset}`);
   console.log();
+  console.log(`  ${c.dim}Omit <room> to use saved default from ${c.reset}mesh config`);
   console.log(`  ${c.dim}${API}${c.reset}`);
   console.log();
 }
@@ -906,39 +962,91 @@ function getFlag(flag: string): string | undefined {
   return undefined;
 }
 
-const defaultName = process.env.MESH_NAME || `user-${Math.random().toString(36).slice(2, 6)}`;
+const defaultName = process.env.MESH_NAME || getConfigName() || `user-${Math.random().toString(36).slice(2, 6)}`;
+
+// Helper: resolve room from arg or config
+function resolveRoom(argRoom?: string, usage?: string): string {
+  const room = argRoom || getConfigRoom();
+  if (!room) {
+    console.error(usage || `  ${c.red}*${c.reset} No room specified. Use ${c.blue}mesh init${c.reset} to create one or pass a room code.`);
+    process.exit(1);
+  }
+  return room;
+}
+
+// ── Config command ─────────────────────────────────────────────────────────
+async function configCmd() {
+  const sub = args[1];
+  const config = loadConfig();
+
+  switch (sub) {
+    case "show":
+    case undefined: {
+      console.log();
+      console.log(box(
+        [
+          `${c.dim}Room${c.reset}   ${config.defaultRoom || c.dim + "(none)" + c.reset}`,
+          `${c.dim}Name${c.reset}   ${config.defaultName || c.dim + "(none)" + c.reset}`,
+          `${c.dim}API${c.reset}    ${config.apiUrl || API}`,
+          ...(config.rooms ? [``, `${c.dim}Saved rooms:${c.reset}`, ...Object.keys(config.rooms).map(r => `  ${c.blue}${r}${c.reset}`)] : []),
+        ].join("\n"),
+        "Mesh Config"
+      ));
+      console.log(`  ${c.dim}${CONFIG_PATH}${c.reset}`);
+      console.log();
+      break;
+    }
+    case "set": {
+      const key = args[2];
+      const val = args[3];
+      if (!key || !val) { console.error("  Usage: mesh config set <room|name|api> <value>"); process.exit(1); }
+      if (key === "room") config.defaultRoom = val;
+      else if (key === "name") config.defaultName = val;
+      else if (key === "api") config.apiUrl = val;
+      else { console.error(`  Unknown key: ${key}. Use room, name, or api.`); process.exit(1); }
+      saveConfig(config);
+      console.log(`  ${c.green}*${c.reset} Set ${key} = ${val}`);
+      break;
+    }
+    case "reset": {
+      saveConfig({});
+      console.log(`  ${c.green}*${c.reset} Config reset`);
+      break;
+    }
+    default:
+      console.error("  Usage: mesh config [show|set|reset]");
+      process.exit(1);
+  }
+}
 
 (async () => {
   try {
     switch (command) {
       case "join": {
-        const room = args[1];
-        if (!room) { console.error("  Usage: mesh join <room> [--name <name>]"); process.exit(1); }
+        const room = resolveRoom(args[1], "  Usage: mesh join <room> [--name <name>]");
         await join(room, getFlag("--name") || defaultName);
         break;
       }
       case "watch": {
-        const room = args[1];
-        if (!room) { console.error("  Usage: mesh watch <room>"); process.exit(1); }
+        const room = resolveRoom(args[1]);
         await watch(room);
         break;
       }
       case "send": {
-        const room = args[1];
+        const room = resolveRoom(args[1]);
         const message = args[2];
-        if (!room || !message) { console.error("  Usage: mesh send <room> \"message\" [--name <name>]"); process.exit(1); }
+        if (!message) { console.error("  Usage: mesh send <room> \"message\" [--name <name>]"); process.exit(1); }
         await send(room, getFlag("--name") || defaultName, message);
         break;
       }
       case "status": {
-        const room = args[1];
-        if (!room) { console.error("  Usage: mesh status <room>"); process.exit(1); }
+        const room = resolveRoom(args[1]);
         await status(room, getFlag("--name"));
         break;
       }
       case "agent": {
-        const room = args[1];
-        if (!room || room === "--help" || room === "-h") {
+        const room = resolveRoom(args[1]);
+        if (room === "--help" || room === "-h") {
           console.error("  Usage: mesh agent <room> [--name <name>] [--via codex|claude|gemini] [--poll <seconds>] [--cooldown <seconds>] [--reply-all]");
           process.exit(1);
         }
@@ -946,9 +1054,9 @@ const defaultName = process.env.MESH_NAME || `user-${Math.random().toString(36).
         break;
       }
       case "bootstrap": {
-        const room = args[1];
+        const room = resolveRoom(args[1]);
         const tool = (getFlag("--tool") || "codex") as BootstrapTool;
-        if (!room || room === "--help" || room === "-h") {
+        if (room === "--help" || room === "-h") {
           console.error("  Usage: mesh bootstrap <room> [--name <name>] [--tool codex|claude|gemini]");
           process.exit(1);
         }
@@ -964,13 +1072,15 @@ const defaultName = process.env.MESH_NAME || `user-${Math.random().toString(36).
         await init();
         break;
       case "connect": {
-        const room = args[1];
-        if (!room) { console.error("  Usage: mesh connect <room> [--name <name>]"); process.exit(1); }
+        const room = resolveRoom(args[1], "  Usage: mesh connect <room> [--name <name>]");
         await connect(room, getFlag("--name") || defaultName);
         break;
       }
+      case "config":
+        await configCmd();
+        break;
       case "dashboard": {
-        const room = args[1];
+        const room = args[1] || getConfigRoom();
         const url = room ? `${API}/dashboard?room=${room}` : API;
         console.log(`  ${c.blue}*${c.reset} Opening ${url}`);
         const { exec } = await import("child_process");

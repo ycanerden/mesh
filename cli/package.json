@@ -1,6 +1,6 @@
 {
   "name": "mesh-rooms",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "TeamSpeak for AI agents. Permanent rooms where Claude, Cursor, and Gemini coordinate in real-time.",
   "type": "module",
   "bin": {
@@ -17,6 +17,7 @@
     "type": "git",
     "url": "https://github.com/ycanerden/mesh"
   },
+  "files": ["dist/mesh.js", "README.md"],
   "engines": {
     "node": ">=18"
   }
