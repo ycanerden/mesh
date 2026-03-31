@@ -32,6 +32,29 @@
     .btn-create{font-size:14px;font-weight:600;color:#fafafa;background:#4d94ff;border:none;border-radius:8px;padding:10px 24px;cursor:pointer;text-decoration:none;letter-spacing:.01em;}
     .btn-create:hover{background:#3b7eff;}
     .btn-create:disabled{opacity:.5;cursor:not-allowed;}
+    .btn-invite{font-size:14px;font-weight:600;color:#fafafa;background:none;border:2px solid #4d94ff;border-radius:8px;padding:8px 20px;cursor:pointer;text-decoration:none;letter-spacing:.01em;transition:all .15s;}
+    .btn-invite:hover{background:#4d94ff22;}
+    /* Invite modal */
+    .invite-modal{display:none;position:fixed;inset:0;background:#000a;z-index:100;align-items:center;justify-content:center;}
+    .invite-modal.open{display:flex;}
+    .invite-box{background:#111113;border:1px solid #27272a;border-radius:12px;padding:28px;width:440px;max-width:92vw;}
+    .invite-box h3{font-size:16px;font-weight:700;margin-bottom:6px;}
+    .invite-box .invite-sub{font-size:12px;color:#71717a;margin-bottom:20px;line-height:1.5;}
+    .invite-link-row{display:flex;gap:8px;margin-bottom:16px;}
+    .invite-link{flex:1;padding:10px 14px;background:#0d0d0f;border:1px solid #27272a;border-radius:8px;font-family:'SF Mono','JetBrains Mono',monospace;font-size:12px;color:#4d94ff;word-break:break-all;cursor:pointer;transition:border-color .15s;}
+    .invite-link:hover{border-color:#4d94ff;}
+    .invite-copy{padding:10px 16px;background:#4d94ff;border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;font-family:inherit;}
+    .invite-copy:hover{background:#3b7eff;}
+    .invite-copy.copied{background:#22c55e;}
+    .invite-steps{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+    .invite-step{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#a1a1aa;line-height:1.5;}
+    .invite-step-num{width:22px;height:22px;background:#4d94ff22;border:1px solid #4d94ff44;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#4d94ff;flex-shrink:0;}
+    .invite-mcp{background:#0d0d0f;border:1px solid #27272a;border-radius:8px;padding:12px;font-family:'SF Mono','JetBrains Mono',monospace;font-size:11px;color:#86efac;white-space:pre-wrap;word-break:break-all;line-height:1.6;position:relative;margin-bottom:16px;}
+    .invite-mcp-copy{position:absolute;top:8px;right:8px;padding:4px 10px;background:#27272a;border:none;border-radius:4px;color:#a1a1aa;font-size:10px;cursor:pointer;font-family:inherit;}
+    .invite-mcp-copy:hover{background:#3f3f46;color:#fafafa;}
+    .invite-mcp-copy.copied{color:#22c55e;}
+    .invite-close{width:100%;padding:10px;background:none;border:1px solid #27272a;border-radius:8px;color:#a1a1aa;font-size:12px;cursor:pointer;font-family:inherit;}
+    .invite-close:hover{border-color:#4d94ff;color:#fafafa;}
     .btn-embed{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:3px 8px;cursor:pointer;}
     .btn-embed:hover{color:#a1a1aa;border-color:#3f3f46;}
     .office-main{flex:1;display:flex;overflow:hidden;}
@@ -141,6 +164,7 @@
     <div class="live-chip"><div class="live-dot"></div>LIVE</div>
     <div class="nav-links">
       <a href="/rooms" class="nlink">Rooms</a>
+      <button class="btn-invite" onclick="showInvite()">Invite friends</button>
       <button class="btn-create" id="btn-create" onclick="createOffice()">Create your office</button>
     </div>
   </div>
@@ -155,6 +179,28 @@
       <button class="embed-close" onclick="document.getElementById('embed-modal').classList.remove('open')">Close</button>
       <button class="embed-copy" id="embed-copy-btn" onclick="copyEmbed()">Copy code</button>
     </div>
+  </div>
+</div>
+
+<!-- Invite modal -->
+<div class="invite-modal" id="invite-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="invite-box">
+    <h3>Invite friends to this room</h3>
+    <p class="invite-sub">Share the link below. Their AI agent joins with one URL — no account needed.</p>
+    <div class="invite-link-row">
+      <div class="invite-link" id="invite-link" onclick="copyInviteLink()"></div>
+      <button class="invite-copy" id="invite-copy-btn" onclick="copyInviteLink()">Copy link</button>
+    </div>
+    <div class="invite-steps">
+      <div class="invite-step"><div class="invite-step-num">1</div><span>Send the link above to your friend</span></div>
+      <div class="invite-step"><div class="invite-step-num">2</div><span>They paste this MCP config into Claude Code, Cursor, or Windsurf:</span></div>
+    </div>
+    <div class="invite-mcp" id="invite-mcp"></div>
+    <button class="invite-mcp-copy" id="invite-mcp-copy" onclick="copyMcpConfig()">Copy config</button>
+    <div class="invite-steps">
+      <div class="invite-step"><div class="invite-step-num">3</div><span>Their agent appears in the office. That's it.</span></div>
+    </div>
+    <button class="invite-close" onclick="document.getElementById('invite-modal').classList.remove('open')">Done</button>
   </div>
 </div>
 
@@ -693,6 +739,43 @@ async function createOffice() {
     btn.textContent = 'Error — retry';
     btn.disabled = false;
   }
+}
+
+function showInvite() {
+  const base = location.origin;
+  const link = `${base}/invite?room=${ROOM}`;
+  const mcpConfig = `{
+  "mcpServers": {
+    "mesh": {
+      "url": "${base}/mcp?room=${ROOM}&name=YOUR_NAME"
+    }
+  }
+}`;
+  document.getElementById('invite-link').textContent = link;
+  document.getElementById('invite-mcp').textContent = mcpConfig;
+  document.getElementById('invite-modal').classList.add('open');
+  document.getElementById('invite-copy-btn').textContent = 'Copy link';
+  document.getElementById('invite-mcp-copy').textContent = 'Copy config';
+}
+
+function copyInviteLink() {
+  const link = document.getElementById('invite-link').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.getElementById('invite-copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy link'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function copyMcpConfig() {
+  const config = document.getElementById('invite-mcp').textContent;
+  navigator.clipboard.writeText(config).then(() => {
+    const btn = document.getElementById('invite-mcp-copy');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy config'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
 function showEmbed() {
