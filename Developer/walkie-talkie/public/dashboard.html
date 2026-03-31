@@ -15,15 +15,15 @@
       --surface3: #222228;
       --border: #2e2e35;
       --border-light: #3e3e48;
-      --accent: #4d94ff;
-      --accent2: #7ab3ff;
-      --accent-dim: rgba(77,148,255,.06);
+      --accent: #5b6af0;
+      --accent2: #7b87f5;
+      --accent-dim: rgba(91,106,240,.06);
       --green: #34d399;
       --green-dim: rgba(52,211,153,.08);
       --orange: #fb923c;
       --orange-dim: rgba(251,146,60,.08);
       --red: #f87171;
-      --red-dim: rgba(248,113,113,.15);
+      --red-dim: rgba(248,113,113,.08);
       --blue: #60a5fa;
       --blue-dim: rgba(96,165,250,.08);
       --pink: #f472b6;
@@ -38,6 +38,30 @@
       --topbar-h: 52px;
     }
 
+    html.light {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --surface2: #f4f4f5;
+      --surface3: #e4e4e7;
+      --border: #e4e4e7;
+      --border-light: #d4d4d8;
+      --accent: #7c3aed;
+      --accent2: #6d28d9;
+      --accent-dim: rgba(124,58,237,.06);
+      --green: #16a34a;
+      --green-dim: rgba(22,163,74,.08);
+      --orange-dim: rgba(217,119,6,.08);
+      --red-dim: rgba(220,38,38,.08);
+      --blue-dim: rgba(37,99,235,.08);
+      --text: #111111;
+      --text2: #3f3f46;
+      --text3: #71717a;
+      --shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    /* Light mode overrides for legibility */
+    html.light .topbar { border-bottom-color: var(--border); }
+    html.light .msg-content { color: #27272a; }
+    html.light .meta-tag { background: #f4f4f5; color: #52525b; border-color: #e4e4e7; }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -206,16 +230,16 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-2px); }
     }
-    /* Bot 0: Robot (blue) */
+    /* Bot 0: Robot (purple) */
     .bot-0 { box-shadow:
-      3px 0 #4d94ff, 6px 0 #4d94ff, 9px 0 #4d94ff, 12px 0 #4d94ff, 15px 0 #4d94ff,
-      0px 3px #4d94ff, 3px 3px #7ab3ff, 6px 3px #7ab3ff, 9px 3px #7ab3ff, 12px 3px #7ab3ff, 15px 3px #7ab3ff, 18px 3px #4d94ff,
-      0px 6px #4d94ff, 3px 6px #fff, 6px 6px #2563eb, 9px 6px #7ab3ff, 12px 6px #fff, 15px 6px #2563eb, 18px 6px #4d94ff,
-      0px 9px #4d94ff, 3px 9px #7ab3ff, 6px 9px #7ab3ff, 9px 9px #7ab3ff, 12px 9px #7ab3ff, 15px 9px #7ab3ff, 18px 9px #4d94ff,
-      3px 12px #4d94ff, 6px 12px #4d94ff, 9px 12px #7ab3ff, 12px 12px #4d94ff, 15px 12px #4d94ff,
-      3px 15px #4d94ff, 6px 15px #7ab3ff, 9px 15px #7ab3ff, 12px 15px #7ab3ff, 15px 15px #4d94ff,
-      0px 18px #4d94ff, 6px 18px #4d94ff, 12px 18px #4d94ff, 18px 18px #4d94ff,
-      0px 21px #4d94ff, 3px 21px #4d94ff, 12px 21px #4d94ff, 15px 21px #4d94ff;
+      3px 0 #8b5cf6, 6px 0 #8b5cf6, 9px 0 #8b5cf6, 12px 0 #8b5cf6, 15px 0 #8b5cf6,
+      0px 3px #8b5cf6, 3px 3px #a78bfa, 6px 3px #a78bfa, 9px 3px #a78bfa, 12px 3px #a78bfa, 15px 3px #a78bfa, 18px 3px #8b5cf6,
+      0px 6px #8b5cf6, 3px 6px #fff, 6px 6px #1e1b4b, 9px 6px #a78bfa, 12px 6px #fff, 15px 6px #1e1b4b, 18px 6px #8b5cf6,
+      0px 9px #8b5cf6, 3px 9px #a78bfa, 6px 9px #a78bfa, 9px 9px #a78bfa, 12px 9px #a78bfa, 15px 9px #a78bfa, 18px 9px #8b5cf6,
+      3px 12px #8b5cf6, 6px 12px #8b5cf6, 9px 12px #c4b5fd, 12px 12px #8b5cf6, 15px 12px #8b5cf6,
+      3px 15px #8b5cf6, 6px 15px #a78bfa, 9px 15px #a78bfa, 12px 15px #a78bfa, 15px 15px #8b5cf6,
+      0px 18px #8b5cf6, 6px 18px #8b5cf6, 12px 18px #8b5cf6, 18px 18px #8b5cf6,
+      0px 21px #8b5cf6, 3px 21px #8b5cf6, 12px 21px #8b5cf6, 15px 21px #8b5cf6;
     }
     /* Bot 1: Ghost (green) */
     .bot-1 { box-shadow:
@@ -346,56 +370,6 @@
       font-size: 10px; background: var(--accent-dim); color: var(--accent2);
       padding: 1px 7px; border-radius: 10px; font-weight: 700;
     }
-
-    /* Workspace Tab */
-    .workspace-container {
-      padding: 40px;
-      max-width: 800px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-    .workspace-hero {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .workspace-hero h2 { font-size: 24px; margin-bottom: 8px; }
-    .workspace-hero p { color: var(--text2); font-size: 14px; }
-    
-    .workspace-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-    }
-    .workspace-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      transition: all .2s;
-    }
-    .workspace-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .workspace-card-icon { font-size: 32px; }
-    .workspace-card-title { font-size: 16px; font-weight: 600; }
-    .workspace-card-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
-    .workspace-card-btn {
-      margin-top: auto;
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s;
-    }
-    .workspace-card-btn:hover { opacity: .9; }
-
     .tab-panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
     .tab-panel.active { display: flex; }
 
@@ -406,6 +380,12 @@
       background:
         repeating-linear-gradient(90deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 40px),
         repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0,rgba(255,255,255,.012) 1px,transparent 1px,transparent 40px),
+        var(--bg);
+    }
+    html.light .messages-container {
+      background:
+        repeating-linear-gradient(90deg,rgba(0,0,0,.025) 0,rgba(0,0,0,.025) 1px,transparent 1px,transparent 40px),
+        repeating-linear-gradient(0deg,rgba(0,0,0,.025) 0,rgba(0,0,0,.025) 1px,transparent 1px,transparent 40px),
         var(--bg);
     }
     .messages-list { display: flex; flex-direction: column; gap: 8px; }
@@ -443,25 +423,6 @@
     .msg-sender { font-weight: 600; font-size: 12px; color: var(--text); }
     .msg-time { font-size: 10px; color: var(--text2); }
     .msg.self .msg-time { color: rgba(255,255,255,.55); }
-    .msg-admin-actions {
-      display: none;
-      margin-left: auto;
-      gap: 8px;
-      align-items: center;
-    }
-    .msg:hover .msg-admin-actions { display: flex; }
-    .msg-btn {
-      background: none;
-      border: none;
-      color: var(--text3);
-      cursor: pointer;
-      font-size: 11px;
-      padding: 2px 4px;
-      border-radius: 4px;
-      transition: all .2s;
-    }
-    .msg-btn:hover { background: var(--surface); color: var(--red); }
-    .msg-btn.redact:hover { color: var(--orange); }
     .msg-type-badge {
       font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700;
       text-transform: uppercase; letter-spacing: .5px; line-height: 1;
@@ -472,19 +433,19 @@
     .msg-type-badge.direct { background: var(--red-dim); color: var(--red); }
     .msg-type-badge.status { background: var(--blue-dim); color: var(--blue); }
     .msg-type-badge.system { background: var(--surface3); color: var(--text2); }
-    .msg-type-badge.help { background: var(--red-dim); color: var(--red); box-shadow: 0 0 8px var(--red-dim); }
-
-    .msg.help {
-      border: 2px solid var(--red) !important;
-      background: rgba(248,113,113,.05) !important;
-      animation: msg-help-flash 2s infinite !important;
-    }
-    @keyframes msg-help-flash {
-      0%, 100% { border-color: var(--red); box-shadow: 0 0 0px var(--red); }
-      50% { border-color: #ff0000; box-shadow: 0 0 15px rgba(255,0,0,0.3); }
-    }
-
     .msg-body { font-size: 14px; line-height: 1.55; white-space: pre-wrap; }
+    .msg-reactions {
+      display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;
+    }
+    .reaction-pill {
+      display: flex; align-items: center; gap: 4px; padding: 2px 6px;
+      background: var(--surface3); border: 1px solid var(--border);
+      border-radius: 100px; font-size: 11px; cursor: pointer;
+      transition: all .15s;
+    }
+    .reaction-pill:hover { border-color: var(--accent); background: var(--surface); }
+    .reaction-pill.me { border-color: var(--accent); background: var(--accent-dim); }
+    .msg.self .reaction-pill { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
     .msg-reply-ref {
       font-size: 11px; color: var(--text2); border-left: 2px solid var(--accent);
       padding-left: 8px; margin-bottom: 4px; font-style: italic;
@@ -498,6 +459,7 @@
     .msg.dm { border-left: 2px solid var(--accent2); padding-left: 10px; }
     .msg.dm-to-me { border-left-color: var(--orange); background: rgba(251,146,60,.04); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
     .msg.dm-to-me .msg-to { color: var(--orange); font-weight: 600; }
+    .msg-reaction-count { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 10px; }
 
     .date-sep {
       text-align: center; font-size: 11px; color: var(--text2);
@@ -655,44 +617,31 @@
 
     /* ===================== MOBILE ===================== */
     @media (max-width: 860px) {
-      :root { --sidebar-w: 0px; --topbar-h: 56px; }
+      :root { --sidebar-w: 0px; }
       .layout { grid-template-columns: 1fr; }
       .sidebar {
         position: fixed; top: var(--topbar-h); left: 0; bottom: 0;
-        width: 280px; z-index: 150;
+        width: 300px; z-index: 150;
         transform: translateX(-100%);
-        box-shadow: 20px 0 50px rgba(0,0,0,0.5);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow);
       }
       .sidebar.open { transform: translateX(0); }
       .sidebar-overlay {
         display: none; position: fixed; inset: 0; top: var(--topbar-h);
-        background: rgba(0,0,0,.6); z-index: 140;
-        backdrop-filter: blur(4px);
+        background: rgba(0,0,0,.5); z-index: 140;
       }
       .sidebar-overlay.show { display: block; }
-      .mobile-menu-btn { display: flex !important; align-items: center; justify-content: center; }
+      .mobile-menu-btn { display: flex; align-items: center; justify-content: center; }
       .topbar-center { display: none; }
       .meta-tag { display: none; }
       .messages-container { padding: 16px 12px; }
-      .composer { padding: 12px 12px 16px; gap: 6px; }
-      .composer-left { flex-direction: row; width: 100%; justify-content: space-between; }
-      .composer-name { width: calc(50% - 4px); height: 36px; }
-      .composer-type { width: calc(50% - 4px); height: 36px; }
-      .composer-body { width: 100%; order: -1; }
-      .composer-input { min-height: 44px; font-size: 16px; } /* Prevent iOS zoom */
-      .msg { max-width: 92%; padding: 10px 14px; }
+      .composer { padding: 10px 12px 14px; }
+      .composer-left { flex-direction: row; }
+      .composer-name { width: 80px; }
+      .composer-type { width: 90px; }
+      .msg { max-width: 88%; }
       .files-grid, .directory-grid { grid-template-columns: 1fr; padding: 16px 12px; }
-      .main-tabs { padding: 0 8px; gap: 4px; }
-      .main-tab { padding: 12px 14px; font-size: 12px; }
-      .main-tab span { display: block; }
-      
-      #kanban-board {
-        grid-template-columns: 1fr !important;
-        gap: 20px !important;
-      }
-      .workspace-grid { grid-template-columns: 1fr; }
-      .workspace-container { padding: 24px 16px; }
+      .main-tabs { padding: 0 12px; }
     }
 
     /* Collapsible sections */
@@ -700,6 +649,20 @@
     .sidebar-section.collapsed .sidebar-content { display: none !important; }
     .mention { background: rgba(91,106,240,.15); color: var(--accent2); border-radius: 3px; padding: 1px 4px; font-weight: 600; font-size: .9em; }
     .mention-self { background: rgba(91,106,240,.3); color: #fff; }
+
+    /* Reactions — interactive add button (pills defined above) */
+    .reaction-pill.me { border-color: var(--accent); background: var(--accent-dim); }
+    .reaction-add { display: none; background: none; border: 1px dashed var(--border); border-radius: 12px; padding: 2px 8px; font-size: 12px; cursor: pointer; color: var(--text2); font-family: inherit; transition: border-color .15s, color .15s; }
+    .reaction-add:hover { border-color: var(--accent); color: var(--accent2); }
+    .msg:hover .reaction-add { display: inline-flex; align-items: center; }
+
+    /* Autocomplete dropdown */
+    #autocomplete-dropdown { position: fixed; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.4); z-index: 9998; min-width: 180px; max-height: 220px; overflow-y: auto; display: none; }
+    .ac-item { padding: 8px 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+    .ac-item:hover, .ac-item.active { background: var(--accent-dim); color: var(--accent2); }
+    .ac-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .ac-label { font-size: 10px; color: var(--text3); margin-left: auto; }
+
     .sidebar-section.collapsed .sidebar-toggle { transform: rotate(-90deg); }
     .sidebar-toggle { transition: transform 0.2s; font-size: 10px; opacity: 0.5; }
 
@@ -767,30 +730,6 @@
       border-color: var(--accent);
       color: var(--text);
     }
-
-    /* Project progress bar in sidebar */
-    .project-progress-wrap {
-      width: 100%;
-      height: 4px;
-      background: var(--surface3);
-      border-radius: 2px;
-      margin-top: 6px;
-      overflow: hidden;
-    }
-    .project-progress-fill {
-      height: 100%;
-      background: var(--green);
-      transition: width 0.4s ease;
-    }
-    .project-title-sm {
-      font-size: 10px;
-      color: var(--text2);
-      margin-top: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: block;
-    }
   </style>
 </head>
 <body>
@@ -816,18 +755,14 @@
       </div>
       <span class="meta-tag" id="version-tag">v--</span>
       <span class="meta-tag" id="uptime-tag">--</span>
-      <div style="position:relative;" id="pages-menu-wrap">
-        <button onclick="document.getElementById('pages-dropdown').style.display=document.getElementById('pages-dropdown').style.display==='none'?'block':'none'" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Pages ▾</button>
-        <div id="pages-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);min-width:120px;z-index:200;overflow:hidden;">
-          <a href="/?tab=rooms" style="display:block;padding:8px 12px;font-size:12px;color:var(--text2);text-decoration:none;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">Rooms</a>
-          <a href="/team" style="display:block;padding:8px 12px;font-size:12px;color:var(--text2);text-decoration:none;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">Team</a>
-          <a href="/office" style="display:block;padding:8px 12px;font-size:12px;color:var(--text2);text-decoration:none;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">Office</a>
-          <a href="/analytics" style="display:block;padding:8px 12px;font-size:12px;color:var(--text2);text-decoration:none;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background=''">Analytics</a>
-        </div>
-      </div>
-      <button id="notif-btn" onclick="requestNotifPerm()" title="Enable mention notifications" style="display:none;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">Notify</button>
+      <a href="/?tab=rooms" title="Browse and switch workspaces" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Rooms</a>
+      <a href="/team" title="Team roster — agent cards with model badges" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Team</a>
+      <a href="/office" title="Pixel Office" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Office</a>
+      <a href="/analytics" title="Platform analytics — rooms, agents, latency, uptime" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;text-decoration:none;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Analytics</a>
+      <button id="notif-btn" onclick="requestNotifPerm()" title="Enable mention notifications" style="display:none;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">🔔</button>
       <button id="invite-btn" onclick="copyInviteLink()" title="Copy invite link for this room" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;">Invite</button>
       <button onclick="goToSettings()" title="Room settings — privacy, Telegram, admin" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:12px;line-height:1;font-family:inherit;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Settings</button>
+      <button id="theme-btn" onclick="toggleTheme()" title="Toggle light/dark mode" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;cursor:pointer;color:var(--text2);font-size:13px;line-height:1;font-family:inherit;">Light</button>
     </div>
   </div>
 
@@ -917,12 +852,9 @@
           <span>Chat</span>
           <span class="tab-badge" id="chat-badge" style="display:none;">0</span>
         </div>
-        <div class="main-tab" data-tab="summary"><span>Summary</span></div>
         <div class="main-tab" data-tab="tasks"><span>Tasks</span></div>
-        <div class="main-tab" data-tab="files"><span>Files</span></div>
-        <div class="main-tab" data-tab="handoffs"><span>Handoffs</span></div>
-        <div class="main-tab" data-tab="workspace"><span>Workspace</span></div>
-        <div class="main-tab" data-tab="pins"><span>Pins <span class="tab-badge" id="pin-count">0</span></span></div>
+        <div class="main-tab" data-tab="directory"><span>Directory</span></div>
+        <div class="main-tab" data-tab="search"><span>Search</span></div>
       </div>
 
       <!-- Chat panel -->
@@ -939,7 +871,6 @@
               <option value="TASK">Task</option>
               <option value="DIRECT">DM</option>
               <option value="HANDOFF">Handoff</option>
-              <option value="HELP">🆘 Help</option>
             </select>
           </div>
           <div class="composer-body">
@@ -950,13 +881,6 @@
       </div>
 
       <!-- Tasks / Kanban panel -->
-      <!-- Summary panel -->
-      <div class="tab-panel" id="panel-summary">
-        <div id="summary-tab-content" style="padding:16px 20px;overflow-y:auto;flex:1;font-size:13px;color:var(--text2);line-height:1.6;">
-          <div style="color:var(--text3);">Loading summary...</div>
-        </div>
-      </div>
-
       <div class="tab-panel" id="panel-tasks">
         <div style="padding:16px 20px;overflow-y:auto;flex:1;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -990,43 +914,30 @@
         <div class="handoffs-list" id="handoffs-container" style="overflow-y:auto;"></div>
       </div>
 
-      <!-- Workspace panel -->
-      <div class="tab-panel" id="panel-workspace">
-        <div class="workspace-container" style="overflow-y:auto;">
-          <div class="workspace-hero">
-            <h2>Google Workspace</h2>
-            <p>Create documents, slides, and sheets directly in your shared workspace.</p>
-          </div>
-          <div class="workspace-grid">
-            <div class="workspace-card">
-              <div class="workspace-card-icon">📄</div>
-              <div class="workspace-card-title">Google Doc</div>
-              <div class="workspace-card-desc">Start a new document for requirements, notes, or technical specs.</div>
-              <button class="workspace-card-btn" onclick="showWorkspaceModal('doc')">Create Doc</button>
-            </div>
-            <div class="workspace-card">
-              <div class="workspace-card-icon">📊</div>
-              <div class="workspace-card-title">Google Slides</div>
-              <div class="workspace-card-desc">Generate a presentation deck for pitches or status updates.</div>
-              <button class="workspace-card-btn" onclick="showWorkspaceModal('slides')">Create Slides</button>
-            </div>
-            <div class="workspace-card">
-              <div class="workspace-card-icon">📈</div>
-              <div class="workspace-card-title">Google Sheet</div>
-              <div class="workspace-card-desc">Create a spreadsheet for project tracking or data analysis.</div>
-              <button class="workspace-card-btn" onclick="showWorkspaceModal('sheets')">Create Sheet</button>
-            </div>
-          </div>
-          <div id="workspace-results" style="margin-top:32px;"></div>
-        </div>
+      <!-- Directory panel -->
+      <div class="tab-panel" id="panel-directory">
+        <div class="directory-grid" id="directory-container" style="overflow-y:auto;"></div>
       </div>
 
       <!-- Pins panel -->
       <div class="tab-panel" id="panel-pins">
         <div class="pins-list" id="pins-container" style="overflow-y:auto;"></div>
       </div>
+
+      <!-- Search panel -->
+      <div class="tab-panel" id="panel-search">
+        <div style="padding:20px 24px;">
+          <div style="display:flex;gap:10px;margin-bottom:16px;">
+            <input type="text" id="search-input" placeholder="Search messages..." style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-size:14px;font-family:inherit;outline:none;" />
+            <button onclick="doSearch()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 20px;cursor:pointer;font-weight:600;font-size:13px;">Search</button>
+          </div>
+          <div id="search-results" style="overflow-y:auto;max-height:calc(100vh - 200px);"></div>
+        </div>
+      </div>
     </div>
   </div>
+
+<div id="autocomplete-dropdown"></div>
 
 <script>
 (function() {
@@ -1054,30 +965,9 @@
   let activeTab = 'chat';
   let autoScroll = true;
   let sidebarOpen = false;
-
-  // === Admin Mode ===
-  const adminToken = localStorage.getItem('mesh-admin-token') || urlParams.get('token');
-  const isAdmin = !!adminToken;
-
-  async function adminAction(msgId, mode) {
-    if (!isAdmin) return;
-    if (mode === 'delete' && !confirm('Delete this message?')) return;
-    try {
-      const res = await fetch('/api/messages/' + msgId + '?room=' + encodeURIComponent(ROOM) + '&mode=' + mode + '&token=' + encodeURIComponent(adminToken), {
-        method: 'DELETE'
-      });
-      const data = await res.json();
-      if (data.ok) {
-        // Optimistic UI: remove or update local state
-        allMessages = allMessages.filter(m => m.id !== msgId);
-        renderMessages();
-      } else {
-        alert('Admin action failed: ' + (data.error || 'Unknown error'));
-      }
-    } catch (e) {
-      alert('Error: ' + e.message);
-    }
-  }
+  let reactionRenderTimer = null;
+  let reactionCache = {}; // message_id -> [{emoji, count, title}]
+  const reactionLoading = new Set();
 
   // === Color system ===
   const agentColors = {};
@@ -1146,132 +1036,6 @@
   }
   setTimeout(syncDisplayName, 2000);
 
-  // === Google OAuth ===
-  // Env-gated: activated when GOOGLE_CLIENT_ID is set in Railway.
-  // Falls back gracefully to the existing name/email gate when disabled.
-  let googleAuthEnabled = false;
-  let googleClientId = null;
-  let currentGoogleUser = null;
-
-  async function initGoogleAuth() {
-    try {
-      const cfg = await api('/api/auth/config');
-      if (!cfg.google_oauth_enabled) return;
-      googleAuthEnabled = true;
-      googleClientId = cfg.client_id;
-
-      // Check for existing session
-      const existingToken = localStorage.getItem('mesh-google-session');
-      if (existingToken) {
-        try {
-          const meRes = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + existingToken } });
-          if (meRes.ok) {
-            const me = await meRes.json();
-            if (me.ok) {
-              currentGoogleUser = me.user;
-              senderInput.value = me.user.name;
-              localStorage.setItem('mesh-sender-name', me.user.name);
-              localStorage.setItem('mesh-user-seen', '1');
-              renderUserBadge(me.user);
-              return;
-            }
-          }
-        } catch {}
-        localStorage.removeItem('mesh-google-session');
-      }
-
-      // Show sign-in button
-      injectGoogleSignIn();
-    } catch {}
-  }
-
-  function renderUserBadge(user) {
-    const existing = document.getElementById('google-user-badge');
-    if (existing) existing.remove();
-    const badge = document.createElement('div');
-    badge.id = 'google-user-badge';
-    badge.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;';
-    badge.title = 'Click to sign out';
-    badge.innerHTML =
-      (user.picture ? '<img src="' + user.picture + '" style="width:22px;height:22px;border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\'" />' : '') +
-      '<span style="color:var(--text);font-weight:500;">' + esc(user.name) + '</span>';
-    badge.addEventListener('click', googleSignOut);
-    // Insert near sender input
-    const senderWrap = senderInput.closest('div') || senderInput.parentNode;
-    if (senderWrap && senderWrap.parentNode) {
-      senderWrap.parentNode.insertBefore(badge, senderWrap.nextSibling);
-    }
-    // Hide manual sender input when signed in
-    senderInput.style.display = 'none';
-  }
-
-  function injectGoogleSignIn() {
-    if (!googleClientId || document.getElementById('google-gsi-script')) return;
-    const script = document.createElement('script');
-    script.id = 'google-gsi-script';
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = function() {
-      window.google.accounts.id.initialize({
-        client_id: googleClientId,
-        callback: handleGoogleCredential,
-        auto_select: false,
-      });
-      // Render a sign-in button below the sender input
-      const btn = document.createElement('div');
-      btn.id = 'google-signin-btn';
-      btn.style.cssText = 'margin-top:6px;';
-      const senderWrap = senderInput.closest('div') || senderInput.parentNode;
-      if (senderWrap && senderWrap.parentNode) {
-        senderWrap.parentNode.insertBefore(btn, senderWrap.nextSibling);
-      }
-      window.google.accounts.id.renderButton(btn, { theme: 'filled_black', size: 'medium', text: 'signin_with', shape: 'pill' });
-    };
-    document.head.appendChild(script);
-  }
-
-  async function handleGoogleCredential(response) {
-    try {
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_token: response.credential }),
-      });
-      const data = await res.json();
-      if (!data.ok) { console.error('Google auth failed:', data); return; }
-      localStorage.setItem('mesh-google-session', data.session_token);
-      localStorage.setItem('mesh-sender-name', data.user.name);
-      localStorage.setItem('mesh-user-seen', '1');
-      currentGoogleUser = data.user;
-      senderInput.value = data.user.name;
-      document.getElementById('google-signin-btn')?.remove();
-      renderUserBadge(data.user);
-      // If there was a pending send, retry
-      if (window.__pendingGoogleSend) {
-        window.__pendingGoogleSend = false;
-        sendMessage();
-      }
-    } catch (e) { console.error('Google auth error:', e); }
-  }
-
-  async function googleSignOut() {
-    const token = localStorage.getItem('mesh-google-session');
-    if (token) {
-      fetch('/api/auth/logout', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } }).catch(() => {});
-      localStorage.removeItem('mesh-google-session');
-    }
-    currentGoogleUser = null;
-    senderInput.style.display = '';
-    senderInput.value = 'Viewer';
-    localStorage.removeItem('mesh-sender-name');
-    localStorage.removeItem('mesh-user-seen');
-    document.getElementById('google-user-badge')?.remove();
-    injectGoogleSignIn();
-  }
-
-  initGoogleAuth();
-
   // === Init room input ===
   roomInput.value = ROOM;
   roomInput.addEventListener('keydown', function(e) {
@@ -1283,6 +1047,8 @@
         lastMsgHash = '';
         lastMsgTs = 0;
         knownMsgTs = 0;
+        reactionCache = {};
+        reactionLoading.clear();
         presenceMap = {};
         renderMessages();
         renderAgents();
@@ -1308,8 +1074,8 @@
       // Fetch data for tab if needed
       if (name === 'files') fetchFiles();
       if (name === 'handoffs') fetchHandoffs();
+      if (name === 'directory') fetchDirectory();
       if (name === 'pins') fetchPins();
-      if (name === 'summary') buildSummary();
     });
   });
 
@@ -1320,6 +1086,17 @@
     $('sidebar-overlay').classList.toggle('show', sidebarOpen);
   };
 
+  // === Light/Dark mode — default DARK ===
+  const savedTheme = localStorage.getItem('mesh-theme');
+  if (savedTheme === 'light') {
+    document.documentElement.classList.add('light');
+    $('theme-btn').textContent = 'Dark';
+  }
+  window.toggleTheme = function() {
+    const isLight = document.documentElement.classList.toggle('light');
+    $('theme-btn').textContent = isLight ? 'Dark' : 'Light';
+    localStorage.setItem('mesh-theme', isLight ? 'light' : 'dark');
+  };
 
   window.copyInviteLink = function() {
     const link = location.origin + '/invite?room=' + encodeURIComponent(ROOM);
@@ -1330,88 +1107,6 @@
       btn.style.color = 'var(--green)';
       setTimeout(() => { btn.textContent = 'Invite'; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
     });
-  };
-
-  window.showWorkspaceModal = function(type) {
-    const typeNames = { doc: 'Google Doc', slides: 'Google Slides', sheets: 'Google Sheet' };
-    const toolNames = { doc: 'google.create_doc', slides: 'google.create_slides', sheets: 'google.create_sheet' };
-    
-    const modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
-    modal.innerHTML = `
-      <div class="card" style="width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;">
-        <h3 style="margin-bottom:16px;">Create ${typeNames[type]}</h3>
-        <div style="margin-bottom:20px;">
-          <label style="display:block;font-size:12px;color:var(--text2);margin-bottom:6px;">Document Title</label>
-          <input type="text" id="ws-title" placeholder="e.g. Project Plan" style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);outline:none;">
-        </div>
-        <div style="display:flex;gap:10px;">
-          <button id="ws-cancel" style="flex:1;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;">Cancel</button>
-          <button id="ws-submit" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px;font-weight:600;cursor:pointer;">Create</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    
-    const input = modal.querySelector('#ws-title');
-    input.focus();
-    
-    modal.querySelector('#ws-cancel').onclick = () => modal.remove();
-    modal.querySelector('#ws-submit').onclick = async () => {
-      const title = input.value.trim();
-      if (!title) { input.focus(); return; }
-      
-      const btn = modal.querySelector('#ws-submit');
-      const originalText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = 'Creating...';
-      
-      try {
-        const res = await fetch('/api/mcp-invoke', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            room: ROOM,
-            name: $('sender-name').value.trim() || 'User',
-            tool: toolNames[type],
-            arguments: { title }
-          })
-        });
-        const data = await res.json();
-        modal.remove();
-        
-        if (data.isError) {
-          alert('Error: ' + (data.content?.[0]?.text || 'Failed to create document'));
-        } else {
-          const result = JSON.parse(data.content[0].text);
-          if (result.url) {
-            const resultsEl = $('workspace-results');
-            const link = document.createElement('div');
-            link.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;animation:msg-in .2s ease;';
-            link.innerHTML = `
-              <div style="display:flex;align-items:center;gap:12px;">
-                <span style="font-size:20px;">${type === 'doc' ? '📄' : type === 'slides' ? '📊' : '📈'}</span>
-                <div>
-                  <div style="font-size:13px;font-weight:600;">${esc(title)}</div>
-                  <div style="font-size:11px;color:var(--text3);">${typeNames[type]}</div>
-                </div>
-              </div>
-              <a href="${result.url}" target="_blank" style="background:var(--surface3);color:var(--text);text-decoration:none;font-size:12px;padding:6px 12px;border-radius:6px;border:1px solid var(--border);">Open</a>
-            `;
-            resultsEl.prepend(link);
-          }
-        }
-      } catch (e) {
-        btn.disabled = false;
-        btn.textContent = originalText;
-        alert('Network error: ' + e.message);
-      }
-    };
-    
-    input.onkeydown = (e) => {
-      if (e.key === 'Enter') modal.querySelector('#ws-submit').click();
-      if (e.key === 'Escape') modal.remove();
-    };
   };
 
   // === Auto-scroll detection ===
@@ -1641,28 +1336,11 @@
       const bg = isCurrentRoom ? 'var(--accent)' : 'transparent';
       const color = isCurrentRoom ? '#fff' : 'var(--text1)';
       const border = isCurrentRoom ? 'var(--accent)' : 'var(--border)';
-      
-      let projectHtml = '';
-      if (room.mode === 'project') {
-        const total = room.total_deliverables || 0;
-        const done = room.done_deliverables || 0;
-        const percent = total > 0 ? Math.round((done / total) * 100) : 0;
-        projectHtml = `
-          <div class="project-title-sm">${esc(room.project_title || 'Untitled Project')}</div>
-          <div class="project-progress-wrap">
-            <div class="project-progress-fill" style="width: ${percent}%"></div>
-          </div>
-        `;
-      }
-
-      return `<div style="padding:10px 12px;border:1px solid ${border};border-radius:var(--radius-sm);cursor:pointer;font-size:12px;background:${bg};color:${color};transition:all .2s;margin-bottom:6px;"
+      return `<div style="padding:6px 10px;border:1px solid ${border};border-radius:var(--radius-sm);cursor:pointer;font-size:12px;background:${bg};color:${color};transition:all .2s;display:flex;align-items:center;justify-content:space-between;"
               onclick="switchRoom('${room.code}')"
               title="${room.agent_count} agents, ${room.message_count} msgs">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;"># ${room.code}</span>
-          <span style="font-size:10px;opacity:0.5;">${room.agent_count} ag</span>
-        </div>
-        ${projectHtml}
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"># ${room.code}</span>
+        <span style="font-size:10px;opacity:0.5;">${room.agent_count}</span>
       </div>`;
     }).join('');
   }
@@ -1674,12 +1352,6 @@
       const section = document.getElementById('section-' + id);
       if (section) section.classList.toggle('collapsed', isCollapsed);
     });
-  });
-  // Close pages dropdown when clicking outside
-  document.addEventListener('click', function(e) {
-    const wrap = document.getElementById('pages-menu-wrap');
-    const dd = document.getElementById('pages-dropdown');
-    if (wrap && dd && !wrap.contains(e.target)) dd.style.display = 'none';
   });
 
   // === Send heartbeat ===
@@ -1701,75 +1373,17 @@
     });
   }
 
-  function showFirstSendGate(onConfirm) {
-    if (document.getElementById('first-send-modal')) return;
-    const modal = document.createElement('div');
-    modal.id = 'first-send-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
-    modal.innerHTML =
-      '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;max-width:400px;width:90%;">' +
-        '<h2 style="font-size:18px;font-weight:700;margin-bottom:6px;">Who are you?</h2>' +
-        '<p style="color:var(--text2);font-size:14px;margin-bottom:20px;">Enter your name and email to send messages. No spam.</p>' +
-        '<input id="gate-name" type="text" placeholder="Your name" style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;margin-bottom:10px;outline:none;" />' +
-        '<input id="gate-email" type="email" placeholder="Email address (optional)" style="width:100%;padding:11px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;margin-bottom:16px;outline:none;" />' +
-        '<button id="gate-submit" style="width:100%;padding:11px;background:var(--text);color:var(--bg);border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Send message</button>' +
-      '</div>';
-    document.body.appendChild(modal);
-    const nameInput = modal.querySelector('#gate-name');
-    nameInput.focus();
-    modal.querySelector('#gate-submit').addEventListener('click', async function() {
-      const n = modal.querySelector('#gate-name').value.trim();
-      const e = modal.querySelector('#gate-email').value.trim();
-      if (!n) { modal.querySelector('#gate-name').focus(); return; }
-      localStorage.setItem('mesh-sender-name', n);
-      localStorage.setItem('mesh-user-seen', '1');
-      senderInput.value = n;
-      if (e) {
-        localStorage.setItem('mesh-user-email', e);
-        fetch('/api/waitlist', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: e, use_case: 'dashboard' }) }).catch(() => {});
-      }
-      modal.remove();
-      onConfirm(n);
-    });
-    modal.querySelector('#gate-email').addEventListener('keydown', function(ev) {
-      if (ev.key === 'Enter') modal.querySelector('#gate-submit').click();
-    });
-    modal.querySelector('#gate-name').addEventListener('keydown', function(ev) {
-      if (ev.key === 'Enter') modal.querySelector('#gate-email').focus();
-    });
-  }
-
   async function sendMessage() {
     const name = senderInput.value.trim() || VIEWER_DEFAULT;
     const msg = msgInput.value.trim();
     const type = msgTypeSelect.value;
     if (!msg) return;
-
-    // Hard gate: must sign in with Google to send messages
-    if (googleAuthEnabled && !currentGoogleUser) {
-      window.__pendingGoogleSend = true;
-      window.google?.accounts.id.prompt();
-      return;
-    }
-    // Fallback for when Google OAuth is not configured
-    if (!googleAuthEnabled) {
-      const isViewer = name === VIEWER_DEFAULT || name === 'Viewer';
-      const hasSeen = localStorage.getItem('mesh-user-seen');
-      if (isViewer && !hasSeen) {
-        showFirstSendGate(function(confirmedName) {
-          sendMessage();
-        });
-        return;
-      }
-    }
-
-    // Use Google-verified name when signed in (prevent impersonation)
-    const verifiedName = currentGoogleUser ? currentGoogleUser.name : name;
-    localStorage.setItem('mesh-sender-name', verifiedName);
+    // Persist sender name
+    localStorage.setItem('mesh-sender-name', name);
 
     sendBtn.disabled = true;
     const body = { message: msg, type: type };
-    await api('/api/send?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(verifiedName), {
+    await api('/api/send?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -1779,6 +1393,78 @@
     sendBtn.disabled = false;
     sendTyping(false);
     setTimeout(fetchMessages, 400);
+  }
+
+  function getReactionSummary(reactions) {
+    const grouped = {};
+    const myName = (senderInput ? senderInput.value.trim() : '') || VIEWER_DEFAULT;
+    for (const r of reactions) {
+      const emoji = (r && r.emoji) ? String(r.emoji) : '';
+      if (!emoji) continue;
+      if (!grouped[emoji]) grouped[emoji] = { count: 0, names: [], me: false };
+      grouped[emoji].count++;
+      if (r.agent_name) {
+        grouped[emoji].names.push(r.agent_name);
+        if (r.agent_name === myName) grouped[emoji].me = true;
+      }
+    }
+    return Object.entries(grouped)
+      .map(([emoji, data]) => ({
+        emoji,
+        count: data.count,
+        me: data.me,
+        title: data.names.length ? (data.names.join(', ') + ' reacted with ' + emoji) : ''
+      }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  function getReactionsHtml(messageId) {
+    if (!messageId) return '';
+    const summary = reactionCache[messageId];
+    const pills = summary && summary.length ? summary.map(function(r) {
+      const meClass = r.me ? ' me' : '';
+      return '<span class="reaction-pill' + meClass + '" title="' + esc(r.title) + '" onclick="meshToggleReaction(\'' + esc(messageId) + '\',\'' + esc(r.emoji) + '\')">' +
+        '<span>' + esc(r.emoji) + '</span>' +
+        '<span class="msg-reaction-count">' + esc(String(r.count)) + '</span>' +
+      '</span>';
+    }).join('') : '';
+    return '<div class="msg-reactions">' + pills +
+      '<button class="reaction-add" onclick="meshShowEmojiPicker(event,\'' + esc(messageId) + '\')">+</button>' +
+    '</div>';
+  }
+
+  function scheduleReactionRender() {
+    if (reactionRenderTimer) return;
+    reactionRenderTimer = setTimeout(function() {
+      reactionRenderTimer = null;
+      renderMessages();
+    }, 80);
+  }
+
+  function fetchReactionsForMessages(messages) {
+    for (const m of messages) {
+      const messageId = m && m.id;
+      if (!messageId) continue;
+      if (Object.prototype.hasOwnProperty.call(reactionCache, messageId)) continue;
+      if (reactionLoading.has(messageId)) continue;
+      reactionLoading.add(messageId);
+      fetch('/api/reactions/' + encodeURIComponent(messageId))
+        .then(function(r) { return r.ok ? r.json() : null; })
+        .then(function(d) {
+          if (d && d.ok && Array.isArray(d.reactions)) {
+            reactionCache[messageId] = getReactionSummary(d.reactions);
+          } else {
+            reactionCache[messageId] = [];
+          }
+        })
+        .catch(function() {
+          reactionCache[messageId] = [];
+        })
+        .finally(function() {
+          reactionLoading.delete(messageId);
+          scheduleReactionRender();
+        });
+    }
   }
 
   // === Render: Messages ===
@@ -1808,12 +1494,12 @@
       const content = m.content || m.message || '';
       const color = getColor(from);
       const isSystem = type === 'SYSTEM';
-      const isHelp = type === 'HELP';
       const isDM = !!m.to;
       const isDMToMe = isDM && (m.to || '').toLowerCase() === viewerName.toLowerCase();
-      const cssClass = isSystem ? 'system' : (isHelp ? 'help' : (isSelf ? 'self' : 'other'));
+      const cssClass = isSystem ? 'system' : (isSelf ? 'self' : 'other');
       const dmClass = isDM ? ' dm' + (isDMToMe ? ' dm-to-me' : '') : '';
-      html += '<div class="msg ' + cssClass + dmClass + '">';
+
+      html += '<div class="msg ' + cssClass + dmClass + '" data-id="' + esc(m.id || '') + '">';
 
       // Reply reference
       if (m.reply_to) {
@@ -1829,15 +1515,6 @@
         html += '<span class="msg-type-badge ' + esc(typeClass) + '">' + esc(type) + '</span>';
       }
       html += '<span class="msg-time">' + esc(time) + '</span>';
-
-      // Admin actions
-      if (isAdmin && !isSystem) {
-        html += '<div class="msg-admin-actions">';
-        html += '<button class="msg-btn redact" onclick="adminAction(\'' + m.id + '\', \'redact\')" title="Redact content">Redact</button>';
-        html += '<button class="msg-btn delete" onclick="adminAction(\'' + m.id + '\', \'delete\')" title="Delete message">Delete</button>';
-        html += '</div>';
-      }
-
       html += '</div>';
 
       html += '<div class="msg-body">' + formatContent(content, viewerName) + '</div>';
@@ -1845,11 +1522,13 @@
       if (m.to) {
         html += '<div class="msg-to">To: ' + esc(m.to) + '</div>';
       }
+      html += getReactionsHtml(m.id);
 
       html += '</div>';
     }
 
     messagesList.innerHTML = html;
+    fetchReactionsForMessages(allMessages);
 
     if (autoScroll) {
       requestAnimationFrame(function() {
@@ -2169,6 +1848,161 @@
     });
   }
 
+  // === @ mention autocomplete + / slash command picker ===
+  const acDropdown = document.getElementById('autocomplete-dropdown');
+  let acItems = [];
+  let acIndex = -1;
+  let acMode = null; // 'mention' | 'slash'
+  let acTriggerPos = -1;
+
+  const SLASH_COMMANDS = [
+    { name: '/broadcast', label: 'Send to everyone', type: 'BROADCAST' },
+    { name: '/task',      label: 'Assign a task',    type: 'TASK' },
+    { name: '/handoff',   label: 'Handoff to agent', type: 'HANDOFF' },
+    { name: '/status',    label: 'Status update',    type: 'STATUS' },
+    { name: '/decision',  label: 'Log a decision',   type: 'DECISION' },
+  ];
+
+  function acHide() {
+    acDropdown.style.display = 'none';
+    acItems = [];
+    acIndex = -1;
+    acMode = null;
+    acTriggerPos = -1;
+  }
+
+  function acShow(items, label) {
+    if (!items.length) { acHide(); return; }
+    acDropdown.innerHTML = items.map(function(it, i) {
+      return '<div class="ac-item' + (i === acIndex ? ' active' : '') + '" data-idx="' + i + '">' +
+        (acMode === 'mention' ? '<span class="ac-dot"></span>' : '<span style="font-size:12px;opacity:.5">/</span>') +
+        '<span>' + esc(it.name) + '</span>' +
+        (it.label ? '<span class="ac-label">' + esc(it.label) + '</span>' : '') +
+        '</div>';
+    }).join('');
+    // Position above the composer
+    const rect = msgInput.getBoundingClientRect();
+    acDropdown.style.display = 'block';
+    acDropdown.style.left = rect.left + 'px';
+    const dropH = Math.min(items.length * 36 + 8, 220);
+    acDropdown.style.top = (rect.top - dropH - 6) + 'px';
+    acDropdown.style.width = Math.max(rect.width * 0.5, 200) + 'px';
+  }
+
+  function acApply(idx) {
+    if (idx < 0 || idx >= acItems.length) return;
+    const item = acItems[idx];
+    const val = msgInput.value;
+    const before = val.slice(0, acTriggerPos);
+    const after = val.slice(msgInput.selectionStart);
+    if (acMode === 'mention') {
+      msgInput.value = before + '@' + item.name + ' ' + after.replace(/^\S*/, '');
+      const pos = before.length + item.name.length + 2;
+      msgInput.setSelectionRange(pos, pos);
+    } else {
+      msgInput.value = before + item.name + ' ' + after.replace(/^\S*/, '');
+      msgTypeSelect.value = item.type;
+      const pos = before.length + item.name.length + 1;
+      msgInput.setSelectionRange(pos, pos);
+    }
+    acHide();
+    msgInput.focus();
+  }
+
+  msgInput.addEventListener('input', function() {
+    const val = this.value;
+    const cursor = this.selectionStart;
+    // Find last @ or / before cursor
+    let trigPos = -1, mode = null;
+    for (let i = cursor - 1; i >= 0; i--) {
+      if (val[i] === '@') { trigPos = i; mode = 'mention'; break; }
+      if (val[i] === '/') { trigPos = i; mode = 'slash'; break; }
+      if (/\s/.test(val[i])) break;
+    }
+    if (trigPos === -1 || mode === null) { acHide(); return; }
+    const query = val.slice(trigPos + 1, cursor).toLowerCase();
+    acTriggerPos = trigPos;
+    acMode = mode;
+    if (mode === 'mention') {
+      acItems = Object.keys(presenceMap)
+        .filter(function(n) { return n.toLowerCase().startsWith(query); })
+        .slice(0, 8)
+        .map(function(n) { return { name: n, label: presenceMap[n].status || '' }; });
+    } else {
+      acItems = SLASH_COMMANDS.filter(function(c) { return c.name.slice(1).startsWith(query); });
+    }
+    acIndex = acItems.length ? 0 : -1;
+    acShow(acItems, query);
+  });
+
+  msgInput.addEventListener('keydown', function(e) {
+    if (!acItems.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); acIndex = (acIndex + 1) % acItems.length; acShow(acItems); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); acIndex = (acIndex - 1 + acItems.length) % acItems.length; acShow(acItems); }
+    else if (e.key === 'Tab' || (e.key === 'Enter' && acItems.length)) {
+      if (acItems.length) { e.preventDefault(); acApply(acIndex < 0 ? 0 : acIndex); }
+    }
+    else if (e.key === 'Escape') { acHide(); }
+  }, true); // capture so it fires before the send-on-Enter listener
+
+  acDropdown.addEventListener('click', function(e) {
+    const item = e.target.closest('.ac-item');
+    if (!item) return;
+    acApply(Number(item.dataset.idx));
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!acDropdown.contains(e.target) && e.target !== msgInput) acHide();
+  });
+
+  // === Expose reaction helpers to global scope (called from onclick in innerHTML) ===
+  window.meshToggleReaction = async function(messageId, emoji) {
+    const name = senderInput.value.trim() || VIEWER_DEFAULT;
+    const cached = reactionCache[messageId];
+    const existing = cached && cached.find(function(r) { return r.emoji === emoji; });
+    const alreadyMe = existing && existing.me;
+    if (alreadyMe) {
+      await fetch('/api/react?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name) + '&message_id=' + encodeURIComponent(messageId), { method: 'DELETE' });
+    } else {
+      await fetch('/api/react?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message_id: messageId, emoji: emoji }),
+      });
+    }
+    // Invalidate cache and re-fetch
+    delete reactionCache[messageId];
+    reactionLoading.delete(messageId);
+    fetchReactionsForMessages([{ id: messageId }]);
+  };
+
+  const QUICK_EMOJIS = ['👍','👎','❤️','🎉','🚀','😂','🔥','✅','❌','👀'];
+  window.meshShowEmojiPicker = function(e, messageId) {
+    e.stopPropagation();
+    let picker = document.getElementById('mesh-emoji-picker');
+    if (picker && picker.dataset.msgId === messageId) { picker.remove(); return; }
+    if (picker) picker.remove();
+    picker = document.createElement('div');
+    picker.id = 'mesh-emoji-picker';
+    picker.dataset.msgId = messageId;
+    picker.style.cssText = 'position:fixed;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;gap:4px;flex-wrap:wrap;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.5);width:196px;';
+    QUICK_EMOJIS.forEach(function(emoji) {
+      const btn = document.createElement('button');
+      btn.textContent = emoji;
+      btn.title = emoji;
+      btn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:20px;padding:4px 6px;border-radius:4px;transition:background .1s;';
+      btn.onmouseover = function() { btn.style.background = 'var(--accent-dim)'; };
+      btn.onmouseout = function() { btn.style.background = 'none'; };
+      btn.onclick = function(ev) { ev.stopPropagation(); window.meshToggleReaction(messageId, emoji); picker.remove(); };
+      picker.appendChild(btn);
+    });
+    const rect = e.target.getBoundingClientRect();
+    picker.style.left = Math.min(rect.left, window.innerWidth - 210) + 'px';
+    picker.style.top = (rect.top - 90) + 'px';
+    document.body.appendChild(picker);
+    setTimeout(function() { document.addEventListener('click', function rm() { picker.remove(); document.removeEventListener('click', rm); }); }, 0);
+  };
+
 })();
 
 function goToSettings() {
@@ -2409,74 +2243,6 @@ function showConnectModal() {
       '<button onclick="this.closest(\'#connect-modal\').remove()" style="margin-top:20px;width:100%;padding:10px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer;">Close</button>' +
     '</div>';
   document.body.appendChild(modal);
-}
-
-// ── Executive Summary (tab-based, built from already-fetched messages) ─────
-function buildSummary() {
-  var el = document.getElementById('summary-tab-content');
-  if (!el) return;
-  var now = Date.now();
-  var hourAgo = now - 3600000;
-  var recent = allMessages.filter(function(m) { return m.ts >= hourAgo; });
-  var skip = ['GitHub','system','Pulse','Scout','Archie','office-viewer','demo-viewer','team-viewer','Viewer'];
-  var agentMsgs = recent.filter(function(m) { return skip.indexOf(m.from) === -1 && m.type !== 'SYSTEM'; });
-  var deploys = recent.filter(function(m) { return m.from === 'GitHub'; });
-  var agents = [];
-  agentMsgs.forEach(function(m) { if (agents.indexOf(m.from) === -1) agents.push(m.from); });
-
-  var shipped = agentMsgs.filter(function(m) {
-    var c = m.content.toLowerCase();
-    return c.indexOf('shipped') >= 0 || c.indexOf('done') >= 0 || c.indexOf('deployed') >= 0 || c.indexOf('live at') >= 0 || c.indexOf('completed') >= 0;
-  });
-  var decisions = agentMsgs.filter(function(m) {
-    var c = m.content.toLowerCase();
-    return c.indexOf('@can') >= 0 || c.indexOf('needs decision') >= 0 || c.indexOf('blocked') >= 0 || c.indexOf('waiting on can') >= 0;
-  });
-  var inProgress = agentMsgs.filter(function(m) {
-    var c = m.content.toLowerCase();
-    return (c.indexOf('taking') >= 0 || c.indexOf('working on') >= 0 || c.indexOf('picking up') >= 0 || c.indexOf('building') >= 0) && c.indexOf('shipped') < 0 && c.indexOf('done') < 0;
-  });
-
-  var html = '';
-  // Stats row
-  html += '<div style="display:flex;gap:16px;margin-bottom:20px;">';
-  html += '<div><span style="font-size:20px;font-weight:800;color:var(--text);">' + agentMsgs.length + '</span> <span style="font-size:11px;color:var(--text3);">messages</span></div>';
-  html += '<div><span style="font-size:20px;font-weight:800;color:var(--text);">' + deploys.length + '</span> <span style="font-size:11px;color:var(--text3);">deploys</span></div>';
-  html += '<div><span style="font-size:20px;font-weight:800;color:var(--text);">' + agents.length + '</span> <span style="font-size:11px;color:var(--text3);">agents</span></div>';
-  html += '</div>';
-
-  // Decisions
-  if (decisions.length > 0) {
-    html += '<div style="font-size:11px;font-weight:700;color:var(--orange);letter-spacing:.5px;margin-bottom:6px;">NEEDS YOUR DECISION</div>';
-    decisions.slice(0, 5).forEach(function(m) {
-      html += '<div style="background:var(--orange-dim);border-radius:6px;padding:8px 10px;margin-bottom:5px;font-size:12px;"><strong>' + esc(m.from) + '</strong> ' + esc(m.content.slice(0, 150)) + '</div>';
-    });
-    html += '<div style="height:10px;"></div>';
-  }
-
-  // Shipped
-  if (shipped.length > 0) {
-    html += '<div style="font-size:11px;font-weight:700;color:var(--green);letter-spacing:.5px;margin-bottom:6px;">SHIPPED</div>';
-    shipped.slice(0, 8).forEach(function(m) {
-      html += '<div style="border-left:2px solid var(--green);padding:3px 10px;margin-bottom:4px;font-size:12px;"><strong>' + esc(m.from) + '</strong> ' + esc(m.content.slice(0, 120)) + '</div>';
-    });
-    html += '<div style="height:10px;"></div>';
-  }
-
-  // In progress
-  if (inProgress.length > 0) {
-    html += '<div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:.5px;margin-bottom:6px;">IN PROGRESS</div>';
-    inProgress.slice(0, 6).forEach(function(m) {
-      html += '<div style="border-left:2px solid var(--blue);padding:3px 10px;margin-bottom:4px;font-size:12px;"><strong>' + esc(m.from) + '</strong> ' + esc(m.content.slice(0, 120)) + '</div>';
-    });
-  }
-
-  if (!shipped.length && !inProgress.length && !decisions.length) {
-    html += '<div style="color:var(--text3);text-align:center;padding:30px 0;">No key activity in the last hour.</div>';
-  }
-
-  html += '<div style="margin-top:16px;font-size:10px;color:var(--text3);">Last hour. Updates when you switch to this tab.</div>';
-  el.innerHTML = html;
 }
 </script>
 </body>
