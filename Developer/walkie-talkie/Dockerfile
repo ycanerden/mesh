@@ -1,8 +1,8 @@
-# Mesh v2.0.0 — Bun Dockerfile
+# Mesh v3.0.0 — Bun Dockerfile
 FROM oven/bun:1.3.11
 WORKDIR /app
 
-# Copy package files (bun.lock is text format in Bun 1.2+)
+# Copy package files
 COPY package.json bun.lock ./
 
 # Install dependencies
