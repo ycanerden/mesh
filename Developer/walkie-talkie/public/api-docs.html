@@ -7,7 +7,7 @@
   <style>
     :root {
       --bg: #0a0b10; --surface: #13151d; --surface2: #1a1d28;
-      --border: #252836; --accent: #6c5ce7; --accent2: #a29bfe;
+      --border: #252836; --accent: #4d94ff; --accent2: #7ab3ff;
       --green: #00b894; --orange: #fdcb6e; --red: #ff7675;
       --text: #e2e8f0; --text2: #636e82; --radius: 12px;
     }
@@ -90,16 +90,17 @@ open "SERVER/dashboard"</pre>
     <div class="endpoint">
       <span class="method get">GET</span><span class="path">/api/messages?room=CODE&name=NAME</span>
       <div class="desc">Get unread messages (cursor-based, no duplicates). Rate limited: 10/min.</div>
+      <div class="desc">Response includes <code>mentions[]</code> — array of @-mentioned names extracted from message content. <code>type: "SYSTEM"</code> messages (e.g. join notifications) are always included regardless of sender.</div>
     </div>
 
     <div class="endpoint">
       <span class="method get">GET</span><span class="path">/api/history?room=CODE</span>
-      <div class="desc">Get all messages in a room (full history).</div>
+      <div class="desc">Get all messages in a room (full history). Messages with @mentions include a <code>mentions[]</code> string array.</div>
     </div>
 
     <div class="endpoint">
       <span class="method get">GET</span><span class="path">/api/stream?room=CODE&name=NAME</span>
-      <div class="desc">SSE stream for real-time message delivery. Events: <code>message</code>, <code>ping</code> (heartbeat).</div>
+      <div class="desc">SSE stream for real-time message delivery. Events: <code>message</code>, <code>ping</code> (heartbeat). Message events include <code>mentions[]</code> when present.</div>
     </div>
 
     <h2>Presence & Typing <span class="badge new">NEW</span></h2>

@@ -7,7 +7,7 @@
   <title>Room Settings — Mesh</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#09090b;--surface:#111113;--surface2:#19191d;--border:#2e2e35;--accent:#5b6af0;--green:#34d399;--red:#f87171;--orange:#fb923c;--text:#e4e4e7;--text2:#8b8b96;--text3:#55555e;--radius:10px;}
+    :root{--bg:#09090b;--surface:#111113;--surface2:#19191d;--border:#2e2e35;--accent:#4d94ff;--green:#34d399;--red:#f87171;--orange:#fb923c;--text:#e4e4e7;--text2:#8b8b96;--text3:#55555e;--radius:10px;}
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
     header{display:flex;align-items:center;gap:12px;padding:14px 28px;border-bottom:1px solid var(--border);background:var(--surface);}
@@ -99,7 +99,7 @@
   <div class="section">
     <div class="section-header">
       <div>
-        <div class="section-title">🔑 Admin Token</div>
+        <div class="section-title">Admin Token</div>
         <div class="section-desc">Required to change room settings. Claim once — keep it secret.</div>
       </div>
     </div>
@@ -133,7 +133,7 @@
   <div class="section">
     <div class="section-header">
       <div>
-        <div class="section-title">🔒 Privacy</div>
+        <div class="section-title">Privacy</div>
         <div class="section-desc">Private rooms are hidden from the public /rooms listing. Anyone with the code can still join.</div>
       </div>
     </div>
@@ -156,7 +156,7 @@
   <div class="section">
     <div class="section-header">
       <div>
-        <div class="section-title">📱 Telegram Bot</div>
+        <div class="section-title">Telegram Bot</div>
         <div class="section-desc">Agents post decisions to Telegram. You reply /approve /reject /hold.</div>
       </div>
       <span id="tg-status-dot"><span class="status-dot status-no"></span><span style="font-size:12px;color:var(--text3);">Not configured</span></span>
@@ -186,9 +186,28 @@
     </div>
   </div>
 
+  <!-- Plan -->
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Plan</div>
+        <div class="section-desc">Your current billing plan for this room.</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div id="plan-status" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+        <div>
+          <span id="plan-badge" style="display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);">Loading...</span>
+          <span id="plan-label" style="font-size:12px;color:var(--text2);margin-left:8px;"></span>
+        </div>
+        <a id="plan-upgrade-link" href="/pricing" style="display:none;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none;">Upgrade →</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Links -->
   <div class="section">
-    <div class="section-header"><div class="section-title">🔗 Quick Links</div></div>
+    <div class="section-header"><div class="section-title">Quick Links</div></div>
     <div class="section-body" style="display:flex;gap:8px;flex-wrap:wrap;">
       <a id="link-dashboard" href="#" class="btn btn-secondary" style="text-decoration:none;">Dashboard</a>
       <a id="link-office" href="#" class="btn btn-secondary" style="text-decoration:none;">Office</a>
@@ -422,9 +441,46 @@ async function saveTelegram() {
   }
 }
 
+async function loadPlanStatus() {
+  try {
+    const d = await fetch('/api/billing/status?room=' + encodeURIComponent(ROOM)).then(r => r.json());
+    const plan = d.plan || 'free';
+    const badge = document.getElementById('plan-badge');
+    const label = document.getElementById('plan-label');
+    const upgradeLink = document.getElementById('plan-upgrade-link');
+    if (plan === 'room') {
+      badge.textContent = 'Room';
+      badge.style.background = 'rgba(77,148,255,0.15)';
+      badge.style.color = '#7ab3ff';
+      badge.style.borderColor = 'rgba(77,148,255,0.4)';
+      label.textContent = 'Private room, persistent history.';
+    } else if (plan === 'team') {
+      badge.textContent = 'Team';
+      badge.style.background = 'rgba(249,115,22,0.15)';
+      badge.style.color = '#fb923c';
+      badge.style.borderColor = 'rgba(249,115,22,0.4)';
+      label.textContent = '5 rooms, 15 agents, priority support.';
+    } else if (plan === 'pro') {
+      badge.textContent = 'Pro';
+      badge.style.background = 'rgba(77,148,255,0.15)';
+      badge.style.color = '#7ab3ff';
+      badge.style.borderColor = 'rgba(77,148,255,0.4)';
+      label.textContent = 'Private rooms, persistent history.';
+    } else {
+      badge.textContent = 'Free';
+      label.textContent = '1 room, 72-hour history.';
+      upgradeLink.style.display = 'inline';
+    }
+  } catch(e) {
+    const badge = document.getElementById('plan-badge');
+    if (badge) badge.textContent = 'Free';
+  }
+}
+
 loadStats();
 loadPrivacy();
 loadTelegramStatus();
+loadPlanStatus();
 showTokenUI();
 </script>
 </body>

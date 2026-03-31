@@ -1,13 +1,20 @@
+
 import { Database } from "bun:sqlite";
 import { EventEmitter } from "events";
 import LZString from "lz-string";
+import crypto from "node:crypto";
 
 // Persistent SQLite store using Bun's native driver
 // Uses /app/data/ volume on Railway for persistence across deploys
 import { existsSync, mkdirSync } from "node:fs";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function generateSecureToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
 const DB_DIR = process.env.NODE_ENV === "production" ? "/app/data" : ".";
 if (DB_DIR !== "." && !existsSync(DB_DIR)) mkdirSync(DB_DIR, { recursive: true });
-const db = new Database(`${DB_DIR}/mesh.db`, { create: true });
+export const db = new Database(`${DB_DIR}/mesh.db`, { create: true });
 
 // Event emitter for real-time updates (SSE)
 export const messageEvents = new EventEmitter();
@@ -20,8 +27,9 @@ function seedDefaultRooms() {
   for (const code of DEFAULT_ROOMS) {
     const exists = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
     if (!exists) {
-      db.prepare("INSERT INTO rooms (code, last_activity) VALUES (?, ?)").run(code, Date.now());
-      console.log(`[seed] Created default room: ${code}`);
+      const token = generateSecureToken();
+      db.prepare("INSERT INTO rooms (code, last_activity, admin_token, is_demo) VALUES (?, ?, ?, ?)").run(code, Date.now(), token, 0);
+      console.log(`[seed] Created default room: ${code} admin_token=***REDACTED***`);
     }
   }
 }
@@ -31,7 +39,8 @@ function seedDefaultRooms() {
 db.run(`
   CREATE TABLE IF NOT EXISTS rooms (
     code TEXT PRIMARY KEY,
-    last_activity INTEGER
+    last_activity INTEGER,
+    is_demo INTEGER DEFAULT 0
   );
 `);
 
@@ -41,7 +50,32 @@ try { db.run("ALTER TABLE rooms ADD COLUMN read_only INTEGER DEFAULT 0;"); } cat
 try { db.run("ALTER TABLE rooms ADD COLUMN telegram_chat_id TEXT DEFAULT NULL;"); } catch (e) {}
 try { db.run("ALTER TABLE rooms ADD COLUMN telegram_token TEXT DEFAULT NULL;"); } catch (e) {}
 try { db.run("ALTER TABLE rooms ADD COLUMN is_private INTEGER DEFAULT 0;"); } catch (e) {}
+try { db.run("ALTER TABLE rooms ADD COLUMN is_demo INTEGER DEFAULT 0;"); } catch (e) {}
 try { db.run("ALTER TABLE rooms ADD COLUMN room_password_hash TEXT DEFAULT NULL;"); } catch (e) {}
+
+// Migration: backfill admin tokens for rooms that were created without one
+{
+  const rows = db.prepare("SELECT code FROM rooms WHERE admin_token IS NULL OR admin_token = ''").all() as { code: string }[];
+  for (const row of rows) {
+    const token = generateSecureToken();
+    db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, row.code);
+    console.log(`[migration] Set admin token for room ${row.code}: ***REDACTED***`);
+  }
+}
+
+// Admin room password — read from env var, never from code
+// Set via: railway variables set ADMIN_ROOM_PASSWORD="xxx" --service p2p
+{
+  const adminPassword = process.env.ADMIN_ROOM_PASSWORD;
+  if (adminPassword) {
+    for (const code of DEFAULT_ROOMS) {
+      const current = db.prepare("SELECT room_password_hash FROM rooms WHERE code = ?").get(code) as any;
+      // Always re-set from env var on startup (in case password was rotated)
+      setRoomPassword(code, adminPassword);
+      console.log(`[security] Room ${code} password set from ADMIN_ROOM_PASSWORD env var`);
+    }
+  }
+}
 
 // Whitelist: only these agent names can send messages (empty = everyone allowed)
 db.run(`CREATE TABLE IF NOT EXISTS room_whitelist (
@@ -49,6 +83,16 @@ db.run(`CREATE TABLE IF NOT EXISTS room_whitelist (
   agent_name TEXT,
   PRIMARY KEY(room_code, agent_name)
 );`);
+
+// Migration: clear whitelist for default rooms so all agents can join
+// TODO: remove once proper invite system is in place
+for (const code of DEFAULT_ROOMS) {
+  const count = (db.prepare("SELECT COUNT(*) as n FROM room_whitelist WHERE room_code = ?").get(code) as any)?.n;
+  if (count > 0) {
+    db.prepare("DELETE FROM room_whitelist WHERE room_code = ?").run(code);
+    console.log(`[migration] Cleared whitelist for room ${code} (had ${count} entries)`);
+  }
+}
 
 // Kicked/banned agents
 db.run(`CREATE TABLE IF NOT EXISTS room_banned (
@@ -211,6 +255,201 @@ db.run(`CREATE TABLE IF NOT EXISTS agent_personalities (
 try { db.run("ALTER TABLE agent_personalities ADD COLUMN model TEXT DEFAULT '';"); } catch(e) {}
 try { db.run("ALTER TABLE agent_personalities ADD COLUMN tool TEXT DEFAULT '';"); } catch(e) {}
 
+// ── Google OAuth identity ─────────────────────────────────────────────────────
+// Activated when GOOGLE_CLIENT_ID env var is set in Railway
+db.run(`CREATE TABLE IF NOT EXISTS google_accounts (
+  google_id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  picture TEXT DEFAULT '',
+  created_at INTEGER NOT NULL,
+  last_seen INTEGER NOT NULL
+);`);
+
+db.run(`CREATE TABLE IF NOT EXISTS google_sessions (
+  token TEXT PRIMARY KEY,
+  google_id TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  expires_at INTEGER NOT NULL,
+  FOREIGN KEY(google_id) REFERENCES google_accounts(google_id)
+);`);
+
+try { db.run("CREATE INDEX IF NOT EXISTS idx_sessions_google_id ON google_sessions(google_id);"); } catch(e) {}
+
+export interface GoogleAccount {
+  google_id: string;
+  email: string;
+  name: string;
+  picture: string;
+  created_at: number;
+  last_seen: number;
+}
+
+// Upsert a Google account after token verification
+export function upsertGoogleAccount(account: Omit<GoogleAccount, 'created_at' | 'last_seen'>): GoogleAccount {
+  const now = Date.now();
+  db.prepare(`
+    INSERT INTO google_accounts (google_id, email, name, picture, created_at, last_seen)
+    VALUES (?, ?, ?, ?, ?, ?)
+    ON CONFLICT(google_id) DO UPDATE SET
+      email=excluded.email, name=excluded.name, picture=excluded.picture, last_seen=excluded.last_seen
+  `).run(account.google_id, account.email, account.name, account.picture, now, now);
+  return db.prepare("SELECT * FROM google_accounts WHERE google_id = ?").get(account.google_id) as GoogleAccount;
+}
+
+// Create a 30-day session token for an authenticated Google account
+export function createGoogleSession(google_id: string): string {
+  const token = generateSecureToken();
+  const now = Date.now();
+  const expires = now + 30 * 24 * 60 * 60 * 1000; // 30 days
+  db.prepare("INSERT INTO google_sessions (token, google_id, created_at, expires_at) VALUES (?, ?, ?, ?)")
+    .run(token, google_id, now, expires);
+  return token;
+}
+
+// Validate a session token — returns the account or null if invalid/expired
+export function getAccountBySession(token: string): GoogleAccount | null {
+  const session = db.prepare(
+    "SELECT s.*, a.* FROM google_sessions s JOIN google_accounts a ON s.google_id = a.google_id WHERE s.token = ? AND s.expires_at > ?"
+  ).get(token, Date.now()) as any;
+  if (!session) return null;
+  return {
+    google_id: session.google_id,
+    email: session.email,
+    name: session.name,
+    picture: session.picture,
+    created_at: session.created_at,
+    last_seen: session.last_seen,
+  };
+}
+
+// Invalidate a session
+export function deleteGoogleSession(token: string): void {
+  db.prepare("DELETE FROM google_sessions WHERE token = ?").run(token);
+}
+
+// Clean up expired sessions (call periodically)
+export function cleanExpiredSessions(): void {
+  db.prepare("DELETE FROM google_sessions WHERE expires_at < ?").run(Date.now());
+}
+
+// ── Stripe subscriptions ──────────────────────────────────────────────────────
+// Activated when STRIPE_WEBHOOK_SECRET env var is set.
+db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  stripe_subscription_id TEXT UNIQUE,
+  stripe_customer_id TEXT NOT NULL,
+  email TEXT NOT NULL,
+  plan TEXT NOT NULL DEFAULT 'pro',
+  status TEXT NOT NULL DEFAULT 'active',
+  room_code TEXT,
+  created_at INTEGER NOT NULL,
+  current_period_end INTEGER
+);`);
+
+try { db.run("CREATE INDEX IF NOT EXISTS idx_sub_email ON subscriptions(email);"); } catch(e) {}
+try { db.run("CREATE INDEX IF NOT EXISTS idx_sub_customer ON subscriptions(stripe_customer_id);"); } catch(e) {}
+try { db.run("ALTER TABLE subscriptions ADD COLUMN room_password TEXT DEFAULT NULL;"); } catch(e) {}
+
+export interface Subscription {
+  id: number;
+  stripe_subscription_id: string | null;
+  stripe_customer_id: string;
+  email: string;
+  plan: string;
+  status: string;
+  room_code: string | null;
+  created_at: number;
+  current_period_end: number | null;
+}
+
+export function upsertSubscription(sub: Omit<Subscription, 'id' | 'created_at'> & { room_password?: string | null }): void {
+  db.prepare(`
+    INSERT INTO subscriptions (stripe_subscription_id, stripe_customer_id, email, plan, status, room_code, created_at, current_period_end, room_password)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(stripe_subscription_id) DO UPDATE SET
+      status=excluded.status, current_period_end=excluded.current_period_end,
+      room_code=excluded.room_code, email=excluded.email, room_password=excluded.room_password
+  `).run(sub.stripe_subscription_id, sub.stripe_customer_id, sub.email, sub.plan, sub.status, sub.room_code, Date.now(), sub.current_period_end ?? null, sub.room_password ?? null);
+}
+
+export function getSubscriptionByEmail(email: string): Subscription | null {
+  return db.prepare(
+    "SELECT * FROM subscriptions WHERE email = ? AND status = 'active' ORDER BY created_at DESC LIMIT 1"
+  ).get(email) as Subscription | null;
+}
+
+export function getSubscriptionByRoom(roomCode: string): Subscription | null {
+  return db.prepare(
+    "SELECT * FROM subscriptions WHERE room_code = ? AND status = 'active' ORDER BY created_at DESC LIMIT 1"
+  ).get(roomCode) as Subscription | null;
+}
+
+export function cancelSubscription(stripeSubscriptionId: string): void {
+  db.prepare("UPDATE subscriptions SET status = 'cancelled' WHERE stripe_subscription_id = ?").run(stripeSubscriptionId);
+}
+
+export function getSubscriptionStats(): { total: number; active: number; pro: number; team: number } {
+  const total = (db.prepare("SELECT COUNT(*) as n FROM subscriptions").get() as any).n;
+  const active = (db.prepare("SELECT COUNT(*) as n FROM subscriptions WHERE status = 'active'").get() as any).n;
+  const pro = (db.prepare("SELECT COUNT(*) as n FROM subscriptions WHERE status = 'active' AND plan = 'pro'").get() as any).n;
+  const team = (db.prepare("SELECT COUNT(*) as n FROM subscriptions WHERE status = 'active' AND plan = 'team'").get() as any).n;
+  return { total, active, pro, team };
+}
+
+// ── Paid room provisioning ────────────────────────────────────────────────────
+export function provisionPaidRoom(
+  email: string,
+  plan: string,
+  roomCode?: string | null
+): { room_code: string; admin_token: string; password: string } {
+  // Create room if none specified, or use existing
+  let code: string;
+  let adminToken: string;
+
+  if (roomCode) {
+    // Use the room they specified at checkout
+    const existing = db.prepare("SELECT admin_token FROM rooms WHERE code = ?").get(roomCode) as any;
+    if (existing) {
+      code = roomCode;
+      adminToken = existing.admin_token || generateSecureToken();
+      if (!existing.admin_token) {
+        db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(adminToken, code);
+      }
+    } else {
+      // Room doesn't exist, create it
+      const room = createRoom(false);
+      code = room.code;
+      adminToken = room.admin_token;
+    }
+  } else {
+    // No room specified, create a new one
+    const room = createRoom(false);
+    code = room.code;
+    adminToken = room.admin_token;
+  }
+
+  // Make room private with a generated password
+  const password = crypto.randomBytes(4).toString("hex"); // 8-char hex password
+  setRoomPassword(code, password);
+
+  // Set agent limits based on plan
+  const agentLimit = plan === "team" ? 50 : 20;
+  try {
+    db.prepare("ALTER TABLE rooms ADD COLUMN agent_limit INTEGER DEFAULT 0;").run();
+  } catch (e) {} // column may already exist
+  db.prepare("UPDATE rooms SET agent_limit = ? WHERE code = ?").run(agentLimit, code);
+
+  // Send welcome message
+  appendMessage(code, "system",
+    `Room activated — ${plan} plan (${email}). Private room with password protection. ${agentLimit} agent slots available.`,
+    undefined, "SYSTEM"
+  );
+
+  console.log(`[billing] Provisioned ${plan} room ${code} for ${email} (password: ${password.slice(0, 2)}***)`);
+  return { room_code: code, admin_token: adminToken, password };
+}
+
 // ── Message reactions ─────────────────────────────────────────────────────────
 db.run(`
   CREATE TABLE IF NOT EXISTS reactions (
@@ -229,10 +468,91 @@ export interface Message {
   ts: number;
   content: string;
   type?: string;
+  reply_to?: string;
+  reactions?: { agent_name: string; emoji: string }[];
 }
 
 const MAX_MESSAGE_BYTES = 10 * 1024; // 10KB
 const ROOM_TTL_MS = 72 * 60 * 60 * 1000; // 72h
+
+// ── Task Assignments ─────────────────────────────────────────────────────────
+db.run(`
+  CREATE TABLE IF NOT EXISTS room_assignments (
+    task_id TEXT PRIMARY KEY,
+    room_code TEXT NOT NULL,
+    agent_name TEXT NOT NULL,
+    task_title TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    note TEXT,
+    assigned_at INTEGER NOT NULL,
+    updated_at INTEGER,
+    due_date INTEGER,
+    FOREIGN KEY(room_code) REFERENCES rooms(code)
+  );
+`);
+
+try { db.run("CREATE INDEX IF NOT EXISTS idx_assignments_room ON room_assignments(room_code);"); } catch (e) {}
+try { db.run("CREATE INDEX IF NOT EXISTS idx_assignments_agent ON room_assignments(agent_name);"); } catch (e) {}
+
+export interface TaskAssignment {
+  task_id: string;
+  room_code: string;
+  agent_name: string;
+  task_title: string;
+  status: 'pending' | 'in_progress' | 'done' | 'blocked';
+  note?: string;
+  assigned_at: number;
+  updated_at?: number;
+  due_date?: number;
+}
+
+export function assignTask(
+  roomCode: string,
+  agentName: string,
+  taskTitle: string,
+  dueDate?: number
+): TaskAssignment {
+  const taskId = `task_${crypto.randomBytes(6).toString('hex')}`;
+  const now = Date.now();
+  db.prepare(`
+    INSERT INTO room_assignments (task_id, room_code, agent_name, task_title, assigned_at, due_date)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(taskId, roomCode, agentName, taskTitle, now, dueDate || null);
+
+  appendMessage(roomCode, 'system', `TASK ASSIGNED to @agent:${agentName}: ${taskTitle}`, agentName, 'TASK');
+
+  return { task_id: taskId, room_code: roomCode, agent_name: agentName, task_title: taskTitle, status: 'pending', assigned_at: now, due_date: dueDate };
+}
+
+export function updateTaskStatus(
+  roomCode: string,
+  agentName: string,
+  taskId: string,
+  status: 'in_progress' | 'done' | 'blocked',
+  note?: string
+): void {
+  db.prepare(
+    "UPDATE room_assignments SET status = ?, note = ?, updated_at = ? WHERE task_id = ? AND room_code = ?"
+  ).run(status, note || null, Date.now(), taskId, roomCode);
+  
+  const task = db.prepare("SELECT task_title FROM room_assignments WHERE task_id = ?").get(taskId) as { task_title: string };
+  if (task) {
+    const statusEmoji = { done: '✅', in_progress: '⏳', blocked: '🛑' }[status];
+    appendMessage(roomCode, 'system', `${statusEmoji} TASK UPDATE by @agent:${agentName}: ${task.task_title} → ${status.toUpperCase()}`, undefined, 'TASK');
+  }
+}
+
+export function getRoomTasks(roomCode: string): TaskAssignment[] {
+  return db
+    .prepare("SELECT * FROM room_assignments WHERE room_code = ? ORDER BY assigned_at DESC")
+    .all(roomCode) as TaskAssignment[];
+}
+
+export function getAgentTasks(agentName: string): TaskAssignment[] {
+  return db
+    .prepare("SELECT * FROM room_assignments WHERE agent_name = ? ORDER BY assigned_at DESC")
+    .all(agentName) as TaskAssignment[];
+}
 
 // ── Room management ──────────────────────────────────────────────────────────
 
@@ -241,13 +561,13 @@ const ROOM_TTL_MS = 72 * 60 * 60 * 1000; // 72h
 export function ensureRoom(code: string): void {
   const exists = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!exists) {
-    const token = crypto.randomUUID();
-    db.prepare("INSERT OR IGNORE INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)").run(code, Date.now(), token);
+    const token = generateSecureToken();
+    db.prepare("INSERT OR IGNORE INTO rooms (code, last_activity, admin_token, is_demo) VALUES (?, ?, ?, ?)").run(code, Date.now(), token, 0);
     console.log(`[room] auto-created room ${code} from MCP connection`);
   }
 }
 
-export function createRoom(): { code: string; admin_token: string } {
+export function createRoom(isDemo: boolean = false): { code: string; admin_token: string } {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
   let code: string;
   const checkStmt = db.prepare("SELECT 1 FROM rooms WHERE code = ?");
@@ -259,12 +579,13 @@ export function createRoom(): { code: string; admin_token: string } {
     ).join("");
   } while (checkStmt.get(code));
 
-  const admin_token = crypto.randomUUID();
-  db.prepare("INSERT INTO rooms (code, last_activity, admin_token) VALUES (?, ?, ?)").run(code, Date.now(), admin_token);
+  const admin_token = generateSecureToken();
+  db.prepare("INSERT INTO rooms (code, last_activity, admin_token, is_demo) VALUES (?, ?, ?, ?)").run(code, Date.now(), admin_token, isDemo ? 1 : 0);
   return { code, admin_token };
 }
 
-export function verifyAdmin(roomCode: string, token: string): boolean {
+export function verifyAdmin(roomCode: string, token: string | null | undefined): boolean {
+  if (!token) return false;
   const row = db.prepare("SELECT admin_token FROM rooms WHERE code = ?").get(roomCode) as any;
   return row?.admin_token === token;
 }
@@ -296,13 +617,13 @@ export function getTelegramConfig(roomCode: string): { token: string | null; cha
 export function claimRoomAdmin(roomCode: string): string | null {
   const row = db.prepare("SELECT admin_token FROM rooms WHERE code = ?").get(roomCode) as any;
   if (!row || row.admin_token) return null; // not found or already claimed
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }
 
 export function rotateAdminToken(roomCode: string): string {
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }
@@ -311,7 +632,7 @@ export function rotateAdminToken(roomCode: string): string {
 export function resetAdminToken(roomCode: string): string | null {
   const row = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(roomCode);
   if (!row) return null;
-  const token = crypto.randomUUID();
+  const token = generateSecureToken();
   db.prepare("UPDATE rooms SET admin_token = ? WHERE code = ?").run(token, roomCode);
   return token;
 }
@@ -330,11 +651,29 @@ export function getWhitelist(roomCode: string): string[] {
 }
 
 // Returns true if agent is allowed to send (whitelist empty = everyone allowed)
-export function canAgentSend(roomCode: string, agentName: string): boolean {
+// If an agent token is set in room_agent_tokens, it MUST match.
+export function canAgentSend(roomCode: string, agentName: string, providedToken?: string): boolean {
+  // 1. Deny if banned.
   const banned = db.prepare("SELECT 1 FROM room_banned WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
   if (banned) return false;
+
+  // 2. Check for a registered token for the agent.
+  const tokenRow = db.prepare("SELECT token FROM room_agent_tokens WHERE room_code = ? AND agent_name = ?")
+    .get(roomCode, agentName) as { token: string } | undefined;
+
+  // If a token is registered for this agent, it is the *only* authentication method.
+  // It must be provided and it must be correct.
+  if (tokenRow) {
+    return providedToken === tokenRow.token;
+  }
+
+  // 3. If no token is registered, fall back to whitelist check.
   const whitelistCount = db.prepare("SELECT COUNT(*) as n FROM room_whitelist WHERE room_code = ?").get(roomCode) as any;
-  if (whitelistCount.n === 0) return true; // no whitelist = open room
+  if (whitelistCount.n === 0) {
+    return true; // No whitelist means the room is open to agents without tokens.
+  }
+
+  // If a whitelist exists, the agent must be on it.
   const allowed = db.prepare("SELECT 1 FROM room_whitelist WHERE room_code = ? AND agent_name = ?").get(roomCode, agentName);
   return !!allowed;
 }
@@ -353,46 +692,64 @@ export function getBanned(roomCode: string): string[] {
   return rows.map(r => r.agent_name);
 }
 
-export function joinRoom(code: string, name: string): boolean | null {
+export function joinRoom(code: string, name: string): { isNew: boolean } | null {
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return null;
 
   const user = db.prepare("SELECT 1 FROM users WHERE room_code = ? AND name = ?").get(code, name);
-  if (!user) {
-    const maxRowidRow = db.prepare("SELECT MAX(rowid) as maxRowid FROM messages WHERE room_code = ?").get(code) as { maxRowid: number | null };
-    const initialCursor = maxRowidRow.maxRowid || 0;
-
+  const isNew = !user;
+  if (isNew) {
+    // Set initial last_rowid to -1 so users see all messages when they first call getMessages()
+    // This fixes the bug where new users don't see their own first message
     db.prepare("INSERT INTO users (room_code, name, cursor, last_rowid, last_seen) VALUES (?, ?, ?, ?, ?)")
-      .run(code, name, 0, initialCursor, Date.now());
+      .run(code, name, 0, -1, Date.now());
   } else {
     db.prepare("UPDATE users SET last_seen = ? WHERE room_code = ? AND name = ?")
       .run(Date.now(), code, name);
   }
 
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
-  return true as const;
+  return { isNew };
+}
+
+export function roomExists(code: string): boolean {
+  const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
+  return !!room;
 }
 export function getRoomCount(): number {
   const row = db.prepare("SELECT COUNT(*) as count FROM rooms").get() as { count: number };
   return row.count;
 }
 
-export function getActiveRooms(): { code: string; agent_count: number; message_count: number; last_active: number }[] {
+export function getActiveRooms(): { code: string; agent_count: number; message_count: number; last_active: number; mode?: string; project_title?: string; deadline?: number; total_deliverables?: number; done_deliverables?: number }[] {
   const rows = db.prepare(`
-    SELECT r.code,
-      COUNT(DISTINCT p.agent_name) as agent_count,
-      COUNT(DISTINCT m.id) as message_count,
-      MAX(COALESCE(p.last_heartbeat, 0)) as last_active
+    SELECT r.code, r.mode, r.project_title, r.deadline,
+      COUNT(DISTINCT CASE WHEN p.agent_name NOT IN ('Pulse','Scout','Archie','Viewer','demo-viewer','office-viewer','team-viewer','Atlas','Nova','Echo') THEN p.agent_name END) as agent_count,
+      COUNT(DISTINCT CASE WHEN m.sender NOT IN ('Pulse','Scout','Archie','Viewer','system','Atlas','Nova','Echo') THEN m.id END) as message_count,
+      MAX(COALESCE(p.last_heartbeat, 0)) as last_active,
+      (SELECT COUNT(*) FROM project_deliverables WHERE room_code = r.code) as total_deliverables,
+      (SELECT COUNT(*) FROM project_deliverables WHERE room_code = r.code AND status = 'done') as done_deliverables
     FROM rooms r
     LEFT JOIN presence p ON p.room_code = r.code
     LEFT JOIN messages m ON m.room_code = r.code
     WHERE r.is_private = 0
     GROUP BY r.code
-    HAVING message_count >= 5 OR agent_count >= 2
+    HAVING message_count >= 1 OR agent_count >= 1
     ORDER BY last_active DESC
     LIMIT 30
   `).all() as any[];
   return rows;
+}
+
+export function getPublicRoomActivity(limit: number = 50): any[] {
+  return db.prepare(`
+    SELECT m.id, m.room_code, m.sender as 'from', SUBSTR(m.content, 1, 200) as content, m.timestamp as ts, m.msg_type as type
+    FROM messages m
+    JOIN rooms r ON m.room_code = r.code
+    WHERE r.is_private = 0
+    ORDER BY m.timestamp DESC
+    LIMIT ?
+  `).all(limit) as any[];
 }
 
 export function setRoomPrivate(roomCode: string, isPrivate: boolean): void {
@@ -404,24 +761,50 @@ export function isRoomPrivate(roomCode: string): boolean {
   return row ? row.is_private === 1 : false;
 }
 
-// Simple hash for room passwords — no crypto dep, uses Bun.hash
-function simpleHash(s: string): string {
+// Secure password hashing with salt using Bun's built-in crypto
+function hashPassword(password: string, salt?: string): { hash: string; salt: string } {
+  const s = salt || crypto.randomUUID();
+  const hasher = new Bun.CryptoHasher("sha256");
+  hasher.update(s + ":" + password);
+  return { hash: hasher.digest("hex"), salt: s };
+}
+
+// Legacy DJB2 hash for backwards compatibility with existing passwords
+function legacyHash(s: string): string {
   let h = 5381n;
   for (let i = 0; i < s.length; i++) h = (h * 33n ^ BigInt(s.charCodeAt(i))) & 0xffffffffffffffffn;
   return h.toString(16);
 }
 
 export function setRoomPassword(roomCode: string, password: string | null): void {
-  const hash = password ? simpleHash(password) : null;
-  db.prepare("UPDATE rooms SET room_password_hash = ?, is_private = ? WHERE code = ?").run(hash, password ? 1 : 0, roomCode);
+  if (!password) {
+    db.prepare("UPDATE rooms SET room_password_hash = ?, is_private = ? WHERE code = ?").run(null, 0, roomCode);
+    return;
+  }
+  const { hash, salt } = hashPassword(password);
+  // Store as "salt:hash" format so we can verify later
+  db.prepare("UPDATE rooms SET room_password_hash = ?, is_private = ? WHERE code = ?").run(`${salt}:${hash}`, 1, roomCode);
 }
 
 export function verifyRoomPassword(roomCode: string, password: string): boolean {
   const row = db.prepare("SELECT room_password_hash, is_private FROM rooms WHERE code = ?").get(roomCode) as any;
   if (!row) return false;
-  // No password set — open room
   if (!row.room_password_hash) return true;
-  return simpleHash(password) === row.room_password_hash;
+  const stored = row.room_password_hash as string;
+  // New format: "salt:hash"
+  if (stored.includes(":")) {
+    const [salt, expectedHash] = stored.split(":");
+    const { hash } = hashPassword(password, salt);
+    return hash === expectedHash;
+  }
+  // Legacy format: plain DJB2 hash — verify and upgrade
+  if (legacyHash(password) === stored) {
+    // Upgrade to new format on successful verify
+    const { hash, salt } = hashPassword(password);
+    db.prepare("UPDATE rooms SET room_password_hash = ? WHERE code = ?").run(`${salt}:${hash}`, roomCode);
+    return true;
+  }
+  return false;
 }
 
 export function getRoomPasswordHash(roomCode: string): string | null {
@@ -470,14 +853,19 @@ export function getPartnerCards(
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
+  // Filter patterns for internal/test agents that shouldn't be visible to real agents
+  const HIDDEN_AGENT_PATTERNS = /^(synthetic-\d+|load-tester|test-agent|demo-viewer|live-viewer)/i;
+
   const rows = db.prepare("SELECT name, card_json, updated_at FROM agent_cards WHERE room_code = ? AND name != ?")
     .all(code, name) as Array<{ name: string; card_json: string; updated_at: number }>;
 
-  const cards = rows.map(row => ({
-    name: row.name,
-    card: JSON.parse(row.card_json) as AgentCard,
-    updated_at: row.updated_at,
-  }));
+  const cards = rows
+    .filter(row => !HIDDEN_AGENT_PATTERNS.test(row.name))
+    .map(row => ({
+      name: row.name,
+      card: JSON.parse(row.card_json) as AgentCard,
+      updated_at: row.updated_at,
+    }));
 
   return { ok: true, cards };
 }
@@ -516,7 +904,8 @@ export function appendMessage(
   content: string,
   to?: string,
   msgType: string = "BROADCAST",
-  replyTo?: string
+  replyTo?: string,
+  overrideTs?: number
 ): Ok<{ id: string }> | Err {
   if (new TextEncoder().encode(content).length > MAX_MESSAGE_BYTES) {
     return { ok: false, error: "message_too_large" };
@@ -525,7 +914,7 @@ export function appendMessage(
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
   const id = crypto.randomUUID();
-  const timestamp = Date.now();
+  const timestamp = overrideTs ?? Date.now();
 
   // Compress content for storage (transparent to agents). Fall back to raw if compression fails.
   let compressedContent: string;
@@ -549,8 +938,12 @@ export function appendMessage(
   // Track metric
   trackMetric("message_sent", code, from);
 
+  // Extract @mentions from content
+  const mentionMatches = content.match(/@([\w\s.-]+?)(?=\s|[^a-zA-Z0-9._\s-]|$)/g);
+  const mentions = mentionMatches ? [...new Set(mentionMatches.map(m => m.slice(1).trim()))] : undefined;
+
   // Emit event for real-time listeners (SSE) with decompressed content (transparent compression)
-  const messagePayload = { id, from: from, to: to || undefined, content, ts: timestamp, type: msgType, reply_to: replyTo || undefined };
+  const messagePayload = { id, from: from, to: to || undefined, content, ts: timestamp, type: msgType, reply_to: replyTo || undefined, ...(mentions?.length ? { mentions } : {}) };
   messageEvents.emit("message", { room_code: code, message: messagePayload });
 
   // Fire webhooks (async, non-blocking)
@@ -572,7 +965,7 @@ export function getMessages(
 
   // Fetch messages using rowid cursor (avoids skips on mixed broadcast+DM)
   let query = `
-    SELECT rowid, id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type'
+    SELECT rowid, id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to
     FROM messages
     WHERE room_code = ?
     AND rowid > ?
@@ -590,17 +983,28 @@ export function getMessages(
 
   const rows = db.prepare(query).all(...params) as any[];
 
-  // Filter out own messages and decompress content
-  const filtered = rows
-    .filter(m => m.from !== name)
-    .map(m => ({
-      id: m.id,
-      from: m.from,
-      to: m.to,
-      ts: m.ts,
-      content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content,
-      type: m.type
-    }));
+  // Filter out own messages (but always pass through system messages) and decompress content
+  const filteredRows = rows.filter(m => m.from === "system" || m.from !== name);
+  // Batch-load reactions for all messages in one query (avoids N+1)
+  const reactionsBatch = getMessageReactionsBatch(filteredRows.map(m => m.id));
+  const filtered = filteredRows
+    .map(m => {
+      const decompressed = m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content;
+      const mentionMatches = decompressed.match(/@([\w\s.-]+?)(?=\s|[^a-zA-Z0-9._\s-]|$)/g);
+      const mentions = mentionMatches ? [...new Set(mentionMatches.map((m: string) => m.slice(1).trim()))] : undefined;
+      const reactions = reactionsBatch.get(m.id) || [];
+      return {
+        id: m.id,
+        from: m.from,
+        to: m.to,
+        ts: m.ts,
+        content: decompressed,
+        type: m.type,
+        reply_to: m.reply_to,
+        ...(mentions?.length ? { mentions } : {}),
+        ...(reactions.length ? { reactions } : {})
+      };
+    });
 
   // Advance cursor to max rowid seen (eliminates skips)
   const maxRowid = rows.length > 0 ? rows[rows.length - 1].rowid : user.last_rowid;
@@ -628,26 +1032,38 @@ export function getAllMessages(
   let rows: Message[];
   if (viewer) {
     const query = since
-      ? db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND timestamp > ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`)
-      : db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`);
+      ? db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to FROM messages WHERE room_code = ? AND timestamp > ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`)
+      : db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to FROM messages WHERE room_code = ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`);
     rows = since
       ? query.all(code, since, viewer, viewer, limit) as Message[]
       : query.all(code, viewer, viewer, limit) as Message[];
   } else {
     const query = since
-      ? db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND timestamp > ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`)
-      : db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type' FROM messages WHERE room_code = ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`);
+      ? db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to FROM messages WHERE room_code = ? AND timestamp > ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`)
+      : db.prepare(`SELECT id, sender as 'from', recipient as 'to', content, timestamp as ts, msg_type as 'type', reply_to FROM messages WHERE room_code = ? AND ${dmClause} ORDER BY timestamp DESC LIMIT ?`);
     rows = since
       ? query.all(code, since, limit) as Message[]
       : query.all(code, limit) as Message[];
   }
 
+  // Batch-load reactions for all messages in one query (avoids N+1)
+  const reactionsBatchAll = getMessageReactionsBatch(rows.map(m => m.id));
   const messages = rows
-    .map(m => ({
-      ...m,
-      content: m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content
-    }))
-    .reverse(); // chronological order
+    .map(m => {
+      const decompressed = m.content.startsWith("lz:") ? LZString.decompressFromEncodedURIComponent(m.content.slice(3)) || m.content : m.content;
+      const reactions = reactionsBatchAll.get(m.id) || [];
+      return {
+        ...m,
+        content: decompressed,
+        ...(reactions.length ? { reactions } : {})
+      };
+    })
+    .reverse() // chronological order
+    .map((m: any) => {
+      const mentionMatches = m.content.match(/@([\w\s.-]+?)(?=\s|[^a-zA-Z0-9._\s-]|$)/g);
+      const mentions = mentionMatches ? [...new Set(mentionMatches.map((t: string) => t.slice(1).trim()))] : undefined;
+      return mentions?.length ? { ...m, mentions } : m;
+    });
 
   return { ok: true, messages };
 }
@@ -655,7 +1071,7 @@ export function getAllMessages(
 export function getRoomStatus(
   code: string,
   name: string
-): Ok<{ connected: boolean; partners: any[]; message_count: number }> | Err {
+): Ok<{ connected: boolean; partners: any[]; message_count: number; context: any }> | Err {
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
@@ -685,6 +1101,7 @@ export function getRoomStatus(
     connected: partnersWithCards.length > 0,
     partners: partnersWithCards,
     message_count: countRow.count,
+    context: getRoomContext(code), // Shared room-level context
   };
 }
 // ── Message Admin ─────────────────────────────────────────────────────────────
@@ -705,9 +1122,16 @@ export function redactMessage(messageId: string, roomCode: string): boolean {
 
 export function sweepExpiredRooms(): number {
   const now = Date.now();
-  const threshold = now - ROOM_TTL_MS;
+  // Standard TTL: 72h
+  const standardThreshold = now - ROOM_TTL_MS;
+  // Demo TTL: 1h
+  const demoThreshold = now - (60 * 60 * 1000);
 
-  const expired = db.prepare("SELECT code FROM rooms WHERE last_activity < ?").all(threshold) as { code: string }[];
+  const expired = db.prepare(`
+    SELECT code FROM rooms 
+    WHERE (is_demo = 0 AND last_activity < ?)
+       OR (is_demo = 1 AND last_activity < ?)
+  `).all(standardThreshold, demoThreshold) as { code: string }[];
 
   for (const row of expired) {
     db.prepare("DELETE FROM messages WHERE room_code = ?").run(row.code);
@@ -800,7 +1224,7 @@ export function getRoomPresence(roomCode: string): Array<{ agent_name: string; d
     display_name: r.display_name || r.agent_name,
     // Online if heartbeat within last 5 minutes (was 60s — too aggressive)
     status: r.last_heartbeat > now - 300_000 ? r.status : "offline",
-    is_typing: r.is_typing === 1 && r.last_heartbeat > now - 15_000,
+    is_typing: r.is_typing === 1 && r.last_heartbeat > now - 30_000,
     last_heartbeat: r.last_heartbeat,
     hostname: r.hostname || "",
     role: r.role || "worker",
@@ -839,6 +1263,20 @@ export function removeReaction(messageId: string, agentName: string): { ok: bool
 export function getMessageReactions(messageId: string): Array<{ agent_name: string; emoji: string; created_at: number }> {
   return db.prepare("SELECT agent_name, emoji, created_at FROM reactions WHERE message_id = ?")
     .all(messageId) as any[];
+}
+
+// Batch version to avoid N+1 queries when loading message lists
+export function getMessageReactionsBatch(messageIds: string[]): Map<string, Array<{ agent_name: string; emoji: string; created_at: number }>> {
+  const result = new Map<string, Array<{ agent_name: string; emoji: string; created_at: number }>>();
+  if (messageIds.length === 0) return result;
+  const placeholders = messageIds.map(() => "?").join(",");
+  const rows = db.prepare(`SELECT message_id, agent_name, emoji, created_at FROM reactions WHERE message_id IN (${placeholders})`)
+    .all(...messageIds) as any[];
+  for (const row of rows) {
+    if (!result.has(row.message_id)) result.set(row.message_id, []);
+    result.get(row.message_id)!.push({ agent_name: row.agent_name, emoji: row.emoji, created_at: row.created_at });
+  }
+  return result;
 }
 
 // ── Webhooks ─────────────────────────────────────────────────────────────────
@@ -1076,7 +1514,7 @@ export function getRoomFiles(roomCode: string): Array<{ file_id: string; filenam
     .all(roomCode) as any[];
 }
 
-// ── Handoff Protocol ─────────────────────────────────────────────────────────
+// ── Handoff Protocol ───────────────────────────────────────────────────────
 db.run(`
   CREATE TABLE IF NOT EXISTS handoffs (
     handoff_id TEXT PRIMARY KEY,
@@ -1334,6 +1772,7 @@ export function getLeaderboard(limit: number = 20): any[] {
     END as rank_title
     FROM agent_stats
     WHERE agent_name NOT LIKE 'synthetic-%' AND agent_name NOT LIKE '%viewer%' AND agent_name NOT LIKE 'enemy%' AND agent_name NOT LIKE 'test%'
+    AND agent_name NOT IN ('Can Erden', 'Vincent', 'GitHub', 'system', 'Pulse', 'Scout', 'Archie', 'Viewer')
     ORDER BY score DESC LIMIT ?`)
     .all(limit) as any[];
 
@@ -1538,10 +1977,23 @@ export function getAllPersonalities(): any[] {
 // Generate a CLAUDE.md-compatible identity block for an agent
 export function generateIdentityBlock(name: string): string {
   const p = getPersonality(name);
-  if (!p) return `# ${name}\nNo saved personality. Use /api/personality to save one.`;
-  const modelLine = p.model ? `\nModel: ${p.model}` : "";
-  const toolLine = p.tool ? `\nTool: ${p.tool}` : "";
-  return `# Agent Identity: ${name}${modelLine}${toolLine}\n\n${p.personality}\n\nSkills: ${p.skills}\n\n## System Prompt\n${p.system_prompt}\n\n---\nSaved at: ${new Date(p.updated_at).toISOString()}`;
+  if (!p) return `# ${name}
+No saved personality. Use /api/personality to save one.`;
+  const modelLine = p.model ? `
+Model: ${p.model}` : "";
+  const toolLine = p.tool ? `
+Tool: ${p.tool}` : "";
+  return `# Agent Identity: ${name}${modelLine}${toolLine}
+
+${p.personality}
+
+Skills: ${p.skills}
+
+## System Prompt
+${p.system_prompt}
+
+---
+Saved at: ${new Date(p.updated_at).toISOString()}`;
 }
 
 // ── Waitlist ─────────────────────────────────────────────────────────────────
@@ -1572,12 +2024,31 @@ export function getGrowthMetrics(): {
   const now = Date.now();
   const days = [];
   for (let i = 6; i >= 0; i--) {
-    const start = Math.floor((now - (i + 1) * dayMs) / 1000);
-    const end   = Math.floor((now - i * dayMs) / 1000);
-    const label = new Date(end * 1000).toISOString().slice(0, 10);
-    const msgs    = (db.prepare("SELECT COUNT(*) as n FROM messages WHERE timestamp >= ? AND timestamp < ?").get(start, end) as any)?.n ?? 0;
-    const rooms   = (db.prepare("SELECT COUNT(*) as n FROM rooms WHERE last_activity >= ? AND last_activity < ?").get(start, end) as any)?.n ?? 0;
-    const agents  = (db.prepare("SELECT COUNT(DISTINCT sender) as n FROM messages WHERE timestamp >= ? AND timestamp < ?").get(start, end) as any)?.n ?? 0;
+    const start = now - (i + 1) * dayMs;
+    const end   = now - i * dayMs;
+    const sStart = Math.floor(start / 1000);
+    const sEnd   = Math.floor(end / 1000);
+    const label = new Date(end).toISOString().slice(0, 10);
+    
+    // Robust query: check both ms and seconds windows to prevent zeroing on format mismatch
+    const msgs    = (db.prepare(`
+      SELECT COUNT(*) as n FROM messages 
+      WHERE (timestamp >= ? AND timestamp < ?) 
+         OR (timestamp >= ? AND timestamp < ?)
+    `).get(start, end, sStart, sEnd) as any)?.n ?? 0;
+    
+    const rooms   = (db.prepare(`
+      SELECT COUNT(*) as n FROM rooms 
+      WHERE (last_activity >= ? AND last_activity < ?)
+         OR (last_activity >= ? AND last_activity < ?)
+    `).get(start, end, sStart, sEnd) as any)?.n ?? 0;
+    
+    const agents  = (db.prepare(`
+      SELECT COUNT(DISTINCT sender) as n FROM messages 
+      WHERE (timestamp >= ? AND timestamp < ?)
+         OR (timestamp >= ? AND timestamp < ?)
+    `).get(start, end, sStart, sEnd) as any)?.n ?? 0;
+    
     days.push({ date: label, messages: msgs, rooms, agents });
   }
   return {
@@ -1588,6 +2059,170 @@ export function getGrowthMetrics(): {
       waitlist:       (db.prepare("SELECT COUNT(*) as n FROM waitlist").get() as any)?.n ?? 0,
     },
   };
+}
+
+// ── Room context (shared pinned context per room) ────────────────────────────
+const _roomContextStore = new Map<string, { content: string; updated_by: string; updated_at: number }>();
+
+export function getRoomContext(room: string) {
+  return _roomContextStore.get(room) ?? null;
+}
+
+export function setRoomContext(room: string, content: string, updatedBy: string) {
+  _roomContextStore.set(room, { content, updated_by: updatedBy, updated_at: Date.now() });
+}
+
+// ── Agent Tokens ─────────────────────────────────────────────────────────────
+db.run(`CREATE TABLE IF NOT EXISTS room_agent_tokens (
+  room_code TEXT,
+  agent_name TEXT,
+  token TEXT NOT NULL,
+  created_at INTEGER,
+  PRIMARY KEY (room_code, agent_name)
+);`);
+
+export function generateAgentToken(roomCode: string, agentName: string): string {
+  const token = generateSecureToken();
+  db.prepare(`
+    INSERT INTO room_agent_tokens (room_code, agent_name, token, created_at)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(room_code, agent_name) DO UPDATE SET
+      token=excluded.token, created_at=excluded.created_at
+  `).run(roomCode, agentName, token, Date.now());
+  return token;
+}
+
+export function verifyAgentToken(roomCode: string, agentName: string, token: string): boolean {
+  const row = db.prepare("SELECT 1 FROM room_agent_tokens WHERE room_code = ? AND agent_name = ? AND token = ?")
+    .get(roomCode, agentName, token);
+  return !!row;
+}
+
+// ── Project Rooms ─────────────────────────────────────────────────────────────
+// Rooms can operate in 'chat' mode (default) or 'project' mode.
+// Project rooms have a brief, deadline, and a deliverables checklist.
+
+// Migrations: add project columns to rooms table
+try { db.run("ALTER TABLE rooms ADD COLUMN mode TEXT DEFAULT 'chat';"); } catch (e) {}
+try { db.run("ALTER TABLE rooms ADD COLUMN project_title TEXT DEFAULT NULL;"); } catch (e) {}
+try { db.run("ALTER TABLE rooms ADD COLUMN project_brief TEXT DEFAULT NULL;"); } catch (e) {}
+try { db.run("ALTER TABLE rooms ADD COLUMN deadline INTEGER DEFAULT NULL;"); } catch (e) {}
+
+db.run(`CREATE TABLE IF NOT EXISTS project_deliverables (
+  id TEXT PRIMARY KEY,
+  room_code TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT DEFAULT '',
+  status TEXT DEFAULT 'pending',
+  assigned_to TEXT DEFAULT NULL,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  FOREIGN KEY(room_code) REFERENCES rooms(code)
+);`);
+
+try { db.run("CREATE INDEX IF NOT EXISTS idx_deliverables_room ON project_deliverables(room_code);"); } catch (e) {}
+
+export interface ProjectRoom {
+  code: string;
+  mode: string;
+  project_title: string | null;
+  project_brief: string | null;
+  deadline: number | null;
+  deliverables: ProjectDeliverable[];
+}
+
+export interface ProjectDeliverable {
+  id: string;
+  room_code: string;
+  title: string;
+  description: string;
+  status: string;
+  assigned_to: string | null;
+  created_at: number;
+  updated_at: number;
+}
+
+export function createProjectRoom(opts: {
+  title: string;
+  brief: string;
+  deadline?: number;
+  deliverables?: Array<{ title: string; description?: string; assigned_to?: string }>;
+}): string {
+  const code = crypto.randomBytes(4).toString("hex");
+  const token = generateSecureToken();
+  const now = Date.now();
+  db.prepare(`
+    INSERT INTO rooms (code, last_activity, admin_token, mode, project_title, project_brief, deadline)
+    VALUES (?, ?, ?, 'project', ?, ?, ?)
+  `).run(code, now, token, opts.title, opts.brief, opts.deadline ?? null);
+
+  if (opts.deliverables?.length) {
+    for (const d of opts.deliverables) {
+      const id = crypto.randomUUID();
+      db.prepare(`
+        INSERT INTO project_deliverables (id, room_code, title, description, assigned_to, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)
+      `).run(id, code, d.title, d.description ?? "", d.assigned_to ?? null, now, now);
+    }
+  }
+
+  return code;
+}
+
+export function getProjectRoom(roomCode: string): ProjectRoom | null {
+  const room = db.prepare(
+    "SELECT code, mode, project_title, project_brief, deadline FROM rooms WHERE code = ?"
+  ).get(roomCode) as any;
+  if (!room) return null;
+  const deliverables = db.prepare(
+    "SELECT * FROM project_deliverables WHERE room_code = ? ORDER BY created_at ASC"
+  ).all(roomCode) as ProjectDeliverable[];
+  return { ...room, deliverables };
+}
+
+export function addDeliverable(roomCode: string, opts: {
+  title: string;
+  description?: string;
+  assigned_to?: string;
+}): ProjectDeliverable {
+  const id = crypto.randomUUID();
+  const now = Date.now();
+  db.prepare(`
+    INSERT INTO project_deliverables (id, room_code, title, description, assigned_to, status, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)
+  `).run(id, roomCode, opts.title, opts.description ?? "", opts.assigned_to ?? null, now, now);
+  return db.prepare("SELECT * FROM project_deliverables WHERE id = ?").get(id) as ProjectDeliverable;
+}
+
+export function updateDeliverable(id: string, patch: {
+  title?: string;
+  description?: string;
+  status?: string;
+  assigned_to?: string;
+}): ProjectDeliverable | null {
+  const existing = db.prepare("SELECT * FROM project_deliverables WHERE id = ?").get(id) as ProjectDeliverable | null;
+  if (!existing) return null;
+  const updated = {
+    title: patch.title ?? existing.title,
+    description: patch.description ?? existing.description,
+    status: patch.status ?? existing.status,
+    assigned_to: patch.assigned_to !== undefined ? patch.assigned_to : existing.assigned_to,
+  };
+  db.prepare(`
+    UPDATE project_deliverables SET title=?, description=?, status=?, assigned_to=?, updated_at=? WHERE id=?
+  `).run(updated.title, updated.description, updated.status, updated.assigned_to, Date.now(), id);
+  return db.prepare("SELECT * FROM project_deliverables WHERE id = ?").get(id) as ProjectDeliverable;
+}
+
+export function deleteDeliverable(id: string): boolean {
+  const result = db.prepare("DELETE FROM project_deliverables WHERE id = ?").run(id);
+  return result.changes > 0;
+}
+
+export function getDeliverables(roomCode: string): ProjectDeliverable[] {
+  return db.prepare(
+    "SELECT * FROM project_deliverables WHERE room_code = ? ORDER BY created_at ASC"
+  ).all(roomCode) as ProjectDeliverable[];
 }
 
 // ── Run seeds after all tables are created ───────────────────────────────────

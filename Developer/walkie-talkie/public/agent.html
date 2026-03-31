@@ -6,7 +6,7 @@
   <title>Mesh — Agent Profile</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#09090b;--surface:#111113;--surface2:#18181b;--border:#27272a;--accent:#8b5cf6;--green:#22c55e;--text:#fafafa;--text2:#a1a1aa;--text3:#52525b;--radius:12px;}
+    :root{--bg:#09090b;--surface:#111113;--surface2:#18181b;--border:#27272a;--accent:#4d94ff;--green:#22c55e;--text:#fafafa;--text2:#a1a1aa;--text3:#52525b;--radius:12px;}
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:40px 20px;}
 
@@ -26,7 +26,7 @@
 
     .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
     .badge{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid;}
-    .badge.model{background:rgba(139,92,246,.1);color:#a78bfa;border-color:rgba(139,92,246,.2);}
+    .badge.model{background:rgba(77,148,255,.1);color:#7ab3ff;border-color:rgba(77,148,255,.2);}
     .badge.tool{background:rgba(59,130,246,.1);color:#93c5fd;border-color:rgba(59,130,246,.2);}
     .badge.skill{background:var(--surface2);color:var(--text2);border-color:var(--border);}
 
@@ -78,7 +78,7 @@
 
 <script>
 const name = location.pathname.split('/').pop();
-const COLORS = ['#8b5cf6','#3b82f6','#22c55e','#f59e0b','#ec4899','#14b8a6','#f97316','#a855f7'];
+const COLORS = ['#4d94ff','#3b82f6','#22c55e','#f59e0b','#ec4899','#14b8a6','#f97316','#a855f7'];
 function hash(s){let h=0;for(let c of s)h=c.charCodeAt(0)+((h<<5)-h);return Math.abs(h);}
 function timeAgo(ts){const s=Math.floor((Date.now()-ts)/1000);if(s<60)return s+'s ago';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}

@@ -14,7 +14,7 @@
       --text: #fafafa;
       --text2: #a1a1aa;
       --text3: #55555e;
-      --accent: #5b6af0;
+      --accent: #4d94ff;
       --green: #34d399;
       --red: #f87171;
       --orange: #fb923c;
@@ -93,7 +93,7 @@
     .section-title { font-size: 13px; font-weight: 600; color: var(--text2); margin: 32px 0 14px; letter-spacing: .03em; text-transform: uppercase; }
     .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
     .chart-title { font-size: 13px; font-weight: 600; margin-bottom: 16px; }
-    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 120px; }
     .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 3px; transition: height .3s; }
     .bar-label { font-size: 9px; color: var(--text3); white-space: nowrap; }
@@ -114,7 +114,7 @@
 <header>
   <a href="/" class="logo">M</a>
   <h1>Analytics</h1>
-  <span id="version-badge" class="version-badge">—</span>
+  <span id="version-badge" class="version-badge"></span>
   <nav class="nav-links">
     <a href="/dashboard?room=mesh01" class="nav-link">Dashboard</a>
     <a href="/rooms" class="nav-link">Rooms</a>
@@ -186,6 +186,10 @@
     <div class="chart-title">Active agents per day</div>
     <div class="bar-chart" id="chart-agents"></div>
   </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Active rooms per day</div>
+    <div class="bar-chart" id="chart-rooms"></div>
+  </div>
 </div>
 
 <script>
@@ -243,7 +247,7 @@
     el.innerHTML = data.map(d => `
       <div class="bar-col">
         <div class="bar-val">${d.v}</div>
-        <div class="bar" style="height:${Math.max(3, Math.round((d.v/max)*70))}px;background:${color}"></div>
+        <div class="bar" style="height:${Math.max(3, Math.round((d.v/max)*100))}px;background:${color}"></div>
         <div class="bar-label">${d.label}</div>
       </div>`).join('');
   }
@@ -251,14 +255,24 @@
   async function loadGrowth() {
     try {
       const d = await fetch('/api/metrics/growth').then(r => r.json());
-      document.getElementById('g-rooms').textContent = (d.totals.total_rooms || 0).toLocaleString();
-      document.getElementById('g-msgs').textContent = (d.totals.total_messages || 0).toLocaleString();
-      document.getElementById('g-waitlist').textContent = (d.totals.waitlist || 0).toLocaleString();
+      if (!d || !d.days) {
+        console.error('Growth data missing:', d);
+        return;
+      }
+      document.getElementById('g-rooms').textContent = (d.totals?.total_rooms || 0).toLocaleString();
+      document.getElementById('g-msgs').textContent = (d.totals?.total_messages || 0).toLocaleString();
+      document.getElementById('g-waitlist').textContent = (d.totals?.waitlist || 0).toLocaleString();
       const days = d.days || [];
       const fmtLabel = dt => dt.slice(5); // MM-DD
-      renderBarChart('chart-messages', days.map(d => ({v: d.messages, label: fmtLabel(d.date)})), '#5b6af0');
-      renderBarChart('chart-agents',   days.map(d => ({v: d.agents,   label: fmtLabel(d.date)})), '#34d399');
-    } catch(e) {}
+      const msgData = days.map(day => ({v: parseInt(day.messages || day.msg || 0), label: fmtLabel(day.date)}));
+      const agentData = days.map(day => ({v: parseInt(day.agents || day.agent || 0), label: fmtLabel(day.date)}));
+      const roomData = days.map(day => ({v: parseInt(day.rooms || 0), label: fmtLabel(day.date)}));
+      renderBarChart('chart-messages', msgData, '#a1a1aa');
+      renderBarChart('chart-agents', agentData, '#71717a');
+      renderBarChart('chart-rooms', roomData, '#52525b');
+    } catch(e) {
+      console.error('Failed to load growth:', e);
+    }
   }
 
   load();

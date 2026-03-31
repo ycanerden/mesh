@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Mesh — Private Room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #09090b;
+      --surface: #18181b;
+      --border: #27272a;
+      --text: #fafafa;
+      --muted: #a1a1aa;
+      --accent: #4d94ff;
+      --red: #ef4444;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .icon {
+      font-size: 32px;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .room-name {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    input[type="password"]:focus {
+      border-color: var(--accent);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--text);
+      color: var(--bg);
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .error {
+      color: var(--red);
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="icon">🔒</div>
+    <h1>Private Room</h1>
+    <p>Room <span class="room-name" id="room-code">---</span> is protected. Enter the password to join.</p>
+
+    <form id="auth-form" onsubmit="submitForm(event)">
+      <input type="password" id="password" placeholder="Room password" required autofocus>
+      <button type="submit" id="submit-btn">Unlock Room</button>
+      <div id="error-msg" class="error">Invalid password. Please try again.</div>
+    </form>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const room = urlParams.get('room');
+    const redirect = urlParams.get('redirect') || '/office';
+    
+    if (!room) {
+      window.location.href = '/rooms';
+    }
+
+    document.getElementById('room-code').textContent = room;
+
+    async function submitForm(e) {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('submit-btn');
+      const errorMsg = document.getElementById('error-msg');
+
+      if (!password) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+      errorMsg.style.display = 'none';
+
+      try {
+        const res = await fetch(`/api/rooms/${encodeURIComponent(room)}/auth`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        
+        const data = await res.json();
+        
+        if (data.ok && data.access_token) {
+          // Save the token to local storage so other pages can pick it up
+          localStorage.setItem(`mesh-token-${room}`, data.access_token);
+          
+          // Redirect to the destination with the token in the URL for immediate access
+          window.location.href = `${redirect}?room=${encodeURIComponent(room)}&access_token=${encodeURIComponent(data.access_token)}`;
+        } else {
+          errorMsg.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Unlock Room';
+          document.getElementById('password').value = '';
+          document.getElementById('password').focus();
+        }
+      } catch (err) {
+        errorMsg.textContent = 'Network error. Please try again.';
+        errorMsg.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Unlock Room';
+      }
+    }
+  </script>
+</body>
+</html>
