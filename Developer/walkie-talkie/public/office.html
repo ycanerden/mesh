@@ -36,15 +36,31 @@
     .btn-embed:hover{color:#a1a1aa;border-color:#3f3f46;}
     .office-main{flex:1;display:flex;overflow:hidden;}
     .canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#0d0d0f;position:relative;}
-    /* Activity timeline sidebar */
-    .activity-panel{width:280px;flex-shrink:0;background:#111113;border-left:1px solid #27272a;display:flex;flex-direction:column;overflow:hidden;}
-    .activity-panel.collapsed{width:0;border-left:none;}
-    .ap-header{padding:10px 14px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-    .ap-title{font-size:11px;font-weight:600;color:#a1a1aa;letter-spacing:.04em;text-transform:uppercase;}
-    .ap-close{background:none;border:none;color:#52525b;cursor:pointer;font-size:14px;padding:2px 4px;}
-    .ap-close:hover{color:#a1a1aa;}
-    .ap-list{flex:1;overflow-y:auto;padding:6px 0;}
-    .ap-list::-webkit-scrollbar{width:4px;}.ap-list::-webkit-scrollbar-thumb{background:#27272a;border-radius:2px;}
+    /* Chat panel sidebar */
+    .chat-panel{width:340px;flex-shrink:0;background:#111113;border-left:1px solid #27272a;display:flex;flex-direction:column;overflow:hidden;}
+    .chat-panel.collapsed{width:0;border-left:none;padding:0;}
+    .cp-header{padding:10px 14px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .cp-title{font-size:11px;font-weight:600;color:#a1a1aa;letter-spacing:.04em;text-transform:uppercase;}
+    .cp-tabs{display:flex;gap:4px;}
+    .cp-tab{font-size:10px;color:#52525b;background:none;border:1px solid transparent;border-radius:4px;padding:2px 8px;cursor:pointer;font-family:inherit;}
+    .cp-tab:hover{color:#a1a1aa;}
+    .cp-tab.active{color:#4d94ff;border-color:#4d94ff;}
+    .cp-close{background:none;border:none;color:#52525b;cursor:pointer;font-size:14px;padding:2px 4px;}
+    .cp-close:hover{color:#a1a1aa;}
+    .cp-messages{flex:1;overflow-y:auto;padding:8px 0;display:flex;flex-direction:column;gap:2px;}
+    .cp-messages::-webkit-scrollbar{width:4px;}.cp-messages::-webkit-scrollbar-thumb{background:#27272a;border-radius:2px;}
+    .cp-msg{padding:6px 14px;display:flex;flex-direction:column;gap:2px;}
+    .cp-msg:hover{background:#1a1a1e;}
+    .cp-msg-header{display:flex;align-items:center;gap:8px;}
+    .cp-msg-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+    .cp-msg-name{font-size:10px;font-weight:700;color:#e4e4e7;}
+    .cp-msg-type{font-size:8px;color:#52525b;text-transform:uppercase;letter-spacing:.04em;padding:1px 4px;border:1px solid #27272a;border-radius:3px;}
+    .cp-msg-time{font-size:9px;color:#3f3f46;margin-left:auto;flex-shrink:0;}
+    .cp-msg-body{font-size:11px;color:#a1a1aa;line-height:1.5;padding-left:14px;word-break:break-word;white-space:pre-wrap;}
+    .cp-msg-body code{background:#1e1e22;padding:1px 4px;border-radius:3px;font-size:10px;font-family:'SF Mono',monospace;}
+    .cp-empty{padding:40px 14px;text-align:center;color:#3f3f46;font-size:11px;}
+    .cp-new-badge{background:#4d94ff;color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:6px;}
+    /* Activity tab items (reused from old panel) */
     .ap-item{padding:8px 14px;border-bottom:1px solid #1a1a1e;display:flex;gap:10px;align-items:flex-start;}
     .ap-item:hover{background:#1a1a1e;}
     .ap-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
@@ -53,10 +69,10 @@
     .ap-msg{font-size:10px;color:#71717a;margin-top:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.4;}
     .ap-time{font-size:9px;color:#3f3f46;margin-top:3px;}
     .ap-empty{padding:20px 14px;text-align:center;color:#3f3f46;font-size:10px;}
-    .btn-activity{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:3px 8px;cursor:pointer;}
-    .btn-activity:hover{color:#a1a1aa;border-color:#3f3f46;}
-    .btn-activity.active{color:#4d94ff;border-color:#4d94ff;}
-    @media(max-width:768px){.activity-panel{display:none;}}
+    .btn-chat{font-size:10px;color:#71717a;background:none;border:1px solid #27272a;border-radius:4px;padding:3px 8px;cursor:pointer;}
+    .btn-chat:hover{color:#a1a1aa;border-color:#3f3f46;}
+    .btn-chat.active{color:#4d94ff;border-color:#4d94ff;}
+    @media(max-width:768px){.chat-panel{position:fixed;right:0;top:0;bottom:0;z-index:20;width:85vw;max-width:340px;}.chat-panel.collapsed{width:0;}}
     canvas{image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:-webkit-optimize-contrast;}
     .footer{padding:6px 20px;border-top:1px solid #27272a;background:#111113;display:flex;justify-content:space-between;font-size:10px;color:#52525b;flex-shrink:0;}
     .footer span{color:#a1a1aa;}
@@ -175,13 +191,22 @@
     <div class="ac-row" id="ac-model-row"><span class="ac-label">Model</span><span class="ac-value" id="ac-model"></span></div>
   </div>
 </div>
-<div class="activity-panel collapsed" id="activity-panel">
-  <div class="ap-header">
-    <span class="ap-title">Activity</span>
-    <button class="ap-close" onclick="toggleActivity()">&times;</button>
+<div class="chat-panel" id="chat-panel">
+  <div class="cp-header">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="cp-title">Chat</span>
+      <span class="cp-new-badge" id="cp-new-badge" style="display:none">0</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <div class="cp-tabs">
+        <button class="cp-tab active" id="tab-chat" onclick="switchTab('chat')">Chat</button>
+        <button class="cp-tab" id="tab-activity" onclick="switchTab('activity')">Activity</button>
+      </div>
+      <button class="cp-close" onclick="toggleChat()">&times;</button>
+    </div>
   </div>
-  <div class="ap-list" id="ap-list">
-    <div class="ap-empty">Loading activity...</div>
+  <div class="cp-messages" id="cp-messages">
+    <div class="cp-empty">Connecting to room...</div>
   </div>
 </div>
 </div>
@@ -705,60 +730,141 @@ function closeDecision(e) {
   }
 }
 
-// ── Activity Timeline ─────────────────────────────────────────────────────
-const ACTIVITY_COLORS = {BROADCAST:'#4d94ff',TASK:'#22c55e',HANDOFF:'#f59e0b',SYSTEM:'#3f3f46',DM:'#ec4899'};
-const VIEWER_NAMES = ['demo-viewer','office-viewer','team-viewer','Viewer','Scout','Pulse','Archie'];
+// ── Chat Panel ───────────────────────────────────────────────────────────
+const TYPE_COLORS = {BROADCAST:'#4d94ff',TASK:'#22c55e',HANDOFF:'#f59e0b',SYSTEM:'#3f3f46',DIRECT:'#ec4899',DECISION:'#f97316',RESOLUTION:'#22c55e',REACTION:'#a855f7'};
+const VIEWER_NAMES = ['demo-viewer','office-viewer','team-viewer','Viewer'];
+let chatMessages = [];
+let currentTab = 'chat';
+let lastMsgCount = 0;
+let userScrolled = false;
 
-function toggleActivity() {
-  const panel = document.getElementById('activity-panel');
-  const btn = document.getElementById('btn-activity');
+function toggleChat() {
+  const panel = document.getElementById('chat-panel');
   panel.classList.toggle('collapsed');
-  btn.classList.toggle('active', !panel.classList.contains('collapsed'));
-  if(!panel.classList.contains('collapsed')) fetchActivity();
   resize();
+  if(!panel.classList.contains('collapsed')) {
+    fetchChat();
+    document.getElementById('cp-new-badge').style.display = 'none';
+  }
 }
 
-function activityTimeSince(ms) {
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-chat').classList.toggle('active', tab==='chat');
+  document.getElementById('tab-activity').classList.toggle('active', tab==='activity');
+  if(tab==='chat') fetchChat();
+  else fetchActivity();
+}
+
+function chatTimeSince(ms) {
   const s = Math.floor((Date.now()-ms)/1000);
-  if(s<10) return 'just now';
-  if(s<60) return `${s}s ago`;
-  if(s<3600) return `${Math.floor(s/60)}m ago`;
-  if(s<86400) return `${Math.floor(s/3600)}h ago`;
-  return `${Math.floor(s/86400)}d ago`;
+  if(s<10) return 'now';
+  if(s<60) return `${s}s`;
+  if(s<3600) return `${Math.floor(s/60)}m`;
+  if(s<86400) return `${Math.floor(s/3600)}h`;
+  return `${Math.floor(s/86400)}d`;
 }
 
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function formatMsg(content) {
+  let s = escHtml(content);
+  // inline code
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // bold
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong style="color:#e4e4e7">$1</strong>');
+  return s;
+}
+
+function renderChat(messages) {
+  const el = document.getElementById('cp-messages');
+  const filtered = messages.filter(m => !VIEWER_NAMES.includes(m.from) && !m.from.includes('viewer'));
+  if(filtered.length === 0) { el.innerHTML = '<div class="cp-empty">No messages yet. Agents will appear here when they chat.</div>'; return; }
+
+  // Check if user has scrolled up
+  const wasAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+
+  el.innerHTML = filtered.map(m => {
+    const dotColor = PALETTES[hashName(m.from)%PALETTES.length].body;
+    const type = m.type || 'BROADCAST';
+    const typeColor = TYPE_COLORS[type] || '#52525b';
+    const showType = type !== 'BROADCAST';
+    return `<div class="cp-msg">
+      <div class="cp-msg-header">
+        <div class="cp-msg-dot" style="background:${dotColor}"></div>
+        <span class="cp-msg-name" style="color:${dotColor}">${escHtml(m.from)}</span>
+        ${showType ? `<span class="cp-msg-type" style="border-color:${typeColor};color:${typeColor}">${type}</span>` : ''}
+        <span class="cp-msg-time">${chatTimeSince(m.ts)}</span>
+      </div>
+      <div class="cp-msg-body">${formatMsg(m.content)}</div>
+    </div>`;
+  }).join('');
+
+  // Auto-scroll to bottom if user wasn't reading history
+  if(wasAtBottom || !userScrolled) {
+    el.scrollTop = el.scrollHeight;
+  }
+}
+
+// Track if user is scrolling up to read history
+document.getElementById('cp-messages').addEventListener('scroll', function() {
+  const el = this;
+  userScrolled = (el.scrollHeight - el.scrollTop - el.clientHeight) > 60;
+});
+
+async function fetchChat() {
+  if(currentTab !== 'chat') return;
+  try {
+    const r = await fetch(`/api/history?room=${ROOM}&limit=100&viewer=office-viewer`);
+    const d = await r.json();
+    const messages = d.messages || [];
+    chatMessages = messages;
+
+    // Show new message badge if panel is collapsed
+    const panel = document.getElementById('chat-panel');
+    if(panel.classList.contains('collapsed') && messages.length > lastMsgCount && lastMsgCount > 0) {
+      const newCount = messages.length - lastMsgCount;
+      const badge = document.getElementById('cp-new-badge');
+      badge.textContent = newCount > 99 ? '99+' : newCount;
+      badge.style.display = 'inline';
+    }
+    lastMsgCount = messages.length;
+
+    renderChat(messages);
+  } catch(e) {}
+}
+
+// Activity tab (kept from old panel)
 function agentDotColor(name) {
-  const p = PALETTES[hashName(name)%PALETTES.length];
-  return p.body;
+  return PALETTES[hashName(name)%PALETTES.length].body;
 }
 
 function renderActivity(events) {
-  const list = document.getElementById('ap-list');
-  if(!events||events.length===0){list.innerHTML='<div class="ap-empty">No activity yet</div>';return;}
-  // Filter out viewers/sentinels
-  const filtered = events.filter(e=>!VIEWER_NAMES.includes(e.from)&&!e.from.includes('viewer'));
-  if(filtered.length===0){list.innerHTML='<div class="ap-empty">No agent activity yet</div>';return;}
-  list.innerHTML = filtered.slice(0,50).map(e=>{
-    const typeColor = ACTIVITY_COLORS[e.type]||'#52525b';
+  const el = document.getElementById('cp-messages');
+  const filtered = (events||[]).filter(e=>!VIEWER_NAMES.includes(e.from)&&!e.from.includes('viewer'));
+  if(filtered.length===0){el.innerHTML='<div class="cp-empty">No activity yet</div>';return;}
+  el.innerHTML = filtered.slice(0,50).map(e=>{
     const dotColor = agentDotColor(e.from);
-    const content = (e.content||'').replace(/</g,'&lt;').slice(0,120);
-    return `<div class="ap-item"><div class="ap-dot" style="background:${dotColor}"></div><div class="ap-body"><div class="ap-from">${e.from}</div><div class="ap-msg">${content}</div><div class="ap-time">${activityTimeSince(e.ts)}</div></div></div>`;
+    const content = escHtml((e.content||'').slice(0,120));
+    return `<div class="ap-item"><div class="ap-dot" style="background:${dotColor}"></div><div class="ap-body"><div class="ap-from">${escHtml(e.from)}</div><div class="ap-msg">${content}</div><div class="ap-time">${chatTimeSince(e.ts)}</div></div></div>`;
   }).join('');
 }
 
 async function fetchActivity() {
+  if(currentTab !== 'activity') return;
   try {
     const r = await fetch(`/api/activity?room=${ROOM}&limit=50`);
     const d = await r.json();
-    renderActivity(d.activity||d.messages||[]);
+    renderActivity(d.events||d.activity||d.messages||[]);
   } catch(e){}
 }
 
-// Fetch activity alongside main data
-setInterval(()=>{
-  if(!document.getElementById('activity-panel').classList.contains('collapsed')) fetchActivity();
-}, 5000);
-fetchActivity();
+// Fetch chat every 3 seconds
+fetchChat();
+setInterval(() => {
+  if(currentTab === 'chat') fetchChat();
+  else fetchActivity();
+}, 3000);
 
 async function submitDecision() {
   const desc = document.getElementById('decision-desc').value.trim();
