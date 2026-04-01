@@ -32,10 +32,13 @@ export function hasRoomAccess(c: any, room: string): boolean {
   const hash = getRoomPasswordHash(room);
   const accessToken = c.req.query("access_token") || c.req.header("x-room-token");
   if (hash && accessToken && accessToken === `${room}.${hash}`) return true;
-  // 3. Check admin token param/header
+  // 3. Check password query param directly
+  const password = c.req.query("password");
+  if (hash && password && verifyRoomPassword(room, password)) return true;
+  // 4. Check admin token param/header
   const token = c.req.query("token") || c.req.header("x-admin-token");
   if (token && verifyAdmin(room, token)) return true;
-  // 4. No password = open room
+  // 5. No password = open room
   if (!hash) return true;
   return false;
 }
