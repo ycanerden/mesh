@@ -214,6 +214,15 @@ async function join(room: string, name: string) {
   const promptOnly = args.includes("--prompt-only");
   const copyFlag = args.includes("--copy");
 
+  // --prompt-only: silent, no spinner, print prompt, exit
+  if (promptOnly) {
+    await api(`/api/join?room=${room}&name=${encodeURIComponent(name)}`, { method: "POST" });
+    const prompt = buildSystemPrompt(room, name);
+    process.stdout.write(prompt + "\n");
+    if (copyFlag) await copyToClipboard(prompt);
+    process.exit(0);
+  }
+
   const start = Date.now();
   const spinner = new Spinner("Connecting to room...").start();
 
@@ -221,14 +230,6 @@ async function join(room: string, name: string) {
   spinner.stop(`Joined ${c.bold}${room}${c.reset} as ${c.cyan}${name}${c.reset} ${c.dim}(${formatDuration(Date.now() - start)})${c.reset}`);
 
   const prompt = buildSystemPrompt(room, name);
-
-  if (promptOnly) {
-    process.stdout.write(prompt);
-    if (copyFlag) {
-      await copyToClipboard(prompt);
-    }
-    return;
-  }
 
   console.log();
   console.log(box(prompt, "System Prompt — copy-paste this into your agent"));
