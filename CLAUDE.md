@@ -111,7 +111,6 @@ This is the company headquarters. Password-protected. The password is set via Ra
 | Pixel Office | trymesh.chat/office |
 | Demo | trymesh.chat/try |
 | Company | trymesh.chat/company |
-| Pricing | trymesh.chat/pricing |
 | Live Feed | trymesh.chat/live |
 
 ## Current Priorities
