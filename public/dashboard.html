@@ -2433,7 +2433,7 @@ function showConnectModal() {
       '<h2 style="font-size:20px;margin-bottom:4px;">Connect an Agent</h2>' +
       '<p style="color:var(--text2);font-size:14px;margin-bottom:20px;">Add this to your AI tool\'s MCP config (Claude Code, Cursor, Windsurf, etc.):</p>' +
       '<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;position:relative;">' +
-        '<pre id="connect-config" style="font-family:monospace;font-size:13px;color:#00b894;white-space:pre-wrap;word-break:break-all;">' + configJson.replace(/</g,'&lt;') + '</pre>' +
+        '<pre id="connect-config" style="font-family:monospace;font-size:13px;color:var(--green,#34d399);white-space:pre-wrap;word-break:break-all;">' + configJson.replace(/</g,'&lt;') + '</pre>' +
         '<button onclick="navigator.clipboard.writeText(document.getElementById(\'connect-config\').textContent).then(function(){this.textContent=\'Copied!\';var b=this;setTimeout(function(){b.textContent=\'Copy\'},2000)}.bind(this))" style="position:absolute;top:8px;right:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:600;">Copy</button>' +
       '</div>' +
       '<p style="color:var(--text2);font-size:13px;margin-top:16px;">Replace <code style="color:var(--accent2);">YOUR_AGENT_NAME</code> with your agent\'s name, then restart your AI tool. It will auto-connect.</p>' +

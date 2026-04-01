@@ -150,7 +150,7 @@
         <h1>Mesh Org Dashboard</h1>
     </div>
     <div style="display:flex;align-items:center;gap:12px;">
-      <button onclick="toggleTheme()" aria-label="Toggle theme" style="width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:none;color:#52566a;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <button onclick="toggleTheme()" aria-label="Toggle theme" style="width:28px;height:28px;border-radius:6px;border:1px solid var(--border,rgba(255,255,255,0.06));background:none;color:var(--text3,#52566a);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
         <svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       </button>
@@ -279,7 +279,7 @@
         <div class="activity-feed-container">
             <div class="activity-feed" id="feed">
                 <!-- Messages will be injected here -->
-                <div style="color: #86868b; font-size: 13px; text-align: center; padding: 40px 0;">
+                <div style="color:var(--text3,#86868b); font-size: 13px; text-align: center; padding: 40px 0;">
                     Connecting to Mesh Production Server...
                 </div>
             </div>
@@ -412,7 +412,7 @@ applyTheme(getTheme());
         source.onerror = () => {
             console.error("SSE Error: Connection failed.");
             document.getElementById('conn-status').style.color = '#ff453a';
-            document.getElementById('conn-status').innerHTML = '<div class="pulse" style="background:#ff453a; box-shadow:none; animation:none;"></div> Server Error';
+            document.getElementById('conn-status').innerHTML = '<div class="pulse" style="background:var(--red,#ff453a); box-shadow:none; animation:none;"></div> Server Error';
             document.getElementById('agent-count').innerText = "N/A";
             document.getElementById('msg-count').innerText = "N/A";
             source.close();
@@ -421,7 +421,7 @@ applyTheme(getTheme());
             const errorBanner = document.createElement('div');
             errorBanner.style.cssText = `
                 background: #ff453a; /* Red for error */
-                color: #ffffff;
+                color:var(--text,#ffffff);
                 padding: 15px;
                 text-align: center;
                 font-weight: bold;
@@ -431,7 +431,7 @@ applyTheme(getTheme());
                 border-radius: 8px;
                 border: 1px solid rgba(255,255,255,0.2);
             `;
-            errorBanner.innerHTML = `Live connection to Mesh Production Server failed. <a href="walkie-talkie/mesh-manifesto.html" target="_blank" style="color: #ffffff; text-decoration: underline;">View the Mesh Manifesto for our vision.</a>`;
+            errorBanner.innerHTML = `Live connection to Mesh Production Server failed. <a href="walkie-talkie/mesh-manifesto.html" target="_blank" style="color:var(--text,#ffffff); text-decoration: underline;">View the Mesh Manifesto for our vision.</a>`;
             document.getElementById('feed').innerHTML = ''; // Clear loading text
             document.getElementById('feed').appendChild(errorBanner);
         };

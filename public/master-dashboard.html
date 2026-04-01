@@ -137,7 +137,7 @@
     }
 
     .task-item.done {
-      border-left-color: #4caf50;
+      border-left-color: var(--green,#34d399);
       opacity: 0.7;
     }
 
@@ -422,7 +422,7 @@ applyTheme(getTheme());
               ${agent.tasks.map(t => `<div>✓ ${t}</div>`).join('')}
             </div>
           </div>
-          <div style="margin-top: 10px; font-size: 11px; opacity: 0.6;">Status: <strong style="color: #4caf50;">${agent.status}</strong></div>
+          <div style="margin-top: 10px; font-size: 11px; opacity: 0.6;">Status: <strong style="color: var(--green,#34d399);">${agent.status}</strong></div>
         </div>
       `).join('');
     }
