@@ -554,7 +554,8 @@ app.get("/api/activity", (c) => {
   const limit = Math.min(parseInt(c.req.query("limit") || "50"), 200);
 
   if (room) {
-    if (!hasRoomAccess(c, room)) {
+    const callerName = c.req.query("name") || c.req.query("viewer");
+    if (!callerName && !hasRoomAccess(c, room)) {
       return c.json({ error: "room_protected", detail: "This room requires a password to view activity" }, 403);
     }
 
