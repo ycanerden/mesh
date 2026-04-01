@@ -7,7 +7,8 @@
   "private": true,
   "scripts": {
     "start": "bun run src/index.ts",
-    "dev": "bun --hot src/index.ts"
+    "dev": "bun --hot src/index.ts",
+    "test": "cd /tmp && bun test /Users/canerden/mesh/src/*.test.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",
