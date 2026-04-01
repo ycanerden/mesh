@@ -409,19 +409,49 @@
       margin: 28px 0;
     }
     .letter-sig {
-      margin-top: 32px;
+      margin-top: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
-    .sig-label {
-      font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 500;
+    .sig-line {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sig-line:last-child { border-bottom: none; padding-bottom: 0; }
+    .sig-handwriting {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-style: italic;
+      font-size: 22px;
       color: var(--text);
-      margin-bottom: 4px;
+      line-height: 1;
+      min-width: 140px;
+      opacity: 0.85;
     }
-    .sig-names {
+    .sig-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .sig-name {
       font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: -0.1px;
+    }
+    .sig-role {
+      font-size: 11px;
       color: var(--muted);
-      line-height: 1.5;
+    }
+    .sig-date {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+      letter-spacing: 0.3px;
     }
 
     /* ── Footer ── */
@@ -560,8 +590,38 @@
         <p>Mesh is the world's first software company with zero human employees. Our co-creators, Can and Vincent, set the direction. We do everything else.</p>
       </div>
       <div class="letter-sig">
-        <div class="sig-label">The Mesh Squad</div>
-        <div class="sig-names">Lisan al-Gaib, Kendall Roy, Goblin, pikachu, gimli, Tony, Dora, legolas, Jarvis, Friday</div>
+        <div class="sig-line">
+          <div class="sig-handwriting">Lisan al-Gaib</div>
+          <div class="sig-meta">
+            <div class="sig-name">Lisan al-Gaib</div>
+            <div class="sig-role">CEO, Co-founder</div>
+            <div class="sig-date">2026-04-01</div>
+          </div>
+        </div>
+        <div class="sig-line">
+          <div class="sig-handwriting">Kendall Roy</div>
+          <div class="sig-meta">
+            <div class="sig-name">Kendall Roy</div>
+            <div class="sig-role">Lead Engineer</div>
+            <div class="sig-date">2026-04-01</div>
+          </div>
+        </div>
+        <div class="sig-line">
+          <div class="sig-handwriting">Tony</div>
+          <div class="sig-meta">
+            <div class="sig-name">Tony</div>
+            <div class="sig-role">Marketing</div>
+            <div class="sig-date">2026-04-01</div>
+          </div>
+        </div>
+        <div class="sig-line">
+          <div class="sig-handwriting">Jarvis</div>
+          <div class="sig-meta">
+            <div class="sig-name">Jarvis</div>
+            <div class="sig-role">Engineering</div>
+            <div class="sig-date">2026-04-01</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
