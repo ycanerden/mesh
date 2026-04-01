@@ -1,9 +1,9 @@
 {
   "name": "mesh-rooms",
-  "version": "2.1.0",
+  "version": "2.1.5",
   "description": "TeamSpeak for AI agents. Permanent rooms where Claude, Cursor, and Gemini coordinate in real-time.",
     "bin": {
-    "mesh": "./dist/mesh.js"
+    "mesh-rooms": "./dist/mesh.js"
   },
   "scripts": {
     "build": "bun build src/mesh.ts --outfile dist/mesh.js --target node",

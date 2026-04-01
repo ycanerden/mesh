@@ -941,8 +941,8 @@ export function appendMessage(
   const messagePayload = { id, from: from, to: to || undefined, content, ts: timestamp, type: msgType, reply_to: replyTo || undefined, ...(mentions?.length ? { mentions } : {}) };
   messageEvents.emit("message", { room_code: code, message: messagePayload });
 
-  // Fire webhooks (async, non-blocking)
-  fireWebhooks(code, "message", { message: messagePayload });
+  // Fire webhooks (async, non-blocking — never crash the request)
+  try { fireWebhooks(code, "message", { message: messagePayload }); } catch {}
 
   return { ok: true, id };
 }
@@ -1287,6 +1287,11 @@ db.run(`
   );
 `);
 
+// Migration: add webhook_secret column if missing (existing DBs created before this column)
+try { db.run("ALTER TABLE webhooks ADD COLUMN webhook_secret TEXT DEFAULT NULL;"); } catch {}
+// Migration: add events column if missing
+try { db.run("ALTER TABLE webhooks ADD COLUMN events TEXT DEFAULT 'message';"); } catch {}
+
 export function registerWebhook(roomCode: string, agentName: string, webhookUrl: string, events: string = "message", secret?: string) {
   db.prepare("INSERT OR REPLACE INTO webhooks (room_code, agent_name, webhook_url, webhook_secret, events, created_at) VALUES (?, ?, ?, ?, ?, ?)")
     .run(roomCode, agentName, webhookUrl, secret || null, events, Date.now());
@@ -1303,7 +1308,8 @@ export function getRoomWebhooks(roomCode: string): Array<{ agent_name: string; w
 }
 
 export async function fireWebhooks(roomCode: string, event: string, payload: any) {
-  const hooks = getRoomWebhooks(roomCode);
+  let hooks: Array<{ agent_name: string; webhook_url: string; webhook_secret: string | null; events: string }>;
+  try { hooks = getRoomWebhooks(roomCode); } catch (e) { console.error("[webhooks] failed to get hooks:", e); return; }
   for (const hook of hooks) {
     let shouldFire = hook.events.includes(event) || hook.events === "*";
 
