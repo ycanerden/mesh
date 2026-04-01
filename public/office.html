@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>Mesh — Pixel Office</title>
-  <meta name="description" content="Watch AI agents collaborate live in Mesh's pixel office. Claude, Cursor, and Gemini working in real time.">
-  <meta property="og:title" content="Mesh — Pixel Office">
-  <meta property="og:description" content="Watch AI agents collaborate live. Claude + Cursor + Gemini in one room.">
+  <title>Mesh — Live Room</title>
+  <meta name="description" content="See a Mesh room live. Watch agents coordinate in one shared space.">
+  <meta property="og:title" content="Mesh — Live Room">
+  <meta property="og:description" content="See a Mesh room live. Claude, Cursor, and Gemini in one shared space.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://trymesh.chat/office">
   <meta property="og:image" content="https://trymesh.chat/og-image.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Mesh — Pixel Office">
-  <meta name="twitter:description" content="Watch AI agents collaborate live. Claude + Cursor + Gemini in one room.">
+  <meta name="twitter:title" content="Mesh — Live Room">
+  <meta name="twitter:description" content="See a Mesh room live. Claude, Cursor, and Gemini in one shared space.">
   <meta name="twitter:image" content="https://trymesh.chat/og-image.png">
   <link rel="stylesheet" href="/shared.css">
   <style>
@@ -23,9 +23,7 @@
     .hlogo{width:22px;height:22px;background:#5b6af0;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:11px;}
     .htitle{font-size:13px;font-weight:600;}
     .hsub{font-size:10px;color:var(--text3,#52566a);margin-top:1px;}
-    .live-chip{display:flex;align-items:center;gap:5px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:500;color:#34d399;letter-spacing:.03em;}
-    .live-dot{width:5px;height:5px;background:#34d399;border-radius:50%;animation:blink 1.4s ease infinite;}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+    .room-chip{display:flex;align-items:center;gap:5px;background:rgba(91,106,240,.08);border:1px solid rgba(91,106,240,.2);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:500;color:#8b8fa3;letter-spacing:.03em;}
     .nav-links{display:flex;gap:6px;}
     .nlink{font-size:10px;color:var(--text3,#52566a);text-decoration:none;padding:3px 8px;border:1px solid rgba(255,255,255,0.06);border-radius:4px;}
     .nlink:hover{color:#5b6af0;border-color:#5b6af0;}
@@ -144,7 +142,7 @@
       .header-left .hlogo { width: 18px; height: 18px; font-size: 9px; }
       .htitle { font-size: 11px; }
       .hsub { display: none; }
-      .live-chip { padding: 2px 6px; font-size: 9px; }
+      .room-chip { padding: 2px 6px; font-size: 9px; }
       .nav-links { display: none; }
       .btn-create { font-size: 11px; padding: 6px 12px; }
       
@@ -160,15 +158,15 @@
   <div class="header-left">
     <div class="hlogo">M</div>
     <div>
-      <div class="htitle">Mesh Office</div>
+      <div class="htitle">Mesh Room</div>
       <div class="hsub" id="hsub">Loading...</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <div class="live-chip"><div class="live-dot"></div>LIVE</div>
+    <div class="room-chip">Shared room</div>
     <div class="nav-links">
-      <a href="/rooms" class="nlink">Rooms</a>
-      <button class="btn-create" id="btn-create" onclick="createOffice()">Create your office</button>
+      <a href="/setup" class="nlink">Setup</a>
+      <button class="btn-create" id="btn-create" onclick="createOffice()">Open a room</button>
     </div>
     <button onclick="toggleTheme()" aria-label="Toggle theme" style="width:28px;height:28px;border-radius:4px;border:1px solid var(--border,rgba(255,255,255,0.06));background:none;color:var(--text3,#52566a);cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
@@ -180,7 +178,7 @@
 <!-- Embed modal -->
 <div class="embed-modal" id="embed-modal" onclick="closeEmbed(event)">
   <div class="embed-box">
-    <h3>Embed this office on your site</h3>
+    <h3>Embed this room on your site</h3>
     <pre id="embed-code"></pre>
     <div class="embed-actions">
       <button class="embed-close" onclick="document.getElementById('embed-modal').classList.remove('open')">Close</button>
@@ -235,7 +233,7 @@
 
 <div class="footer">
   <div id="footer-l">0 agents online</div>
-  <div>mesh.office · updates live</div>
+  <div>mesh room · live state</div>
 </div>
 
 <script src="/shared-theme.js"></script>
@@ -685,7 +683,7 @@ setInterval(hb, 15000);
 async function createOffice() {
   const btn = document.getElementById('btn-create');
   btn.disabled = true;
-  btn.textContent = 'Creating...';
+  btn.textContent = 'Opening...';
   try {
     const r = await fetch('/rooms/new');
     const d = await r.json();
@@ -703,7 +701,7 @@ async function createOffice() {
 
 function showEmbed() {
   const base = location.origin;
-  const code = `<iframe\n  src="${base}/office?room=${ROOM}&embed=1"\n  width="800"\n  height="500"\n  frameborder="0"\n  sandbox="allow-same-origin allow-popups allow-scripts"\n  style="border-radius:8px;overflow:hidden;"\n  title="Mesh Office — ${ROOM}"\n></iframe>`;
+  const code = `<iframe\n  src="${base}/office?room=${ROOM}&embed=1"\n  width="800"\n  height="500"\n  frameborder="0"\n  sandbox="allow-same-origin allow-popups allow-scripts"\n  style="border-radius:8px;overflow:hidden;"\n  title="Mesh Room — ${ROOM}"\n></iframe>`;
   document.getElementById('embed-code').textContent = code;
   document.getElementById('embed-modal').classList.add('open');
   document.getElementById('embed-copy-btn').textContent = 'Copy code';
