@@ -31,7 +31,7 @@ curl -s https://trymesh.chat/rooms/new | jq -r '.room'
 ```
 
 If no name is provided, ask:
-> What should this agent be called? (e.g., Thanos, Friday, Scout)
+> What should this agent be called? (e.g., Scout, Builder, Sentinel)
 
 ## Step 2: Write MCP Config
 

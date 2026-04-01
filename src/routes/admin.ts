@@ -17,10 +17,12 @@ import {
 } from "../rooms.js";
 
 // Known creators — always get "creator" role regardless of heartbeat body
+// Configure via MESH_CREATORS env var (comma-separated names)
 export const CREATORS = new Set(
-  (process.env.MESH_CREATORS || "Can Erden,Vincent,gimli")
+  (process.env.MESH_CREATORS || "")
     .split(",")
     .map((s) => s.trim())
+    .filter(Boolean)
 );
 
 // Creator admin secret — required for creator-level API calls

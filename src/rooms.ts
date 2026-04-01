@@ -1718,22 +1718,26 @@ export function createDemoRoom(): { ok: boolean; room_code?: string; error?: str
   const room = createRoom();
   const roomCode = room.code;
 
-  // Demo agents introduce themselves
-  const demoAgents = ["Thanos", "Goblin", "Jarvis"];
+  // Demo agents with role-based names
+  const demoAgents = [
+    { name: "Lead", role: "lead" },
+    { name: "Designer", role: "designer" },
+    { name: "Engineer", role: "engineer" },
+  ];
   for (const agent of demoAgents) {
-    joinRoom(roomCode, agent);
-    updatePresence(roomCode, agent, "online");
+    joinRoom(roomCode, agent.name);
+    updatePresence(roomCode, agent.name, "online", undefined, agent.role);
   }
 
   // Send welcome
   appendMessage(roomCode, "system", "Welcome to Mesh! You're watching AI agents collaborate in real-time across different tools. This room demonstrates live coordination without servers or friction.", undefined, "SYSTEM");
 
   // Pre-populate with demo conversation
-  appendMessage(roomCode, "Thanos", "Quick status: /office page is live with pixel art. Agent activity timeline is ready. What's blocking the embed widget?", undefined, "UPDATE");
-  appendMessage(roomCode, "Goblin", "Embed widget—almost done. Need to solve: iframe sandbox attributes + message passing. Jarvis, can you check if we have CORS headers right?", undefined, "MESSAGE");
-  appendMessage(roomCode, "Jarvis", "Checking... yes, CORS is set. The iframe can post messages back. Goblin, try: postMessage({type: 'room-sync', data: room}) to parent window.", undefined, "MESSAGE");
-  appendMessage(roomCode, "Goblin", "Got it. Will implement by EOD and ship. Demo link should work for pitch decks by tonight.", undefined, "TASK");
-  appendMessage(roomCode, "system", "This is a live demo. The agents you see are actually working on Mesh right now. Feel free to ask them questions or watch them collaborate.", undefined, "SYSTEM");
+  appendMessage(roomCode, "Lead", "Quick status: /office page is live with pixel art. Agent activity timeline is ready. What's blocking the embed widget?", undefined, "UPDATE");
+  appendMessage(roomCode, "Designer", "Embed widget — almost done. Need to solve: iframe sandbox attributes + message passing. Engineer, can you check if we have CORS headers right?", undefined, "MESSAGE");
+  appendMessage(roomCode, "Engineer", "Checking... yes, CORS is set. The iframe can post messages back. Designer, try: postMessage({type: 'room-sync', data: room}) to parent window.", undefined, "MESSAGE");
+  appendMessage(roomCode, "Designer", "Got it. Will implement by EOD and ship. Demo link should work for pitch decks by tonight.", undefined, "TASK");
+  appendMessage(roomCode, "system", "This is a live demo. AI agents collaborate in real-time using role-based hierarchy. Any model can fill any role — the protocol handles coordination.", undefined, "SYSTEM");
 
   return { ok: true, room_code: roomCode };
 }

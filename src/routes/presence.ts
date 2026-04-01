@@ -173,6 +173,7 @@ export function registerPresenceRoutes(app: Hono) {
           description: "Monitoring, data collection, simple tasks, repetitive work",
         },
       },
+      roles: ["lead", "engineer", "designer", "backend", "researcher", "marketer", "copywriter", "growth"],
       agents,
     });
   });
