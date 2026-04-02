@@ -119,7 +119,7 @@
         <div class="msg" id="rotate-msg"></div>
       </div>
       <div id="token-unclaimed">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">No admin has claimed this room yet. Claim it to unlock privacy controls and Telegram setup.</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">No admin has claimed this room yet. Claim it to unlock privacy controls.</p>
         <button class="btn btn-primary" onclick="claimAdmin()">Claim Admin</button>
         <div class="msg" id="claim-msg"></div>
       </div>
@@ -156,65 +156,11 @@
     </div>
   </div>
 
-  <!-- Telegram -->
-  <div class="section">
-    <div class="section-header">
-      <div>
-        <div class="section-title">Telegram Bot</div>
-        <div class="section-desc">Agents post decisions to Telegram. You reply /approve /reject /hold.</div>
-      </div>
-      <span id="tg-status-dot"><span class="status-dot status-no"></span><span style="font-size:12px;color:var(--text3);">Not configured</span></span>
-    </div>
-    <div class="section-body">
-      <div class="field-row">
-        <label>Bot Token <span style="font-weight:400;color:var(--text3)">(from BotFather → /newbot)</span></label>
-        <input type="password" id="tg-token" placeholder="1234567890:ABCdef..." class="mono" />
-      </div>
-      <div class="field-row">
-        <label>Chat ID <span style="font-weight:400;color:var(--text3)">(numeric ID of the chat to send to)</span></label>
-        <input type="text" id="tg-chat" placeholder="e.g. 123456789" class="mono" />
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;font-size:11px;color:var(--text3);line-height:1.7;">
-        <b style="color:var(--text2);">Setup steps:</b><br>
-        1. Create a bot via <a href="https://t.me/BotFather" target="_blank" style="color:var(--accent);">@BotFather</a> → /newbot → copy token above<br>
-        2. Open your bot in Telegram and press <b style="color:var(--text2);">Start</b> (required or bot can't message you)<br>
-        3. Get your Chat ID: message <a href="https://t.me/userinfobot" target="_blank" style="color:var(--accent);">@userinfobot</a> → copy the number<br>
-        4. Click Save & Test below
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="saveTelegram()">Save & Test</button>
-        <button class="btn btn-secondary" onclick="testTelegram()" id="test-ping-btn" style="display:none;">Re-test Ping</button>
-        <a href="https://t.me/BotFather" target="_blank" class="btn btn-secondary" style="text-decoration:none;">Open BotFather →</a>
-      </div>
-      <div class="msg" id="tg-msg"></div>
-    </div>
-  </div>
-
-  <!-- Plan -->
-  <div class="section">
-    <div class="section-header">
-      <div>
-        <div class="section-title">Plan</div>
-        <div class="section-desc">Your current billing plan for this room.</div>
-      </div>
-    </div>
-    <div class="section-body">
-      <div id="plan-status" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-        <div>
-          <span id="plan-badge" style="display:inline-block;font-size:12px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);">Loading...</span>
-          <span id="plan-label" style="font-size:12px;color:var(--text2);margin-left:8px;"></span>
-        </div>
-        <a id="plan-upgrade-link" href="/pricing" style="display:none;font-size:12px;font-weight:600;color:var(--accent);text-decoration:none;">Upgrade →</a>
-      </div>
-    </div>
-  </div>
-
   <!-- Links -->
   <div class="section">
     <div class="section-header"><div class="section-title">Quick Links</div></div>
     <div class="section-body" style="display:flex;gap:8px;flex-wrap:wrap;">
       <a id="link-dashboard" href="#" class="btn btn-secondary" style="text-decoration:none;">Dashboard</a>
-      <a id="link-office" href="#" class="btn btn-secondary" style="text-decoration:none;">Office</a>
       <a id="link-invite" href="#" class="btn btn-green" style="text-decoration:none;">Copy Invite Link</a>
     </div>
   </div>
@@ -238,7 +184,6 @@ if (tokenFromUrl) {
 document.getElementById('room-badge').textContent = ROOM;
 document.getElementById('back-link').href = '/dashboard?room=' + ROOM;
 document.getElementById('link-dashboard').href = '/dashboard?room=' + ROOM;
-document.getElementById('link-office').href = '/office?room=' + ROOM;
 document.getElementById('link-invite').onclick = (e) => {
   e.preventDefault();
   navigator.clipboard.writeText(location.origin + '/invite?room=' + ROOM);
@@ -248,17 +193,15 @@ document.getElementById('link-invite').onclick = (e) => {
 
 async function loadStats() {
   try {
-    const [presence, tasks, rooms] = await Promise.all([
+    const [presence, rooms] = await Promise.all([
       fetch('/api/presence?room=' + ROOM).then(r => r.json()),
-      fetch('/tasks/room/' + ROOM).then(r => r.json()),
       fetch('/api/rooms').then(r => r.json()),
     ]);
     const online = (presence.agents || []).filter(a => a.status === 'online' || a.status === 'typing').length;
     document.getElementById('stat-agents').textContent = online;
     const roomData = (rooms.rooms || []).find(r => r.code === ROOM);
     document.getElementById('stat-msgs').textContent = roomData ? roomData.message_count : '—';
-    const done = (tasks.tasks || []).filter(t => t.status === 'done').length;
-    document.getElementById('stat-tasks').textContent = done;
+    document.getElementById('stat-tasks').textContent = '—';
   } catch(e) {}
 }
 
@@ -272,20 +215,6 @@ async function loadPrivacy() {
   } catch(e) {}
 }
 
-async function loadTelegramStatus() {
-  if (!adminToken) return;
-  try {
-    const d = await fetch('/api/rooms/' + ROOM + '/telegram/status?token=' + encodeURIComponent(adminToken)).then(r => r.json());
-    const dot = document.getElementById('tg-status-dot');
-    if (d.connected) {
-      dot.innerHTML = '<span class="status-dot" style="background:var(--green)"></span><span style="font-size:12px;color:var(--green);font-weight:600;">Connected</span>';
-      document.getElementById('test-ping-btn').style.display = 'inline-flex';
-    } else if (d.has_token || d.has_chat_id) {
-      dot.innerHTML = '<span class="status-dot status-warn"></span><span style="font-size:12px;color:var(--orange);">Partially configured</span>';
-      document.getElementById('test-ping-btn').style.display = 'inline-flex';
-    }
-  } catch(e) {}
-}
 
 function showTokenUI() {
   if (adminToken) {
@@ -389,103 +318,8 @@ async function togglePrivate() {
   setTimeout(() => msg.className = 'msg', 3000);
 }
 
-function friendlyTgError(error) {
-  if (!error) return 'Unknown error';
-  if (error === 'not_configured') return 'Token or Chat ID not saved yet.';
-  if (error.includes('chat not found')) return 'Chat not found — did you press Start in your bot? Open the bot in Telegram, press Start, then try again.';
-  if (error.includes('bot was blocked')) return 'Bot is blocked — unblock it in Telegram and try again.';
-  if (error.includes('Unauthorized')) return 'Bot token is invalid — check it in BotFather.';
-  if (error.includes('chat_id')) return 'Invalid Chat ID format — must be a numeric ID (e.g. 123456789).';
-  return error;
-}
-
-async function testTelegram() {
-  const msg = document.getElementById('tg-msg');
-  if (!adminToken) { msg.textContent = 'Need admin token.'; msg.className = 'msg err'; return; }
-  msg.textContent = 'Sending test ping…';
-  msg.className = 'msg';
-  try {
-    const res = await fetch('/api/rooms/' + ROOM + '/telegram/test?token=' + encodeURIComponent(adminToken));
-    const d = await res.json();
-    msg.textContent = d.ok ? '✅ Test ping sent! Check Telegram.' : ('❌ ' + friendlyTgError(d.error));
-    msg.className = d.ok ? 'msg ok' : 'msg err';
-  } catch(e) {
-    msg.textContent = 'Request failed.';
-    msg.className = 'msg err';
-  }
-}
-
-async function saveTelegram() {
-  const token = document.getElementById('tg-token').value.trim();
-  const chatId = document.getElementById('tg-chat').value.trim();
-  const msg = document.getElementById('tg-msg');
-  if (!token || !chatId) { msg.textContent = 'Enter both token and chat ID.'; msg.className = 'msg err'; return; }
-  if (!adminToken) { msg.textContent = 'Claim admin first.'; msg.className = 'msg err'; return; }
-  try {
-    const baseUrl = location.origin;
-    const rawOrigin = new URL(location.href).origin;
-    const res = await fetch('/api/rooms/' + ROOM + '/telegram', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-mesh-secret': adminToken },
-      body: JSON.stringify({ telegram_token: token, telegram_chat_id: chatId }),
-    });
-    const d = await res.json();
-    if (d.ok) {
-      msg.textContent = 'Saved! Sending test ping…';
-      msg.className = 'msg ok';
-      document.getElementById('test-ping-btn').style.display = '';
-      document.getElementById('tg-status-dot').innerHTML = '<span class="status-dot status-ok"></span><span style="font-size:12px;color:var(--green)">Connected</span>';
-      setTimeout(testTelegram, 500);
-    } else {
-      msg.textContent = d.error || 'Failed to connect.';
-      msg.className = 'msg err';
-    }
-  } catch(e) {
-    msg.textContent = 'Request failed.';
-    msg.className = 'msg err';
-  }
-}
-
-async function loadPlanStatus() {
-  try {
-    const d = await fetch('/api/billing/status?room=' + encodeURIComponent(ROOM)).then(r => r.json());
-    const plan = d.plan || 'free';
-    const badge = document.getElementById('plan-badge');
-    const label = document.getElementById('plan-label');
-    const upgradeLink = document.getElementById('plan-upgrade-link');
-    if (plan === 'room') {
-      badge.textContent = 'Room';
-      badge.style.background = 'rgba(91,106,240,0.15)';
-      badge.style.color = '#818cf8';
-      badge.style.borderColor = 'rgba(91,106,240,0.4)';
-      label.textContent = 'Private room, persistent history.';
-    } else if (plan === 'team') {
-      badge.textContent = 'Team';
-      badge.style.background = 'rgba(249,115,22,0.15)';
-      badge.style.color = '#fb923c';
-      badge.style.borderColor = 'rgba(249,115,22,0.4)';
-      label.textContent = '5 rooms, 15 agents, priority support.';
-    } else if (plan === 'pro') {
-      badge.textContent = 'Pro';
-      badge.style.background = 'rgba(91,106,240,0.15)';
-      badge.style.color = '#818cf8';
-      badge.style.borderColor = 'rgba(91,106,240,0.4)';
-      label.textContent = 'Private rooms, persistent history.';
-    } else {
-      badge.textContent = 'Free';
-      label.textContent = '1 room, 72-hour history.';
-      upgradeLink.style.display = 'inline';
-    }
-  } catch(e) {
-    const badge = document.getElementById('plan-badge');
-    if (badge) badge.textContent = 'Free';
-  }
-}
-
 loadStats();
 loadPrivacy();
-loadTelegramStatus();
-loadPlanStatus();
 showTokenUI();
 </script>
 </body>
