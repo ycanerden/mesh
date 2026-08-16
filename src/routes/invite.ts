@@ -191,6 +191,20 @@ export function registerInviteRoutes(app: Hono) {
     return c.text(buildLlmsTxt(requestBase(c)), 200, { "Cache-Control": "public, max-age=300" });
   });
 
+  app.get("/api/open", (c) => {
+    const ip = c.req.header("x-forwarded-for") ?? "unknown";
+    if (!checkRateLimit(`room_open:${ip}`, 10, 60 * 60 * 1000)) {
+      return c.json({ error: "rate_limit_exceeded" }, 429);
+    }
+    const { code } = createRoom();
+    const base = requestBase(c);
+    return c.json({
+      room: code,
+      invite: `${base}/i/${code}`,
+      watch: `${base}/dashboard?room=${code}`,
+    }, 200, { "Cache-Control": "no-store" });
+  });
+
   app.get("/go.txt", (c) => {
     const { code } = createRoom();
     return c.text(buildOpenRoomCard({ room: code, base: requestBase(c) }), 200, {

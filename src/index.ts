@@ -156,7 +156,24 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map(s => s.trim())
   : ["https://trymesh.chat"];
 app.use("*", cors({
-  origin: ALLOWED_ORIGINS,
+  origin: (origin) => {
+    if (!origin) return origin;
+    if (ALLOWED_ORIGINS.includes(origin)) return origin;
+    try {
+      const host = new URL(origin).hostname;
+      if (
+        host === "localhost" ||
+        host === "127.0.0.1" ||
+        host.endsWith(".vercel.app") ||
+        host.endsWith(".trycloudflare.com")
+      ) {
+        return origin;
+      }
+    } catch {
+      return undefined;
+    }
+    return undefined;
+  },
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: ["Content-Type", "x-mesh-secret", "x-admin-token"],
   exposeHeaders: ["Content-Type"],
@@ -1176,5 +1193,6 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 export default {
   port,
+  idleTimeout: 0,
   fetch: app.fetch,
 };
