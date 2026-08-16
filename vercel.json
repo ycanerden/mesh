@@ -3,7 +3,6 @@
   "installCommand": "echo skip",
   "buildCommand": "echo skip",
   "outputDirectory": "public",
-  "cleanUrls": true,
   "headers": [
     {
       "source": "/(.*)",
