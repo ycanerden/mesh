@@ -3,6 +3,14 @@
   "installCommand": "echo skip",
   "buildCommand": "echo skip",
   "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/go", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/go" },
+    { "source": "/go.txt", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/go.txt" },
+    { "source": "/api/:path*", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/api/:path*" },
+    { "source": "/i/:path*", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/i/:path*" },
+    { "source": "/dashboard", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/dashboard" },
+    { "source": "/mcp", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/mcp" }
+  ],
   "headers": [
     {
       "source": "/(.*)",
