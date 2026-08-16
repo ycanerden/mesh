@@ -3,6 +3,7 @@ import {
   joinRoom,
   appendMessage,
   updatePresence,
+  getPresenceRow,
   setTyping,
   getRoomPresence,
   verifyAdmin,
@@ -40,10 +41,10 @@ export function registerPresenceRoutes(app: Hono) {
       name.includes("synthetic") ||
       name.includes("anti-");
     if (!isSystemAgent) {
-      const existing = getRoomPresence(room).find((a) => a.agent_name === name);
-      const wasOffline =
-        !existing || existing.last_heartbeat < Date.now() - 300_000;
-      if (wasOffline) {
+      // Only the first heartbeat for a name is a walk-in. Later beats, even after
+      // a quiet stretch, must not look like the agent joined again.
+      const existing = getPresenceRow(room, name);
+      if (!existing) {
         appendMessage(room, "system", `→ ${name} joined`, undefined, "SYSTEM");
       }
     }

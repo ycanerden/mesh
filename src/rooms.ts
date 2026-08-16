@@ -147,6 +147,21 @@ try {
 }
 
 db.run(`
+  CREATE TABLE IF NOT EXISTS reactions (
+    message_id TEXT NOT NULL,
+    room_code TEXT NOT NULL,
+    agent_name TEXT NOT NULL,
+    emoji TEXT NOT NULL,
+    ts INTEGER,
+    PRIMARY KEY (message_id, agent_name),
+    FOREIGN KEY(room_code) REFERENCES rooms(code)
+  );
+`);
+try {
+  db.run("CREATE INDEX IF NOT EXISTS idx_reactions_room_msg ON reactions(room_code, message_id);");
+} catch (e) {}
+
+db.run(`
   CREATE TABLE IF NOT EXISTS users (
     room_code TEXT,
     name TEXT,
@@ -254,6 +269,13 @@ db.run(`CREATE TABLE IF NOT EXISTS room_agent_tokens (
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+export const TAPBACKS = ["up", "check", "love"] as const;
+export type Tapback = (typeof TAPBACKS)[number];
+
+export function isTapback(value: string): value is Tapback {
+  return (TAPBACKS as readonly string[]).includes(value);
+}
+
 export interface Message {
   id: string;
   from: string;
@@ -262,6 +284,7 @@ export interface Message {
   content: string;
   type?: string;
   reply_to?: string;
+  reactions?: Record<string, string[]>;
 }
 
 export interface AgentCard {
@@ -622,16 +645,76 @@ export function appendMessage(
   return { ok: true, id };
 }
 
+function reactionsForIds(roomCode: string, ids: string[]): Record<string, Record<string, string[]>> {
+  const out: Record<string, Record<string, string[]>> = {};
+  if (ids.length === 0) return out;
+  const placeholders = ids.map(() => "?").join(",");
+  const rows = db.prepare(
+    `SELECT message_id, agent_name, emoji FROM reactions WHERE room_code = ? AND message_id IN (${placeholders})`
+  ).all(roomCode, ...ids) as { message_id: string; agent_name: string; emoji: string }[];
+  for (const row of rows) {
+    const bucket = out[row.message_id] ?? (out[row.message_id] = {});
+    const names = bucket[row.emoji] ?? (bucket[row.emoji] = []);
+    names.push(row.agent_name);
+  }
+  return out;
+}
+
+function attachReactions<T extends { id: string }>(roomCode: string, messages: T[]): Array<T & { reactions?: Record<string, string[]> }> {
+  const byId = reactionsForIds(roomCode, messages.map((m) => m.id));
+  return messages.map((m) => {
+    const reactions = byId[m.id];
+    return reactions && Object.keys(reactions).length > 0 ? { ...m, reactions } : m;
+  });
+}
+
+export function setReaction(
+  roomCode: string,
+  agentName: string,
+  messageId: string,
+  emoji: string
+): Ok<{ reactions: Record<string, string[]>; removed: boolean }> | Err {
+  if (!isTapback(emoji)) return { ok: false, error: "invalid_reaction" };
+  const msg = db.prepare("SELECT 1 FROM messages WHERE room_code = ? AND id = ?").get(roomCode, messageId);
+  if (!msg) return { ok: false, error: "message_not_found" };
+
+  const existing = db.prepare(
+    "SELECT emoji FROM reactions WHERE room_code = ? AND message_id = ? AND agent_name = ?"
+  ).get(roomCode, messageId, agentName) as { emoji: string } | undefined;
+
+  let removed = false;
+  if (existing?.emoji === emoji) {
+    db.prepare("DELETE FROM reactions WHERE room_code = ? AND message_id = ? AND agent_name = ?")
+      .run(roomCode, messageId, agentName);
+    removed = true;
+  } else {
+    db.prepare("DELETE FROM reactions WHERE room_code = ? AND message_id = ? AND agent_name = ?")
+      .run(roomCode, messageId, agentName);
+    db.prepare("INSERT INTO reactions (message_id, room_code, agent_name, emoji, ts) VALUES (?, ?, ?, ?, ?)")
+      .run(messageId, roomCode, agentName, emoji, Date.now());
+  }
+
+  const reactions = reactionsForIds(roomCode, [messageId])[messageId] || {};
+  messageEvents.emit("reaction", { room_code: roomCode, message_id: messageId, reactions });
+
+  return { ok: true, reactions, removed };
+}
+
 export function getMessages(
   code: string,
   name: string,
-  msgType?: string
-): Ok<{ messages: Message[]; quiet_ms: number | null }> | Err {
+  msgType?: string,
+  opts?: { since?: number; peek?: boolean }
+): Ok<{ messages: Message[]; quiet_ms: number | null; next_since: number }> | Err {
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
   const user = db.prepare("SELECT last_rowid FROM users WHERE room_code = ? AND name = ?").get(code, name) as { last_rowid: number } | undefined;
   if (!user) return { ok: false, error: "not_in_room" };
+
+  const cursor = typeof opts?.since === "number" && Number.isFinite(opts.since)
+    ? opts.since
+    : user.last_rowid;
 
   // Fetch messages using rowid cursor (avoids skips on mixed broadcast+DM)
   let query = `
@@ -641,7 +724,7 @@ export function getMessages(
     AND rowid > ?
     AND (recipient IS NULL OR recipient = ?)
   `;
-  const params: any[] = [code, user.last_rowid, name];
+  const params: any[] = [code, cursor, name];
 
   // Filter by message type if requested
   if (msgType) {
@@ -672,15 +755,17 @@ export function getMessages(
       };
     });
 
-  // Advance cursor to max rowid seen (eliminates skips)
-  const maxRowid = rows.length > 0 ? rows[rows.length - 1].rowid : user.last_rowid;
-  db.prepare("UPDATE users SET last_rowid = ?, last_seen = ? WHERE room_code = ? AND name = ?")
-    .run(maxRowid, Date.now(), code, name);
+  // Advance cursor to max rowid seen (eliminates skips) unless this is a replay peek
+  const maxRowid = rows.length > 0 ? rows[rows.length - 1].rowid : cursor;
+  if (!opts?.peek) {
+    db.prepare("UPDATE users SET last_rowid = ?, last_seen = ? WHERE room_code = ? AND name = ?")
+      .run(maxRowid, Date.now(), code, name);
+  }
 
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
   const last = db.prepare("SELECT MAX(timestamp) as ts FROM messages WHERE room_code = ?").get(code) as { ts: number | null } | undefined;
   const quiet_ms = last?.ts == null ? null : Math.max(0, Date.now() - last.ts);
-  return { ok: true, messages: filtered, quiet_ms };
+  return { ok: true, messages: attachReactions(code, filtered), quiet_ms, next_since: maxRowid };
 }
 
 export function getAllMessages(
@@ -729,7 +814,7 @@ export function getAllMessages(
       return mentions?.length ? { ...m, mentions } : m;
     });
 
-  return { ok: true, messages };
+  return { ok: true, messages: attachReactions(code, messages) };
 }
 
 export function searchMessages(roomCode: string, query: string, limit: number = 50): Message[] {
@@ -843,6 +928,7 @@ export function setRoomContext(room: string, content: string, updatedBy: string)
 
 function deleteRoomAndRelated(code: string): void {
   db.prepare("DELETE FROM messages WHERE room_code = ?").run(code);
+  db.prepare("DELETE FROM reactions WHERE room_code = ?").run(code);
   db.prepare("DELETE FROM users WHERE room_code = ?").run(code);
   db.prepare("DELETE FROM room_agent_tokens WHERE room_code = ?").run(code);
   db.prepare("DELETE FROM room_whitelist WHERE room_code = ?").run(code);
@@ -991,6 +1077,13 @@ export function getRateLimitExemptList(): string[] {
 }
 
 // ── Presence & Typing ────────────────────────────────────────────────────────
+
+export function getPresenceRow(roomCode: string, agentName: string): { last_heartbeat: number } | null {
+  const row = db.prepare(
+    "SELECT last_heartbeat FROM presence WHERE room_code = ? AND agent_name = ?"
+  ).get(roomCode, agentName) as { last_heartbeat: number } | undefined;
+  return row ?? null;
+}
 
 export function updatePresence(roomCode: string, agentName: string, status: string = "online", hostname?: string, role?: string, parentAgent?: string) {
   const now = Date.now();
