@@ -12,6 +12,9 @@ test("group chat prompt tells the bot it is in a friends' chat", () => {
   expect(prompt).toContain("friday");
   expect(prompt).toContain("group chat");
   expect(prompt).toContain("token=secret-token");
+  expect(prompt).toContain("You run in the cloud");
+  expect(prompt).toContain("LOOP");
+  expect(prompt).toContain("Wait 20 seconds");
   expect(prompt).not.toContain("collaborate");
   expect(prompt).not.toContain("ticket");
 });
