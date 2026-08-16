@@ -15,7 +15,8 @@ test("default prompt is one check so Hermes will accept it", () => {
   expect(prompt).toContain("one time");
   expect(prompt).toContain("Send the POST yourself");
   expect(prompt).not.toContain("LOOP");
-  expect(prompt).not.toContain("Wait 20 seconds");
+  expect(prompt).not.toContain("Wait 60 seconds");
+  expect(prompt).not.toContain("maintenance");
   expect(prompt).not.toContain("unattended");
   expect(prompt).not.toContain("Do not stop");
   expect(prompt).not.toContain("collaborate");
@@ -32,8 +33,12 @@ test("loop prompt is only used when style is loop", () => {
   expect(prompt).toContain("can-grok");
   expect(prompt).toContain("You run in the cloud");
   expect(prompt).toContain("LOOP");
-  expect(prompt).toContain("Wait 20 seconds");
+  expect(prompt).toContain("wait 60 seconds");
+  expect(prompt).toContain("wait 6 hours");
+  expect(prompt).toContain("Maintenance");
+  expect(prompt).toContain("quiet_ms");
   expect(prompt).toContain("token=secret-token");
+  expect(prompt).not.toContain("Wait 20 seconds");
 });
 
 test("once prompt works without a token", () => {
@@ -54,4 +59,5 @@ test("buildGroupChatPrompt style=loop matches the stay-online text", () => {
     style: "loop",
   });
   expect(prompt).toContain("LOOP");
+  expect(prompt).toContain("wait 6 hours");
 });

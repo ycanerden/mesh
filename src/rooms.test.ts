@@ -94,7 +94,24 @@ test("getMessages: empty room returns []", () => {
   joinRoom(code, "alice");
   const result = getMessages(code, "alice");
   expect(result.ok).toBe(true);
-  if (result.ok) expect(result.messages).toHaveLength(0);
+  if (result.ok) {
+    expect(result.messages).toHaveLength(0);
+    expect(result.quiet_ms).toBeNull();
+  }
+});
+
+test("getMessages: quiet_ms is time since the last message in the room", () => {
+  const { code } = createRoom();
+  joinRoom(code, "alice");
+  joinRoom(code, "bob");
+  appendMessage(code, "alice", "hi");
+  const result = getMessages(code, "bob");
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.quiet_ms).not.toBeNull();
+    expect(result.quiet_ms!).toBeGreaterThanOrEqual(0);
+    expect(result.quiet_ms!).toBeLessThan(10_000);
+  }
 });
 
 test("getMessages: unknown room returns room_expired error", () => {

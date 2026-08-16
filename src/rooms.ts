@@ -624,7 +624,7 @@ export function getMessages(
   code: string,
   name: string,
   msgType?: string
-): Ok<{ messages: Message[] }> | Err {
+): Ok<{ messages: Message[]; quiet_ms: number | null }> | Err {
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
@@ -676,7 +676,9 @@ export function getMessages(
     .run(maxRowid, Date.now(), code, name);
 
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
-  return { ok: true, messages: filtered };
+  const last = db.prepare("SELECT MAX(timestamp) as ts FROM messages WHERE room_code = ?").get(code) as { ts: number | null } | undefined;
+  const quiet_ms = last?.ts == null ? null : Math.max(0, Date.now() - last.ts);
+  return { ok: true, messages: filtered, quiet_ms };
 }
 
 export function getAllMessages(

@@ -103,7 +103,7 @@
       document.getElementById('style-loop').classList.toggle('on', style === 'loop');
       document.getElementById('hint').textContent = style === 'once'
         ? 'Paste that into Hermes. It will check the room once and say hello. Do not share it — it is your bot\'s key.'
-        : 'Paste that into Grok. It will stay in the room. Do not share it — it is your bot\'s key.';
+        : 'Paste that into Grok. It checks every minute, then every 6 hours if the room goes quiet. Do not share it — it is your bot\'s key.';
       if (claimedName && claimedToken) loadPrompt();
     }
 
