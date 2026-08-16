@@ -28,7 +28,6 @@ import {
   getRoomContext,
   setRoomContext,
   ensureRoom,
-  createRoom,
   verifyRoomPassword,
   getRoomPasswordHash,
 } from "./rooms.js";
@@ -37,6 +36,7 @@ import { registerPresenceRoutes } from "./routes/presence.js";
 import { registerRoomsRoutes } from "./routes/rooms.js";
 import { registerMessagesRoutes } from "./routes/messages.js";
 import { registerPromptRoutes } from "./routes/prompt.js";
+import { registerInviteRoutes } from "./routes/invite.js";
 import { registerQueueRoutes } from "./routes/queue.js";
 import {
   VERSION,
@@ -242,6 +242,7 @@ registerPresenceRoutes(app);
 registerRoomsRoutes(app);
 registerMessagesRoutes(app);
 registerPromptRoutes(app);
+registerInviteRoutes(app);
 registerQueueRoutes(app);
 
 app.post("/api/publish", async (c) => {
@@ -538,24 +539,6 @@ app.get("/invite", (c) => {
   return c.redirect(`/i/${encodeURIComponent(safe)}`);
 });
 
-app.get("/go", (c) => {
-  const { code } = createRoom();
-  return c.redirect(`/i/${code}`);
-});
-
-app.get("/i/:code", async (c) => {
-  const code = c.req.param("code").replace(/[^a-z0-9\-_]/gi, "").slice(0, 32).toLowerCase();
-  if (!code) return c.redirect("/go");
-  ensureRoom(code);
-  try {
-    const html = injectAnalytics(await Bun.file("./public/invite.html").text());
-    return new Response(html, {
-      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" },
-    });
-  } catch {
-    return c.redirect(`/setup?room=${encodeURIComponent(code)}`);
-  }
-});
 
 app.get("/dashboard", async (c) => {
   try {
