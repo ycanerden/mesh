@@ -1,0 +1,13 @@
+# Production edge for trymesh.chat.
+# After Namecheap A records point at this machine, run:
+#   caddy run --config Caddyfile
+# Caddy issues Let's Encrypt certs and proxies to Mesh on :3000.
+
+{
+	email ycanerden@gmail.com
+}
+
+trymesh.chat, www.trymesh.chat {
+	encode gzip
+	reverse_proxy 127.0.0.1:3000
+}
