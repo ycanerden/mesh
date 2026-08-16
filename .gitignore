@@ -59,3 +59,4 @@ macos-app/*.zip
 *.app
 dist/
 LAUNCH-PLAYBOOK.md
+.vercel
