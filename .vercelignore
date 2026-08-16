@@ -1,0 +1,13 @@
+src
+cli
+macos-app
+convex
+*.db
+*.db-*
+node_modules
+.git
+Caddyfile
+Caddyfile.http
+scripts
+fly.toml
+Dockerfile
