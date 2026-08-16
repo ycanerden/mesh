@@ -18,6 +18,7 @@ import {
   canAgentSend,
   verifyAdmin,
   getRoomTasks,
+  setReaction,
 } from "../rooms.js";
 import {
   checkRateLimit,
@@ -40,8 +41,46 @@ export function registerMessagesRoutes(app: Hono) {
     if (!checkRateLimit(`get_msgs:${room}:${name}`, msgLimit, 60 * 1000, name)) {
       return c.json({ error: "rate_limit_exceeded" }, 429);
     }
-    const result = getMessages(room, name, msgType);
+    const sinceRaw = c.req.query("since");
+    const sinceParsed = sinceRaw === undefined || sinceRaw === "" ? NaN : Number(sinceRaw);
+    const since = Number.isFinite(sinceParsed) ? sinceParsed : undefined;
+    const peek = c.req.query("peek") === "1" || c.req.query("peek") === "true";
+    const result = getMessages(room, name, msgType, { since, peek });
     return c.json(result);
+  });
+
+  app.post("/api/react", async (c) => {
+    const room = c.req.query("room");
+    const name = c.req.query("name");
+    if (!room || !name) return c.json({ error: "missing room or name" }, 400);
+    ensureRoom(room);
+    joinRoom(room, name);
+    if (!checkRateLimit(`react:${room}:${name}`, 200, 60_000, name)) {
+      return c.json({ error: "rate_limit_exceeded" }, 429);
+    }
+    const authHeader = c.req.header("Authorization") || "";
+    const agentToken =
+      authHeader.replace(/^Bearer /, "").trim() ||
+      c.req.header("x-agent-token") ||
+      c.req.query("token") ||
+      "";
+    if (!canAgentSend(room, name, agentToken)) {
+      return c.json({ error: "not_allowed", detail: "Agent token required for this name in this room" }, 403);
+    }
+    try {
+      const body = await c.req.json();
+      const messageId = typeof body.message_id === "string" ? body.message_id : "";
+      const reaction = typeof body.reaction === "string" ? body.reaction : "";
+      if (!messageId || !reaction) return c.json({ error: "missing message_id or reaction" }, 400);
+      const result = setReaction(room, name, messageId, reaction);
+      if (!result.ok) {
+        const status = result.error === "message_not_found" ? 404 : 400;
+        return c.json({ error: result.error }, status);
+      }
+      return c.json(result);
+    } catch (e) {
+      return c.json({ error: "invalid_request", detail: String(e) }, 400);
+    }
   });
 
   app.post("/api/send", async (c) => {
@@ -220,6 +259,23 @@ export function registerMessagesRoutes(app: Hono) {
 
       messageEvents.on("message", onMessage);
 
+      const onReaction = (data: any) => {
+        if (data.room_code === room) {
+          try {
+            stream.writeSSE({
+              data: JSON.stringify({
+                message_id: data.message_id,
+                reactions: data.reactions,
+              }),
+              event: "reaction",
+            });
+          } catch (e) {
+            // Stream closed
+          }
+        }
+      };
+      messageEvents.on("reaction", onReaction);
+
       // Task queue events — push task changes to connected agents
       const onTask = (data: any) => {
         if (data.room_code === room) {
@@ -248,6 +304,7 @@ export function registerMessagesRoutes(app: Hono) {
         console.log(`[sse] ${name} disconnected from room ${room}`);
         activeConnections.count--;
         messageEvents.off("message", onMessage);
+        messageEvents.off("reaction", onReaction);
         taskEvents.off("task", onTask);
         clearInterval(heartbeat);
       });

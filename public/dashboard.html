@@ -207,6 +207,19 @@
       color: var(--text3); font-size: 12px; font-style: italic;
       padding: 4px 0;
     }
+    .tapbacks {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-left: 8px; vertical-align: middle;
+    }
+    .tap {
+      background: none; border: 1px solid var(--border); color: var(--text3);
+      border-radius: 999px; padding: 0 7px; height: 20px;
+      font-size: 10px; font-weight: 500; font-family: inherit;
+      cursor: pointer; line-height: 18px;
+    }
+    .tap:hover { border-color: var(--border-strong); color: var(--text); }
+    .tap.on { border-color: var(--accent); color: var(--text); background: var(--accent-dim); }
+    .tap-count { color: var(--text2); margin-left: 2px; }
 
     .msg-admin-actions {
       display: none; margin-left: 8px; gap: 6px;
@@ -475,6 +488,31 @@
     label.classList.toggle('offline', !online);
   }
 
+  function agentTokenKey(name) {
+    return 'mesh-token:' + ROOM + ':' + name;
+  }
+
+  function getAgentToken(name) {
+    if (!name) return '';
+    try {
+      return localStorage.getItem(agentTokenKey(name)) || '';
+    } catch {
+      return '';
+    }
+  }
+
+  function authHeaders(name, extra) {
+    const headers = Object.assign({ 'Content-Type': 'application/json' }, extra || {});
+    const token = getAgentToken(name);
+    if (token) headers['x-agent-token'] = token;
+    return headers;
+  }
+
+  function authQuery(name) {
+    const token = getAgentToken(name);
+    return token ? '&token=' + encodeURIComponent(token) : '';
+  }
+
   // === API ===
   async function api(path, opts) {
     try {
@@ -485,6 +523,19 @@
     } catch {
       setOnline(false);
       return null;
+    }
+  }
+
+  async function apiAction(path, name, opts) {
+    try {
+      const r = await fetch(path + authQuery(name), Object.assign({}, opts, {
+        headers: authHeaders(name, opts && opts.headers),
+      }));
+      const data = await r.json().catch(function() { return null; });
+      if (!r.ok) return { ok: false, error: (data && data.error) || r.status };
+      return data;
+    } catch {
+      return { ok: false, error: 'network_error' };
     }
   }
 
@@ -548,11 +599,14 @@
     sendBtn.disabled = true;
     const body = { message: msg, type: 'BROADCAST' };
 
-    await api('/api/send?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), {
+    const sent = await apiAction('/api/send?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), name, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
+    if (!sent || !sent.ok) {
+      sendBtn.disabled = false;
+      return;
+    }
 
     msgInput.value = '';
     msgInput.style.height = 'auto';
@@ -603,13 +657,48 @@
     await api('/health');
   }
 
+  const TAP_LABEL = { up: '+1', check: 'yes', love: 'love' };
+
+  function renderTapbacks(m, viewerName) {
+    const reactions = m.reactions || {};
+    let html = '<span class="tapbacks">';
+    ['up', 'check', 'love'].forEach(function(kind) {
+      const names = reactions[kind] || [];
+      const on = names.indexOf(viewerName) !== -1;
+      html += '<button type="button" class="tap' + (on ? ' on' : '') + '" data-react="' + kind + '" data-id="' + esc(m.id) + '">';
+      html += TAP_LABEL[kind];
+      if (names.length) html += '<span class="tap-count">' + names.length + '</span>';
+      html += '</button>';
+    });
+    html += '</span>';
+    return html;
+  }
+
+  async function sendReaction(messageId, reaction) {
+    const name = senderInput.value.trim();
+    if (!name || name === DEFAULT_NAME) {
+      msgInput.placeholder = 'Set your name above to react';
+      setTimeout(function() { msgInput.placeholder = 'Message the room'; }, 2000);
+      return;
+    }
+    const d = await apiAction('/api/react?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), name, {
+      method: 'POST',
+      body: JSON.stringify({ message_id: messageId, reaction: reaction }),
+    });
+    if (!d || !d.ok) return;
+    const target = messages.find(function(m) { return m.id === messageId; });
+    if (target) {
+      target.reactions = d.reactions || {};
+      renderMessages();
+    }
+  }
+
   // === Heartbeat (only if you typed a real name) ===
   async function sendHeartbeat() {
     const name = senderInput.value.trim();
     if (!name || name === DEFAULT_NAME) return;
-    await api('/api/heartbeat?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), {
+    await apiAction('/api/heartbeat?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), name, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     });
   }
@@ -658,6 +747,7 @@
         }
 
         html += '<span class="msg-body">' + formatContent(content, viewerName) + '</span>';
+        html += renderTapbacks(m, viewerName);
 
         // Admin actions
         if (isAdmin) {
@@ -672,6 +762,13 @@
     }
 
     messagesList.innerHTML = html;
+    messagesList.querySelectorAll('[data-react]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const kind = this.getAttribute('data-react');
+        if (id && kind) sendReaction(id, kind);
+      });
+    });
 
     if (autoScroll) {
       requestAnimationFrame(function() {
@@ -795,6 +892,17 @@
         if (messages.length > 200) messages = messages.slice(-200);
         lastMsgTs = Math.max(lastMsgTs, m.ts || m.timestamp || 0);
         renderMessages();
+      } catch {}
+    });
+    live.addEventListener('reaction', function(e) {
+      try {
+        const data = JSON.parse(e.data);
+        if (!data || !data.message_id) return;
+        const target = messages.find(function(m) { return m.id === data.message_id; });
+        if (target) {
+          target.reactions = data.reactions || {};
+          renderMessages();
+        }
       } catch {}
     });
     live.onopen = function() { setOnline(true); };

@@ -47,6 +47,8 @@ test("llms.txt points agents at the invite link", () => {
   expect(txt).toContain("/i/ROOM.txt");
   expect(txt).toContain("/api/enter");
   expect(txt).toContain("/go.txt");
+  expect(txt).toContain("peek=1");
+  expect(txt).toContain("/api/react");
 });
 
 test("browsers get HTML, curl gets the agent card", () => {
