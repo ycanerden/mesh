@@ -207,6 +207,19 @@
       color: var(--text3); font-size: 12px; font-style: italic;
       padding: 4px 0;
     }
+    .tapbacks {
+      display: inline-flex; align-items: center; gap: 4px;
+      margin-left: 8px; vertical-align: middle;
+    }
+    .tap {
+      background: none; border: 1px solid var(--border); color: var(--text3);
+      border-radius: 999px; padding: 0 7px; height: 20px;
+      font-size: 10px; font-weight: 500; font-family: inherit;
+      cursor: pointer; line-height: 18px;
+    }
+    .tap:hover { border-color: var(--border-strong); color: var(--text); }
+    .tap.on { border-color: var(--accent); color: var(--text); background: var(--accent-dim); }
+    .tap-count { color: var(--text2); margin-left: 2px; }
 
     .msg-admin-actions {
       display: none; margin-left: 8px; gap: 6px;
@@ -603,6 +616,39 @@
     await api('/health');
   }
 
+  const TAP_LABEL = { up: '+1', check: 'yes', love: 'love' };
+
+  function renderTapbacks(m, viewerName) {
+    const reactions = m.reactions || {};
+    let html = '<span class="tapbacks">';
+    ['up', 'check', 'love'].forEach(function(kind) {
+      const names = reactions[kind] || [];
+      const on = names.indexOf(viewerName) !== -1;
+      html += '<button type="button" class="tap' + (on ? ' on' : '') + '" data-react="' + kind + '" data-id="' + esc(m.id) + '">';
+      html += TAP_LABEL[kind];
+      if (names.length) html += '<span class="tap-count">' + names.length + '</span>';
+      html += '</button>';
+    });
+    html += '</span>';
+    return html;
+  }
+
+  async function sendReaction(messageId, reaction) {
+    const name = senderInput.value.trim();
+    if (!name || name === DEFAULT_NAME) return;
+    const d = await api('/api/react?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message_id: messageId, reaction: reaction }),
+    });
+    if (!d || !d.ok) return;
+    const target = messages.find(function(m) { return m.id === messageId; });
+    if (target) {
+      target.reactions = d.reactions || {};
+      renderMessages();
+    }
+  }
+
   // === Heartbeat (only if you typed a real name) ===
   async function sendHeartbeat() {
     const name = senderInput.value.trim();
@@ -658,6 +704,7 @@
         }
 
         html += '<span class="msg-body">' + formatContent(content, viewerName) + '</span>';
+        html += renderTapbacks(m, viewerName);
 
         // Admin actions
         if (isAdmin) {
@@ -672,6 +719,13 @@
     }
 
     messagesList.innerHTML = html;
+    messagesList.querySelectorAll('[data-react]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const kind = this.getAttribute('data-react');
+        if (id && kind) sendReaction(id, kind);
+      });
+    });
 
     if (autoScroll) {
       requestAnimationFrame(function() {
