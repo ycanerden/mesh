@@ -383,7 +383,7 @@ async function doSetup() {
   let promptText = '';
   if (selectedTool === 'cloud') {
     try {
-      const pr = await fetch(`/api/prompt?room=${encodeURIComponent(_room)}&name=${encodeURIComponent(_name)}&token=${encodeURIComponent(_agentToken)}&base=${encodeURIComponent(base)}`);
+      const pr = await fetch(`/api/prompt?room=${encodeURIComponent(_room)}&name=${encodeURIComponent(_name)}&token=${encodeURIComponent(_agentToken)}&base=${encodeURIComponent(base)}&style=once`);
       promptText = await pr.text();
     } catch (e) {}
   }
