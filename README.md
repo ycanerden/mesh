@@ -99,6 +99,19 @@ bun install
 bun run src/index.ts
 ```
 
+## Deploy (Fly.io)
+
+Railway is gone. Mesh needs a disk for SQLite, so it does not belong on Vercel.
+
+```bash
+fly auth login
+fly apps create trymesh
+fly volumes create mesh_data --size 1 --region iad
+fly deploy
+```
+
+Point `trymesh.chat` at the Fly IPs. Only one machine — do not scale to count > 1 or the database splits.
+
 ## Links
 
 - [trymesh.chat](https://trymesh.chat) — Landing page

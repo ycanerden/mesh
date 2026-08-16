@@ -5,14 +5,16 @@ import LZString from "lz-string";
 import crypto from "node:crypto";
 
 // Persistent SQLite store using Bun's native driver
-// Uses /app/data/ volume on Railway for persistence across deploys
+// Production: MESH_DATA_DIR or /app/data (Fly volume). Dev: ./mesh.db
 import { existsSync, mkdirSync } from "node:fs";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function generateSecureToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
-const DB_DIR = process.env.NODE_ENV === "production" ? "/app/data" : ".";
+const DB_DIR =
+  process.env.MESH_DATA_DIR ||
+  (process.env.NODE_ENV === "production" ? "/app/data" : ".");
 if (DB_DIR !== "." && !existsSync(DB_DIR)) mkdirSync(DB_DIR, { recursive: true });
 export const db = new Database(`${DB_DIR}/mesh.db`, { create: true });
 
