@@ -11,6 +11,9 @@ import {
   messageEvents,
   claimAgentName,
   setRoomReadOnly,
+  setReaction,
+  getPresenceRow,
+  updatePresence,
   db,
 } from "./rooms.js";
 
@@ -293,4 +296,72 @@ test("appendMessage: emits messageEvents for SSE streaming", async () => {
   expect(event.message.from).toBe("alice");
   expect(event.message.content).toBe("test message");
   expect(event.message.id).toHaveLength(36); // UUID
+});
+
+test("getMessages: since+peek replays without consuming the inbox", () => {
+  const { code } = createRoom();
+  joinRoom(code, "alice");
+  joinRoom(code, "bob");
+  appendMessage(code, "alice", "keep this");
+
+  const first = getMessages(code, "bob");
+  expect(first.ok).toBe(true);
+  if (!first.ok) return;
+  expect(first.messages).toHaveLength(1);
+  expect(typeof first.next_since).toBe("number");
+
+  const empty = getMessages(code, "bob");
+  expect(empty.ok).toBe(true);
+  if (empty.ok) expect(empty.messages).toHaveLength(0);
+
+  const replay = getMessages(code, "bob", undefined, { since: -1, peek: true });
+  expect(replay.ok).toBe(true);
+  if (!replay.ok) return;
+  expect(replay.messages).toHaveLength(1);
+  expect(replay.messages[0]?.content).toBe("keep this");
+
+  const stillEmpty = getMessages(code, "bob");
+  expect(stillEmpty.ok).toBe(true);
+  if (stillEmpty.ok) expect(stillEmpty.messages).toHaveLength(0);
+});
+
+test("setReaction: tapback toggles and replaces", () => {
+  const { code } = createRoom();
+  joinRoom(code, "alice");
+  joinRoom(code, "bob");
+  const sent = appendMessage(code, "alice", "lock 6pm?");
+  expect(sent.ok).toBe(true);
+  if (!sent.ok) return;
+
+  const up = setReaction(code, "bob", sent.id, "up");
+  expect(up.ok).toBe(true);
+  if (!up.ok) return;
+  expect(up.removed).toBe(false);
+  expect(up.reactions.up).toEqual(["bob"]);
+
+  const love = setReaction(code, "bob", sent.id, "love");
+  expect(love.ok).toBe(true);
+  if (!love.ok) return;
+  expect(love.reactions.up).toBeUndefined();
+  expect(love.reactions.love).toEqual(["bob"]);
+
+  const off = setReaction(code, "bob", sent.id, "love");
+  expect(off.ok).toBe(true);
+  if (!off.ok) return;
+  expect(off.removed).toBe(true);
+  expect(off.reactions.love).toBeUndefined();
+
+  const bad = setReaction(code, "bob", sent.id, "fire");
+  expect(bad.ok).toBe(false);
+  if (!bad.ok) expect(bad.error).toBe("invalid_reaction");
+});
+
+test("getPresenceRow: first sighting only, later beats reuse the row", () => {
+  const { code } = createRoom();
+  expect(getPresenceRow(code, "Guest")).toBeNull();
+  updatePresence(code, "Guest", "online");
+  const row = getPresenceRow(code, "Guest");
+  expect(row).not.toBeNull();
+  const again = getPresenceRow(code, "Guest");
+  expect(again?.last_heartbeat).toBeGreaterThan(0);
 });
