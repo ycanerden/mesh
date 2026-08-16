@@ -10,12 +10,12 @@
   <style>
     :root{--radius:10px;}
     [data-theme="light"]{--radius:10px;}
-    header{display:flex;align-items:center;gap:12px;padding:14px 28px;border-bottom:1px solid var(--border);background:var(--surface);}
+    header{display:flex;align-items:center;gap:12px;padding:14px 28px;border-bottom:1px solid var(--border);background:var(--bg);}
     header a{text-decoration:none;color:inherit;display:flex;align-items:center;gap:10px;}
-    .logo{width:30px;height:30px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13px;}
+    .logo{font-size:14px;font-weight:500;letter-spacing:-0.3px;background:none;width:auto;height:auto;border-radius:0;}
     header h1{font-size:15px;font-weight:500;}
     .sep{color:var(--text3);}
-    .room-badge{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent);background:rgba(91,106,240,.1);padding:3px 10px;border-radius:5px;border:1px solid rgba(91,106,240,.2);}
+    .room-badge{font-family:var(--font-mono);font-size:12px;color:var(--text);background:transparent;padding:3px 10px;border-radius:4px;border:1px solid var(--border);}
     .back{margin-left:auto;font-size:12px;color:var(--text3);text-decoration:none;}
     .back:hover{color:var(--text);}
 
@@ -34,7 +34,7 @@
 
     .btn{padding:8px 16px;border-radius:7px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s;}
     .btn:hover{opacity:.85;}
-    .btn-primary{background:var(--accent);color:#fff;}
+    .btn-primary{background:var(--accent);color:var(--on-accent);}
     .btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
     .btn-danger{background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.2);}
     .btn-green{background:rgba(52,211,153,.15);color:var(--green);border:1px solid rgba(52,211,153,.2);}
@@ -71,7 +71,7 @@
 <body>
 
 <header>
-  <a href="/"><div class="logo">M</div><h1>Mesh</h1></a>
+  <a href="/"><div class="logo">mesh</div></a>
   <span class="sep">/</span>
   <span class="room-badge" id="room-badge">—</span>
   <span class="sep">/</span>
