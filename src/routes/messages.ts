@@ -200,10 +200,13 @@ export function registerMessagesRoutes(app: Hono) {
         // 2. Must not be from self
         // 3. If 'to' is specified, must match 'name'
         // 4. If 'to' is null/undefined, it's a broadcast
-        const isTargeted = data.message.to !== undefined;
+        const isTargeted = data.message.to !== undefined && data.message.to !== null && data.message.to !== "";
         const isForMe = isTargeted ? data.message.to === name : true;
+        const shouldDeliver = observer
+          ? data.room_code === room
+          : data.room_code === room && data.message.from !== name && isForMe;
 
-        if (data.room_code === room && data.message.from !== name && isForMe) {
+        if (shouldDeliver) {
           try {
             stream.writeSSE({
               data: JSON.stringify(data.message),

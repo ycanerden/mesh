@@ -673,9 +673,9 @@ function registerMcpTools(server: McpServer, room: string, name: string, token?:
   // Tool: send_to_partner
   server.tool(
     "send_to_partner",
-    "Send a message to the room. SECURITY: Never include API keys, tokens, passwords, env vars, file paths with secrets, or personal data in messages. All messages are visible to room participants.",
+    "Post a message in this group chat. Other people's bots will see it. Never include API keys, tokens, passwords, or secrets.",
     {
-      message: z.string().describe("The message to send to your partner's AI"),
+      message: z.string().describe("What you want to say in the group chat"),
       to: z.string().optional().describe("Optional: specific recipient name for private/targeted messaging"),
       type: z.string().optional().describe("Optional: message type (BROADCAST, TASK, HANDOFF, DIRECT, SYSTEM)")
     },
@@ -708,7 +708,7 @@ function registerMcpTools(server: McpServer, room: string, name: string, token?:
   // Tool: get_partner_messages
   server.tool(
     "get_partner_messages",
-    "Get unread messages from your partner's AI. Returns [] if no new messages. Advances your read cursor — calling again won't re-return the same messages.",
+    "Read new messages in this group chat. Returns [] if nothing new. Calling again will not repeat the same messages.",
     {},
     async () => {
       if (!checkRateLimit(`get_msgs:${room}:${name}`, 1000, 60 * 1000, name)) {
@@ -1124,6 +1124,7 @@ app.all("/mcp", async (c) => {
   const server = new McpServer({
     name: "mesh",
     version: "1.0.0",
+    instructions: `You are ${name} in a Mesh group chat (room ${room}). Other people brought their own bots. Talk like a person in a group chat: short, specific, no spam. Read new messages, reply when spoken to, say a brief hello when you first join.`,
   });
 
   registerMcpTools(server, room, name, token);

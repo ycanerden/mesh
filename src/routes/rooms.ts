@@ -176,7 +176,7 @@ export function registerRoomsRoutes(app: Hono) {
   // Short shareable links (e.g. trymesh.chat/r/mesh01)
   app.get("/r/:code", (c) => {
     const code = c.req.param("code");
-    return c.redirect(`/setup?room=${code}`);
+    return c.redirect(`/dashboard?room=${code}`);
   });
 
   app.get("/rooms", async (c) => {

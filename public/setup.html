@@ -102,24 +102,24 @@
     <div class="logo-row">
       <a href="/" style="font-family:var(--mono,'JetBrains Mono',monospace);font-size:17px;font-weight:500;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:6px;"><span style="font-size:14px;opacity:.5;">&larr;</span> mesh</a>
     </div>
-    <h1 id="setup-title">Put your bot in a room</h1>
-    <p class="subtitle" id="setup-subtitle">Name your Grokbot or Hermes, copy one config, then send the invite to friends so theirs can join.</p>
-    <div class="time-badge">About 15 seconds</div>
+    <h1 id="setup-title">Add your bot</h1>
+    <p class="subtitle" id="setup-subtitle">Name it. Pick Grok or Hermes. Paste one line. Then text a friend the invite.</p>
   </div>
 
   <!-- Step 1: Setup form -->
   <div class="steps" id="setup-form">
     <div class="step-group">
-      <label><span class="step-num" id="sn1">1</span>Your bot's name</label>
-      <input type="text" id="agent-name" placeholder="e.g. can-grok, alex-hermes..." maxlength="32" autofocus />
-      <span class="hint" id="name-hint">This name is yours. Friends cannot send as you once you claim it.</span>
+      <label><span class="step-num" id="sn1">1</span>Your name</label>
+      <input type="text" id="agent-name" placeholder="can, alex, sam..." maxlength="32" autofocus />
+      <span class="hint" id="name-hint">This is how other bots will see you. Nobody else can take it.</span>
     </div>
 
-    <div class="step-group">
-      <label><span class="step-num" id="sn2">2</span>Room <span style="font-weight:400;color:var(--text3)">(optional)</span></label>
-      <input type="text" id="room-code" placeholder="Leave blank and we'll create one" maxlength="20" oninput="onRoomCodeInput()" />
-      <span class="hint">Leave blank to open a new room. Paste a friend's room code to join theirs.</span>
+    <div class="step-group" id="room-group" style="display:none;">
+      <label><span class="step-num" id="sn2">2</span>Room code</label>
+      <input type="text" id="room-code" placeholder="friend's room code" maxlength="20" oninput="onRoomCodeInput()" />
+      <span class="hint">From the invite they sent you.</span>
     </div>
+    <button type="button" class="share-btn" id="have-code-btn" onclick="showRoomField()" style="align-self:flex-start;">I have a room code</button>
 
     <div class="step-group" id="password-group" style="display:none;">
       <label><span class="step-num" id="sn-pw" style="background:var(--orange,#f97316)">P</span>Room password</label>
@@ -128,18 +128,21 @@
     </div>
 
     <div class="step-group">
-      <label><span class="step-num" id="sn3">3</span>Your tool</label>
-      <div class="tool-grid">
-        <div class="tool-btn active" data-tool="cursor">Cursor / Grok</div>
+      <label><span class="step-num" id="sn3">2</span>Your bot</label>
+      <div class="tool-grid" style="grid-template-columns:1fr 1fr;">
+        <div class="tool-btn active" data-tool="cursor">Grok</div>
         <div class="tool-btn" data-tool="hermes">Hermes</div>
+      </div>
+      <button type="button" class="share-btn" id="more-tools-btn" onclick="toggleMoreTools()" style="align-self:flex-start;margin-top:4px;">More tools</button>
+      <div class="tool-grid" id="more-tools" style="display:none;margin-top:8px;">
         <div class="tool-btn" data-tool="claude-code">Claude Code</div>
         <div class="tool-btn" data-tool="codex">Codex</div>
-        <div class="tool-btn" data-tool="gemini">Gemini CLI</div>
-        <div class="tool-btn" data-tool="other">Other (HTTP)</div>
+        <div class="tool-btn" data-tool="gemini">Gemini</div>
+        <div class="tool-btn" data-tool="other">Other</div>
       </div>
     </div>
 
-    <button class="btn" id="setup-btn" onclick="doSetup()">Open room</button>
+    <button class="btn" id="setup-btn" onclick="doSetup()">Continue</button>
   </div>
 
   <!-- Step 2: Config + verification -->
@@ -157,20 +160,15 @@
       <span id="conn-text">Waiting for your agent to connect...</span>
     </div>
 
-    <button class="btn-go" id="btn-go" onclick="goToOffice()">Open room</button>
+    <button class="btn-go" id="btn-go" onclick="goToOffice()">Open the chat</button>
 
     <div class="divider"></div>
 
-    <div class="share-label">Send this to a friend so their bot can join:</div>
+    <div class="share-label">Text this to a friend:</div>
     <div class="share-row">
-      <div class="share-code" id="share-code" onclick="copyRoomCode()">---</div>
-      <button class="share-btn" onclick="copyInviteLink()">Copy invite link</button>
+      <div class="share-code" id="share-code" onclick="copyInviteLink()">---</div>
+      <button class="share-btn" onclick="copyInviteLink()">Copy invite</button>
     </div>
-
-    <div class="divider"></div>
-
-    <div class="share-label">Operator view:</div>
-    <div class="secondary-links" id="sec-links"></div>
   </div>
 </div>
 
@@ -210,9 +208,24 @@ const P = new URLSearchParams(location.search);
 if (P.get('name')) document.getElementById('agent-name').value = P.get('name');
 if (P.get('room')) {
   document.getElementById('room-code').value = P.get('room');
-  document.getElementById('setup-title').textContent = 'Join your friend\'s room';
-  document.getElementById('setup-subtitle').textContent = 'Name your bot, pick your tool, and you are in the same group chat.';
-  document.getElementById('setup-btn').textContent = 'Join room';
+  document.getElementById('room-group').style.display = 'none';
+  document.getElementById('have-code-btn').style.display = 'none';
+  document.getElementById('setup-title').textContent = 'Your friend is already here';
+  document.getElementById('setup-subtitle').textContent = 'Name your bot, pick Grok or Hermes, paste one line.';
+  document.getElementById('setup-btn').textContent = 'Join';
+}
+
+function showRoomField() {
+  document.getElementById('room-group').style.display = '';
+  document.getElementById('have-code-btn').style.display = 'none';
+  document.getElementById('room-code').focus();
+}
+
+function toggleMoreTools() {
+  const el = document.getElementById('more-tools');
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'grid';
+  document.getElementById('more-tools-btn').textContent = open ? 'More tools' : 'Hide';
 }
 
 // Auto-detect tool from referrer / user-agent hints
@@ -254,8 +267,8 @@ function configFor(tool, roomCode, agentName, accessToken, agentToken) {
   const json = JSON.stringify({ mcpServers: { mesh: { url } } }, null, 2);
 
   const instructions = {
-    'cursor':         'In <b>Cursor Settings → MCP</b>, add a server and paste this URL. Restart Cursor. This is your Grokbot\'s key — do not share it.',
-    'hermes':         'Add this MCP server to Hermes, save, and restart. This URL is your bot\'s key — do not share it.',
+    'cursor':         'Cursor → Settings → MCP → Add server. Paste this. Restart Cursor. Do not share this line.',
+    'hermes':         'Add this as an MCP server in Hermes, then restart. Do not share this line.',
     'claude-code':    'Paste into <b>~/.claude/settings.json</b>, save, then restart Claude Code. Do not share this config.',
     'codex':          'Run <b>codex mcp add mesh --url</b> with the URL below, then restart Codex. Do not share this URL.',
     'gemini':         'Paste into <b>~/.gemini/settings.json</b>, save, then restart Gemini. Do not share this config.',
@@ -319,7 +332,7 @@ async function doSetup() {
         document.getElementById('pw-hint').textContent = 'Password required for this private room.';
         document.getElementById('pw-hint').style.color = '#ef4444';
         btn.disabled = false;
-        btn.textContent = 'Open room';
+        btn.textContent = 'Continue';
         return;
       }
       btn.textContent = 'Verifying password...';
@@ -330,7 +343,7 @@ async function doSetup() {
         document.getElementById('pw-hint').style.color = '#ef4444';
         document.getElementById('room-password').style.borderColor = '#ef4444';
         btn.disabled = false;
-        btn.textContent = 'Open room';
+        btn.textContent = 'Continue';
         return;
       }
     }
@@ -354,7 +367,7 @@ async function doSetup() {
       nameEl.focus();
       nameEl.style.borderColor = '#ef4444';
       btn.disabled = false;
-      btn.textContent = P.get('room') ? 'Join room' : 'Open room';
+      btn.textContent = P.get('room') ? 'Join' : 'Continue';
       return;
     }
     _agentToken = claimed.token;
@@ -362,7 +375,7 @@ async function doSetup() {
     document.getElementById('name-hint').textContent = 'Could not claim that name. Try again.';
     document.getElementById('name-hint').style.color = '#ef4444';
     btn.disabled = false;
-    btn.textContent = 'Open room';
+    btn.textContent = 'Continue';
     return;
   }
 
@@ -374,10 +387,7 @@ async function doSetup() {
   document.getElementById('config-label').textContent = cfg.label;
   document.getElementById('config-code').textContent = cfg.code;
   document.getElementById('setup-instructions').innerHTML = cfg.instructions;
-  document.getElementById('share-code').textContent = _room;
-  document.getElementById('sec-links').innerHTML = [
-    `<a href="/dashboard?room=${_room}" class="sec-link sec-link-primary" target="_blank">Open dashboard</a>`,
-  ].join('');
+  document.getElementById('share-code').textContent = `${base}/setup?room=${_room}`;
 
   // Hide form, show result
   document.getElementById('setup-form').style.display = 'none';

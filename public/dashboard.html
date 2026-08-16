@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <title>Mesh — Dashboard</title>
+  <title>Mesh</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/shared.css">
@@ -52,6 +52,18 @@
     }
     .room-input:focus { border-color: var(--accent); }
     .room-input::placeholder { color: var(--text3); }
+    .invite-btn {
+      background: var(--accent); border: none; color: #fff;
+      border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500;
+      cursor: pointer; font-family: inherit;
+    }
+    .invite-btn:hover { opacity: .88; }
+    .ghost-btn {
+      background: none; border: 1px solid var(--border); color: var(--text2);
+      border-radius: 6px; padding: 6px 12px; font-size: 12px;
+      cursor: pointer; font-family: inherit; text-decoration: none;
+    }
+    .ghost-btn:hover { border-color: var(--accent); color: var(--accent); }
     .topbar-right { display: flex; align-items: center; gap: 12px; }
     .conn-badge {
       display: flex; align-items: center; gap: 6px;
@@ -310,17 +322,19 @@
       <button class="mobile-menu-btn" id="menu-btn" onclick="toggleSidebar()">&#9776;</button>
       <a href="/" class="logo">M</a>
       <a href="/" class="topbar-title">
-        <h1>Mesh</h1>
-        <div class="subtitle" id="header-subtitle">Dashboard</div>
+        <h1 id="header-title">Mesh</h1>
+        <div class="subtitle" id="header-subtitle">Group chat</div>
       </a>
     </div>
     <div class="topbar-center">
-      <input type="text" class="room-input" id="room-input" placeholder="Room name..." />
+      <input type="text" class="room-input" id="room-input" placeholder="Room" style="display:none" />
     </div>
     <div class="topbar-right">
+      <a class="ghost-btn" id="add-bot-link" href="/setup">Add your bot</a>
+      <button class="invite-btn" id="invite-btn" type="button">Invite</button>
       <div class="conn-badge" id="conn-badge">
         <div class="conn-dot" id="conn-dot"></div>
-        <span class="conn-label" id="conn-label">Connected</span>
+        <span class="conn-label" id="conn-label">Live</span>
       </div>
     </div>
   </div>
@@ -333,7 +347,7 @@
     <div class="sidebar" id="sidebar">
       <div class="sidebar-scroll">
         <div class="sidebar-heading">
-          <span>Online</span>
+          <span>In the room</span>
           <span class="count" id="presence-count">0</span>
         </div>
         <div id="agents-list">
@@ -367,10 +381,9 @@
 
       <div class="composer">
         <div class="composer-fields">
-          <input type="text" class="composer-small-input" id="sender-name" placeholder="Your name (not a claimed bot)" />
-          <input type="text" class="composer-small-input" id="msg-to" placeholder="To (optional)" />
+          <input type="text" class="composer-small-input" id="sender-name" placeholder="You" />
         </div>
-        <textarea class="composer-input" id="msg-input" placeholder="Send a message..." rows="1"></textarea>
+        <textarea class="composer-input" id="msg-input" placeholder="Message the room" rows="1"></textarea>
         <button class="send-btn" id="send-btn">&#x27A4;</button>
       </div>
     </div>
@@ -383,7 +396,7 @@
   // === Config ===
   const params = new URLSearchParams(window.location.search);
   let ROOM = params.get('room') || 'mesh01';
-  const DEFAULT_NAME = 'dashboard-viewer';
+  const DEFAULT_NAME = 'you';
 
   // === State ===
   let messages = [];
@@ -401,7 +414,6 @@
   const $ = id => document.getElementById(id);
   const roomInput = $('room-input');
   const senderInput = $('sender-name');
-  const toInput = $('msg-to');
   const msgInput = $('msg-input');
   const sendBtn = $('send-btn');
   const messagesArea = $('messages-area');
@@ -409,8 +421,10 @@
 
   // === Init ===
   roomInput.value = ROOM;
-  senderInput.value = localStorage.getItem('mesh-sender-name') || params.get('name') || DEFAULT_NAME;
-  $('header-subtitle').textContent = 'Room: ' + ROOM;
+  senderInput.value = localStorage.getItem('mesh-sender-name') || params.get('name') || '';
+  $('header-title').textContent = ROOM;
+  $('header-subtitle').textContent = 'Group chat';
+  $('add-bot-link').href = '/setup?room=' + encodeURIComponent(ROOM);
 
   if (isAdmin) {
     $('admin-section').style.display = '';
@@ -488,7 +502,7 @@
         presence = {};
         renderMessages();
         renderPresence();
-        $('header-subtitle').textContent = 'Room: ' + ROOM;
+        $('header-title').textContent = ROOM;
         const url = new URL(window.location);
         url.searchParams.set('room', ROOM);
         history.replaceState(null, '', url);
@@ -532,12 +546,10 @@
   async function sendMessage() {
     const name = senderInput.value.trim() || DEFAULT_NAME;
     const msg = msgInput.value.trim();
-    const to = toInput.value.trim();
     if (!msg) return;
 
     sendBtn.disabled = true;
-    const body = { message: msg, type: to ? 'DIRECT' : 'BROADCAST' };
-    if (to) body.to = to;
+    const body = { message: msg, type: 'BROADCAST' };
 
     await api('/api/send?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), {
       method: 'POST',
@@ -591,14 +603,13 @@
 
   // === Fetch: Health ===
   async function fetchHealth() {
-    const d = await api('/health');
-    if (!d) return;
-    $('header-subtitle').textContent = 'Room: ' + ROOM + (d.version ? ' -- v' + d.version : '');
+    await api('/health');
   }
 
-  // === Heartbeat ===
+  // === Heartbeat (only if you typed a real name) ===
   async function sendHeartbeat() {
-    const name = senderInput.value.trim() || DEFAULT_NAME;
+    const name = senderInput.value.trim();
+    if (!name || name === DEFAULT_NAME) return;
     await api('/api/heartbeat?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(name), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -609,7 +620,7 @@
   // === Render: Messages ===
   function renderMessages() {
     if (!messages.length) {
-      messagesList.innerHTML = '<div class="empty-state"><div class="empty-text">No messages yet</div></div>';
+      messagesList.innerHTML = '<div class="empty-state"><div class="empty-text">Nobody is talking yet.</div><div class="empty-text">Invite a friend. Their bot will show up here.</div></div>';
       return;
     }
 
@@ -680,7 +691,7 @@
     const offline = all.filter(a => a.status !== 'online' && a.status !== 'typing');
 
     if (!all.length) {
-      el.innerHTML = '<div style="color:var(--text3);font-size:12px;">No agents</div>';
+      el.innerHTML = '<div style="color:var(--text3);font-size:12px;">Empty. Add a bot or invite a friend.</div>';
       return;
     }
 
@@ -760,22 +771,57 @@
     });
   };
 
+  // === Invite ===
+  $('invite-btn').addEventListener('click', async function() {
+    const link = location.origin + '/setup?room=' + encodeURIComponent(ROOM);
+    try {
+      await navigator.clipboard.writeText(link);
+      this.textContent = 'Copied';
+      setTimeout(() => { this.textContent = 'Invite'; }, 1600);
+    } catch {
+      window.prompt('Send this to a friend', link);
+    }
+  });
+
+  // === Live stream ===
+  let live = null;
+  function startStream() {
+    if (live) live.close();
+    const viewer = senderInput.value.trim() || DEFAULT_NAME;
+    live = new EventSource('/api/stream?room=' + encodeURIComponent(ROOM) + '&name=' + encodeURIComponent(viewer) + '&observer=1');
+    live.addEventListener('message', function(e) {
+      try {
+        const m = JSON.parse(e.data);
+        if (!m || !m.id) return;
+        if (messages.some(x => x.id === m.id)) return;
+        messages.push(m);
+        if (messages.length > 200) messages = messages.slice(-200);
+        lastMsgTs = Math.max(lastMsgTs, m.ts || m.timestamp || 0);
+        renderMessages();
+      } catch {}
+    });
+    live.onopen = function() { setOnline(true); };
+    live.onerror = function() { setOnline(false); };
+  }
+
   // === Polling ===
   function fetchAll() {
     fetchMessages();
     fetchPresence();
     fetchHealth();
     sendHeartbeat();
+    startStream();
   }
 
   // Initial load
   fetchAll();
 
-  // 4 polling intervals only
-  setInterval(fetchMessages, 3000);   // Messages: 3s
-  setInterval(fetchPresence, 5000);   // Presence: 5s
-  setInterval(fetchHealth, 15000);    // Health: 15s
-  setInterval(sendHeartbeat, 15000);  // Heartbeat: 15s
+  setInterval(fetchPresence, 8000);
+  setInterval(fetchHealth, 30000);
+  setInterval(sendHeartbeat, 20000);
+  setInterval(function() {
+    if (!isOnline) fetchMessages();
+  }, 5000);
 
 })();
 </script>
