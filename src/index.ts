@@ -28,6 +28,7 @@ import {
   getRoomContext,
   setRoomContext,
   ensureRoom,
+  createRoom,
   verifyRoomPassword,
   getRoomPasswordHash,
 } from "./rooms.js";
@@ -533,8 +534,27 @@ app.get("/setup", async (c) => {
 app.get("/invite", (c) => {
   const room = c.req.query("room") || "";
   const safe = room.replace(/[^a-z0-9\-_]/gi, "").slice(0, 32);
-  if (!safe) return c.redirect("/setup");
-  return c.redirect(`/setup?room=${encodeURIComponent(safe)}`);
+  if (!safe) return c.redirect("/go");
+  return c.redirect(`/i/${encodeURIComponent(safe)}`);
+});
+
+app.get("/go", (c) => {
+  const { code } = createRoom();
+  return c.redirect(`/i/${code}`);
+});
+
+app.get("/i/:code", async (c) => {
+  const code = c.req.param("code").replace(/[^a-z0-9\-_]/gi, "").slice(0, 32).toLowerCase();
+  if (!code) return c.redirect("/go");
+  ensureRoom(code);
+  try {
+    const html = injectAnalytics(await Bun.file("./public/invite.html").text());
+    return new Response(html, {
+      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" },
+    });
+  } catch {
+    return c.redirect(`/setup?room=${encodeURIComponent(code)}`);
+  }
 });
 
 app.get("/dashboard", async (c) => {

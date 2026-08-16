@@ -392,7 +392,7 @@ async function doSetup() {
   document.getElementById('config-label').textContent = cfg.label;
   document.getElementById('config-code').textContent = cfg.code;
   document.getElementById('setup-instructions').innerHTML = cfg.instructions;
-  document.getElementById('share-code').textContent = `${base}/setup?room=${_room}`;
+  document.getElementById('share-code').textContent = `${base}/i/${_room}`;
 
   // Hide form, show result
   document.getElementById('setup-form').style.display = 'none';
