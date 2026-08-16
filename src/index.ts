@@ -22,6 +22,9 @@ import {
   verifyAdmin,
   canAgentSend,
   generateAgentToken,
+  claimAgentName,
+  getAgentToken,
+  normalizeAgentName,
   getRoomContext,
   setRoomContext,
   ensureRoom,
@@ -343,6 +346,38 @@ app.get("/api/agent/token", (c) => {
   return c.json({ ok, room, agent_name: name });
 });
 
+// First person to take a bot name in a room gets the key. Friends pick their own.
+app.post("/api/claim", async (c) => {
+  const roomRaw = (c.req.query("room") || "").replace(/[^a-z0-9\-_]/gi, "").slice(0, 32).toLowerCase();
+  const name = normalizeAgentName(c.req.query("name") || "");
+  if (!roomRaw || !name) return c.json({ error: "missing room or name" }, 400);
+
+  const body = await c.req.json().catch(() => ({} as { token?: string }));
+  ensureRoom(roomRaw);
+  if (!hasRoomAccess(c, roomRaw)) {
+    return c.json({ ok: false, error: "room_protected" }, 403);
+  }
+  const result = claimAgentName(roomRaw, name, body.token);
+  if (!result.ok) {
+    const status = result.error === "name_taken" ? 409 : 400;
+    return c.json({ ok: false, error: result.error }, status);
+  }
+
+  const origin = new URL(c.req.url).origin;
+  const proto = c.req.header("x-forwarded-proto") || new URL(c.req.url).protocol.replace(":", "");
+  const baseUrl = origin.replace(/^https?/, proto);
+  const mcpUrl = `${baseUrl}/mcp?room=${encodeURIComponent(roomRaw)}&name=${encodeURIComponent(name)}&token=${encodeURIComponent(result.token)}`;
+  return c.json({
+    ok: true,
+    room: roomRaw,
+    name,
+    token: result.token,
+    created: result.created,
+    mcp_url: mcpUrl,
+    invite_url: `${baseUrl}/setup?room=${encodeURIComponent(roomRaw)}`,
+  });
+});
+
 // ── Morning briefing ──────────────────────────────────────────────────────
 app.get("/api/briefing", (c) => {
   const room = c.req.query("room");
@@ -634,7 +669,7 @@ app.get("/download/mac", (c) => {
 });
 
 // ── MCP shared tool registration ──────────────────────────────────────────────
-function registerMcpTools(server: McpServer, room: string, name: string) {
+function registerMcpTools(server: McpServer, room: string, name: string, token?: string) {
   // Tool: send_to_partner
   server.tool(
     "send_to_partner",
@@ -645,6 +680,12 @@ function registerMcpTools(server: McpServer, room: string, name: string) {
       type: z.string().optional().describe("Optional: message type (BROADCAST, TASK, HANDOFF, DIRECT, SYSTEM)")
     },
     async ({ message, to, type }) => {
+      if (!canAgentSend(room, name, token)) {
+        return {
+          content: [{ type: "text", text: JSON.stringify({ error: "not_allowed", detail: "This name is claimed. Use the token from your invite config." }) }],
+          isError: true,
+        };
+      }
       if (!checkRateLimit(`send:${room}:${name}`, 1000, 60 * 1000, name)) {
         return {
           content: [{ type: "text", text: JSON.stringify({ error: "rate_limit_exceeded_please_wait" }) }],
@@ -1055,7 +1096,8 @@ function registerMcpTools(server: McpServer, room: string, name: string) {
 // ── MCP endpoint ──────────────────────────────────────────────────────────────
 app.all("/mcp", async (c) => {
   const room = c.req.query("room");
-  const name = c.req.query("name");
+  const name = normalizeAgentName(c.req.query("name") || "");
+  const token = c.req.query("token") || c.req.query("agent_token") || "";
 
   if (!room || !name) {
     return c.json(
@@ -1065,10 +1107,18 @@ app.all("/mcp", async (c) => {
   }
 
   ensureRoom(room);
+  const claimed = getAgentToken(room, name);
+  if (claimed && claimed !== token) {
+    return c.json(
+      { error: "name_taken", detail: "That bot name is already claimed in this room. Pick another name." },
+      403
+    );
+  }
+
   const joined = joinRoom(room, name);
 
   if (joined?.isNew) {
-    appendMessage(room, "system", `${name} joined the room. Welcome to Mesh — start by publishing your Agent Card, then check partner messages.`);
+    appendMessage(room, "system", `${name} joined the room.`);
   }
 
   const server = new McpServer({
@@ -1076,7 +1126,7 @@ app.all("/mcp", async (c) => {
     version: "1.0.0",
   });
 
-  registerMcpTools(server, room, name);
+  registerMcpTools(server, room, name, token);
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
@@ -1089,7 +1139,7 @@ app.all("/mcp", async (c) => {
 // ── MCP Invoke Endpoint (Direct tool call) ───────────────────────────────────
 app.post("/api/mcp-invoke", async (c) => {
   try {
-    const { room, name, tool, arguments: args } = await c.req.json();
+    const { room, name, tool, arguments: args, token } = await c.req.json();
 
     if (!room || !name || !tool) {
       return c.json({ error: "Missing required fields: room, name, tool" }, 400);
@@ -1107,7 +1157,7 @@ app.post("/api/mcp-invoke", async (c) => {
       version: "1.0.0",
     });
 
-    registerMcpTools(server, room, name);
+    registerMcpTools(server, room, name, token || c.req.query("token") || "");
 
     const result = await server.callTool(tool, args || {});
     return c.json(result);
