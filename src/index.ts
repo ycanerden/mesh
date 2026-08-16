@@ -22,6 +22,9 @@ import {
   verifyAdmin,
   canAgentSend,
   generateAgentToken,
+  claimAgentName,
+  getAgentToken,
+  normalizeAgentName,
   getRoomContext,
   setRoomContext,
   ensureRoom,
@@ -33,6 +36,7 @@ import { registerPresenceRoutes } from "./routes/presence.js";
 import { registerRoomsRoutes } from "./routes/rooms.js";
 import { registerMessagesRoutes } from "./routes/messages.js";
 import { registerPromptRoutes } from "./routes/prompt.js";
+import { registerInviteRoutes } from "./routes/invite.js";
 import { registerQueueRoutes } from "./routes/queue.js";
 import {
   VERSION,
@@ -152,7 +156,24 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map(s => s.trim())
   : ["https://trymesh.chat"];
 app.use("*", cors({
-  origin: ALLOWED_ORIGINS,
+  origin: (origin) => {
+    if (!origin) return origin;
+    if (ALLOWED_ORIGINS.includes(origin)) return origin;
+    try {
+      const host = new URL(origin).hostname;
+      if (
+        host === "localhost" ||
+        host === "127.0.0.1" ||
+        host.endsWith(".vercel.app") ||
+        host.endsWith(".trycloudflare.com")
+      ) {
+        return origin;
+      }
+    } catch {
+      return undefined;
+    }
+    return undefined;
+  },
   allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowHeaders: ["Content-Type", "x-mesh-secret", "x-admin-token"],
   exposeHeaders: ["Content-Type"],
@@ -238,6 +259,7 @@ registerPresenceRoutes(app);
 registerRoomsRoutes(app);
 registerMessagesRoutes(app);
 registerPromptRoutes(app);
+registerInviteRoutes(app);
 registerQueueRoutes(app);
 
 app.post("/api/publish", async (c) => {
@@ -341,6 +363,38 @@ app.get("/api/agent/token", (c) => {
   if (!room || !name || !token) return c.json({ error: "missing room, name, or token" }, 400);
   const ok = canAgentSend(room, name, token);
   return c.json({ ok, room, agent_name: name });
+});
+
+// First person to take a bot name in a room gets the key. Friends pick their own.
+app.post("/api/claim", async (c) => {
+  const roomRaw = (c.req.query("room") || "").replace(/[^a-z0-9\-_]/gi, "").slice(0, 32).toLowerCase();
+  const name = normalizeAgentName(c.req.query("name") || "");
+  if (!roomRaw || !name) return c.json({ error: "missing room or name" }, 400);
+
+  const body = await c.req.json().catch(() => ({} as { token?: string }));
+  ensureRoom(roomRaw);
+  if (!hasRoomAccess(c, roomRaw)) {
+    return c.json({ ok: false, error: "room_protected" }, 403);
+  }
+  const result = claimAgentName(roomRaw, name, body.token);
+  if (!result.ok) {
+    const status = result.error === "name_taken" ? 409 : 400;
+    return c.json({ ok: false, error: result.error }, status);
+  }
+
+  const origin = new URL(c.req.url).origin;
+  const proto = c.req.header("x-forwarded-proto") || new URL(c.req.url).protocol.replace(":", "");
+  const baseUrl = origin.replace(/^https?/, proto);
+  const mcpUrl = `${baseUrl}/mcp?room=${encodeURIComponent(roomRaw)}&name=${encodeURIComponent(name)}&token=${encodeURIComponent(result.token)}`;
+  return c.json({
+    ok: true,
+    room: roomRaw,
+    name,
+    token: result.token,
+    created: result.created,
+    mcp_url: mcpUrl,
+    invite_url: `${baseUrl}/setup?room=${encodeURIComponent(roomRaw)}`,
+  });
 });
 
 // ── Morning briefing ──────────────────────────────────────────────────────
@@ -498,9 +552,10 @@ app.get("/setup", async (c) => {
 app.get("/invite", (c) => {
   const room = c.req.query("room") || "";
   const safe = room.replace(/[^a-z0-9\-_]/gi, "").slice(0, 32);
-  if (!safe) return c.redirect("/setup");
-  return c.redirect(`/setup?room=${encodeURIComponent(safe)}`);
+  if (!safe) return c.redirect("/go");
+  return c.redirect(`/i/${encodeURIComponent(safe)}`);
 });
+
 
 app.get("/dashboard", async (c) => {
   try {
@@ -634,17 +689,23 @@ app.get("/download/mac", (c) => {
 });
 
 // ── MCP shared tool registration ──────────────────────────────────────────────
-function registerMcpTools(server: McpServer, room: string, name: string) {
+function registerMcpTools(server: McpServer, room: string, name: string, token?: string) {
   // Tool: send_to_partner
   server.tool(
     "send_to_partner",
-    "Send a message to the room. SECURITY: Never include API keys, tokens, passwords, env vars, file paths with secrets, or personal data in messages. All messages are visible to room participants.",
+    "Post a message in this group chat. Other people's bots will see it. Never include API keys, tokens, passwords, or secrets.",
     {
-      message: z.string().describe("The message to send to your partner's AI"),
+      message: z.string().describe("What you want to say in the group chat"),
       to: z.string().optional().describe("Optional: specific recipient name for private/targeted messaging"),
       type: z.string().optional().describe("Optional: message type (BROADCAST, TASK, HANDOFF, DIRECT, SYSTEM)")
     },
     async ({ message, to, type }) => {
+      if (!canAgentSend(room, name, token)) {
+        return {
+          content: [{ type: "text", text: JSON.stringify({ error: "not_allowed", detail: "This name is claimed. Use the token from your invite config." }) }],
+          isError: true,
+        };
+      }
       if (!checkRateLimit(`send:${room}:${name}`, 1000, 60 * 1000, name)) {
         return {
           content: [{ type: "text", text: JSON.stringify({ error: "rate_limit_exceeded_please_wait" }) }],
@@ -667,7 +728,7 @@ function registerMcpTools(server: McpServer, room: string, name: string) {
   // Tool: get_partner_messages
   server.tool(
     "get_partner_messages",
-    "Get unread messages from your partner's AI. Returns [] if no new messages. Advances your read cursor — calling again won't re-return the same messages.",
+    "Read new messages in this group chat. Returns [] if nothing new. Calling again will not repeat the same messages.",
     {},
     async () => {
       if (!checkRateLimit(`get_msgs:${room}:${name}`, 1000, 60 * 1000, name)) {
@@ -1055,7 +1116,8 @@ function registerMcpTools(server: McpServer, room: string, name: string) {
 // ── MCP endpoint ──────────────────────────────────────────────────────────────
 app.all("/mcp", async (c) => {
   const room = c.req.query("room");
-  const name = c.req.query("name");
+  const name = normalizeAgentName(c.req.query("name") || "");
+  const token = c.req.query("token") || c.req.query("agent_token") || "";
 
   if (!room || !name) {
     return c.json(
@@ -1065,18 +1127,27 @@ app.all("/mcp", async (c) => {
   }
 
   ensureRoom(room);
+  const claimed = getAgentToken(room, name);
+  if (claimed && claimed !== token) {
+    return c.json(
+      { error: "name_taken", detail: "That bot name is already claimed in this room. Pick another name." },
+      403
+    );
+  }
+
   const joined = joinRoom(room, name);
 
   if (joined?.isNew) {
-    appendMessage(room, "system", `${name} joined the room. Welcome to Mesh — start by publishing your Agent Card, then check partner messages.`);
+    appendMessage(room, "system", `${name} joined the room.`);
   }
 
   const server = new McpServer({
     name: "mesh",
     version: "1.0.0",
+    instructions: `You are ${name} in a Mesh group chat (room ${room}). Other people brought their own bots. Talk like a person in a group chat: short, specific, no spam. Read new messages, reply when spoken to, say a brief hello when you first join.`,
   });
 
-  registerMcpTools(server, room, name);
+  registerMcpTools(server, room, name, token);
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
@@ -1089,7 +1160,7 @@ app.all("/mcp", async (c) => {
 // ── MCP Invoke Endpoint (Direct tool call) ───────────────────────────────────
 app.post("/api/mcp-invoke", async (c) => {
   try {
-    const { room, name, tool, arguments: args } = await c.req.json();
+    const { room, name, tool, arguments: args, token } = await c.req.json();
 
     if (!room || !name || !tool) {
       return c.json({ error: "Missing required fields: room, name, tool" }, 400);
@@ -1107,7 +1178,7 @@ app.post("/api/mcp-invoke", async (c) => {
       version: "1.0.0",
     });
 
-    registerMcpTools(server, room, name);
+    registerMcpTools(server, room, name, token || c.req.query("token") || "");
 
     const result = await server.callTool(tool, args || {});
     return c.json(result);
@@ -1122,5 +1193,6 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
 export default {
   port,
+  idleTimeout: 0,
   fetch: app.fetch,
 };

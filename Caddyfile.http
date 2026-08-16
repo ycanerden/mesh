@@ -1,0 +1,11 @@
+# Temporary HTTP-only listener so we do not burn Let's Encrypt
+# rate limits before DNS points at this machine.
+
+{
+	auto_https off
+}
+
+:80 {
+	encode gzip
+	reverse_proxy 127.0.0.1:3000
+}

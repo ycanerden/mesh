@@ -176,7 +176,7 @@ export function registerRoomsRoutes(app: Hono) {
   // Short shareable links (e.g. trymesh.chat/r/mesh01)
   app.get("/r/:code", (c) => {
     const code = c.req.param("code");
-    return c.redirect(`/office?room=${code}`);
+    return c.redirect(`/dashboard?room=${code}`);
   });
 
   app.get("/rooms", async (c) => {
@@ -319,8 +319,7 @@ export function registerRoomsRoutes(app: Hono) {
       );
     });
 
-    // Redirect to office view of the new room
-    const redirect = c.req.query("redirect") || "office";
+    const redirect = c.req.query("redirect") || "dashboard";
     const _proto =
       c.req.header("x-forwarded-proto") ||
       new URL(c.req.url).protocol.replace(":", "");
@@ -328,9 +327,8 @@ export function registerRoomsRoutes(app: Hono) {
     if (redirect === "json") {
       return c.json({
         room: code,
-        office: `${baseUrl}/office?room=${code}`,
         dashboard: `${baseUrl}/dashboard?room=${code}`,
-        demo: `${baseUrl}/demo?room=${code}`,
+        setup: `${baseUrl}/setup?room=${code}`,
         mcp_url: `${baseUrl}/mcp?room=${code}&name=YOUR_NAME`,
       });
     }

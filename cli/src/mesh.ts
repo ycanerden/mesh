@@ -1077,7 +1077,7 @@ async function init() {
       ``,
       `${c.white}npx mesh-rooms join ${room}${c.reset}          ${c.dim}CLI${c.reset}`,
       `${c.white}${API}/try?room=${room}${c.reset}   ${c.dim}Web${c.reset}`,
-      `${c.white}${API}/office?room=${room}${c.reset}   ${c.dim}Live office view${c.reset}`,
+      `${c.white}${API}/dashboard?room=${room}${c.reset}   ${c.dim}Watch the room${c.reset}`,
     ].join("\n"),
     "Invite"
   ));
@@ -1104,7 +1104,7 @@ async function init() {
       console.log();
       await watch(room);
     } else if (action === 1) {
-      const url = `${API}/office?room=${room}`;
+      const url = `${API}/dashboard?room=${room}`;
       console.log(`  ${c.blue}*${c.reset} Opening ${url}`);
       const { exec } = await import("child_process");
       const cmd = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
@@ -1136,7 +1136,7 @@ async function invite(room: string) {
     [
       `${c.bold}Watch the room:${c.reset}  ${c.white}npx mesh-rooms watch${c.reset}`,
       `${c.bold}Chat:${c.reset}            ${c.white}npx mesh-rooms chat${c.reset}`,
-      `${c.bold}Web:${c.reset}             ${c.blue}${API}/office?room=${room}${c.reset}`,
+      `${c.bold}Web:${c.reset}             ${c.blue}${API}/dashboard?room=${room}${c.reset}`,
     ].join("\n"),
     "For you"
   ));
@@ -1177,9 +1177,8 @@ function buildBootstrapPrompt(tool: BootstrapTool, room: string, name: string) {
 
 async function bootstrap(room: string, name: string, tool: BootstrapTool) {
   const prompt = buildBootstrapPrompt(tool, room, name);
-  const officeUrl = `${API}/office?room=${room}`;
   const dashboardUrl = `${API}/dashboard?room=${room}`;
-  const demoUrl = `${API}/demo?room=${room}`;
+  const setupUrl = `${API}/setup?room=${room}`;
 
   console.log();
   console.log(box(
@@ -1188,9 +1187,8 @@ async function bootstrap(room: string, name: string, tool: BootstrapTool) {
       ``,
       `${c.dim}Room:${c.reset} ${c.white}${room}${c.reset}`,
       `${c.dim}MCP:${c.reset}  ${c.blue}${API}/mcp?room=${room}&name=${encodeURIComponent(name)}${c.reset}`,
-      `${c.dim}Office:${c.reset} ${c.blue}${officeUrl}${c.reset}`,
-      `${c.dim}Board:${c.reset}  ${c.blue}${dashboardUrl}${c.reset}`,
-      `${c.dim}Feed:${c.reset}   ${c.blue}${demoUrl}${c.reset}`,
+      `${c.dim}Watch:${c.reset} ${c.blue}${dashboardUrl}${c.reset}`,
+      `${c.dim}Invite:${c.reset} ${c.blue}${setupUrl}${c.reset}`,
     ].join("\n"),
     "Mesh Bootstrap"
   ));
@@ -1386,7 +1384,7 @@ async function interactive() {
     [
       `${c.bold}Watch your agents:${c.reset}  ${c.white}npx mesh-rooms watch${c.reset}`,
       `${c.bold}Chat yourself:${c.reset}      ${c.white}npx mesh-rooms chat${c.reset}`,
-      `${c.bold}Web:${c.reset}                ${c.blue}${API}/office?room=${room}${c.reset}`,
+      `${c.bold}Web:${c.reset}                ${c.blue}${API}/dashboard?room=${room}${c.reset}`,
       ``,
       `${c.bold}Invite a friend:${c.reset}    ${c.dim}send them${c.reset} ${c.white}npx mesh-rooms${c.reset}`,
       `                    ${c.dim}room code:${c.reset} ${c.bold}${room}${c.reset}`,

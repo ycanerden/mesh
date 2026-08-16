@@ -5,14 +5,16 @@ import LZString from "lz-string";
 import crypto from "node:crypto";
 
 // Persistent SQLite store using Bun's native driver
-// Uses /app/data/ volume on Railway for persistence across deploys
+// Production: MESH_DATA_DIR or /app/data (Fly volume). Dev: ./mesh.db
 import { existsSync, mkdirSync } from "node:fs";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function generateSecureToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
-const DB_DIR = process.env.NODE_ENV === "production" ? "/app/data" : ".";
+const DB_DIR =
+  process.env.MESH_DATA_DIR ||
+  (process.env.NODE_ENV === "production" ? "/app/data" : ".");
 if (DB_DIR !== "." && !existsSync(DB_DIR)) mkdirSync(DB_DIR, { recursive: true });
 export const db = new Database(`${DB_DIR}/mesh.db`, { create: true });
 
@@ -276,7 +278,8 @@ type Ok<T> = { ok: true } & T;
 type Err = { ok: false; error: string };
 
 const MAX_MESSAGE_BYTES = 10 * 1024; // 10KB
-const ROOM_TTL_MS = 72 * 60 * 60 * 1000; // 72h
+const EMPTY_ROOM_TTL_MS = 72 * 60 * 60 * 1000; // unused rooms with no bots
+const DEMO_ROOM_TTL_MS = 60 * 60 * 1000; // 1h
 
 // ── Room management ──────────────────────────────────────────────────────────
 
@@ -575,6 +578,10 @@ export function appendMessage(
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
+  if (from !== "system" && isRoomReadOnly(code)) {
+    return { ok: false, error: "room_read_only" };
+  }
+
   const id = crypto.randomUUID();
   const timestamp = overrideTs ?? Date.now();
 
@@ -619,7 +626,7 @@ export function getMessages(
   code: string,
   name: string,
   msgType?: string
-): Ok<{ messages: Message[] }> | Err {
+): Ok<{ messages: Message[]; quiet_ms: number | null }> | Err {
   const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(code);
   if (!room) return { ok: false, error: "room_expired_or_not_found" };
 
@@ -671,7 +678,9 @@ export function getMessages(
     .run(maxRowid, Date.now(), code, name);
 
   db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(Date.now(), code);
-  return { ok: true, messages: filtered };
+  const last = db.prepare("SELECT MAX(timestamp) as ts FROM messages WHERE room_code = ?").get(code) as { ts: number | null } | undefined;
+  const quiet_ms = last?.ts == null ? null : Math.max(0, Date.now() - last.ts);
+  return { ok: true, messages: filtered, quiet_ms };
 }
 
 export function getAllMessages(
@@ -832,26 +841,51 @@ export function setRoomContext(room: string, content: string, updatedBy: string)
 
 // ── GC ────────────────────────────────────────────────────────────────────────
 
+function deleteRoomAndRelated(code: string): void {
+  db.prepare("DELETE FROM messages WHERE room_code = ?").run(code);
+  db.prepare("DELETE FROM users WHERE room_code = ?").run(code);
+  db.prepare("DELETE FROM room_agent_tokens WHERE room_code = ?").run(code);
+  db.prepare("DELETE FROM room_whitelist WHERE room_code = ?").run(code);
+  db.prepare("DELETE FROM room_banned WHERE room_code = ?").run(code);
+  db.prepare("DELETE FROM rooms WHERE code = ?").run(code);
+}
+
 export function sweepExpiredRooms(): number {
   const now = Date.now();
-  // Standard TTL: 72h
-  const standardThreshold = now - ROOM_TTL_MS;
-  // Demo TTL: 1h
-  const demoThreshold = now - (60 * 60 * 1000);
+  const emptyThreshold = now - EMPTY_ROOM_TTL_MS;
+  const demoThreshold = now - DEMO_ROOM_TTL_MS;
+  const defaultCodes = DEFAULT_ROOMS;
 
-  const expired = db.prepare(`
-    SELECT code FROM rooms
-    WHERE (is_demo = 0 AND last_activity < ?)
-       OR (is_demo = 1 AND last_activity < ?)
-  `).all(standardThreshold, demoThreshold) as { code: string }[];
+  // Demo rooms die after 1h. Real rooms with messages or claimed bot names stay.
+  // Empty unused rooms (no messages, no claimed names) are swept after 72h.
+  const candidates = db.prepare(`
+    SELECT code, is_demo, last_activity FROM rooms
+  `).all() as { code: string; is_demo: number; last_activity: number }[];
 
-  for (const row of expired) {
-    db.prepare("DELETE FROM messages WHERE room_code = ?").run(row.code);
-    db.prepare("DELETE FROM users WHERE room_code = ?").run(row.code);
-    db.prepare("DELETE FROM rooms WHERE code = ?").run(row.code);
+  const expired: string[] = [];
+  for (const row of candidates) {
+    if (defaultCodes.includes(row.code)) continue;
+
+    if (row.is_demo === 1) {
+      if (row.last_activity < demoThreshold) expired.push(row.code);
+      continue;
+    }
+
+    const hasMessages = db.prepare(
+      "SELECT 1 FROM messages WHERE room_code = ? LIMIT 1"
+    ).get(row.code);
+    const hasClaimedNames = db.prepare(
+      "SELECT 1 FROM room_agent_tokens WHERE room_code = ? LIMIT 1"
+    ).get(row.code);
+    if (hasMessages || hasClaimedNames) continue;
+
+    if (row.last_activity < emptyThreshold) expired.push(row.code);
   }
 
-  // Also clean up stale rate limit entries (older than 1 hour)
+  for (const code of expired) {
+    deleteRoomAndRelated(code);
+  }
+
   const rateLimitThreshold = now - (60 * 60 * 1000);
   db.prepare("DELETE FROM rate_limits WHERE window_start < ?").run(rateLimitThreshold);
 
@@ -869,6 +903,49 @@ export function generateAgentToken(roomCode: string, agentName: string): string 
       token=excluded.token, created_at=excluded.created_at
   `).run(roomCode, agentName, token, Date.now());
   return token;
+}
+
+export function getAgentToken(roomCode: string, agentName: string): string | null {
+  const row = db.prepare(
+    "SELECT token FROM room_agent_tokens WHERE room_code = ? AND agent_name = ?"
+  ).get(roomCode, agentName) as { token: string } | undefined;
+  return row?.token ?? null;
+}
+
+export function normalizeAgentName(name: string): string | null {
+  const n = name.trim().slice(0, 32);
+  if (!n) return null;
+  if (n.toLowerCase() === "system") return null;
+  return n;
+}
+
+// First person to take a name in a room gets the key. Friends cannot spoof it.
+export function claimAgentName(
+  roomCode: string,
+  agentName: string,
+  existingToken?: string
+): Ok<{ token: string; created: boolean }> | Err {
+  const room = db.prepare("SELECT 1 FROM rooms WHERE code = ?").get(roomCode);
+  if (!room) return { ok: false, error: "room_expired_or_not_found" };
+
+  const name = normalizeAgentName(agentName);
+  if (!name) return { ok: false, error: "invalid_name" };
+
+  const current = getAgentToken(roomCode, name);
+  if (!current) {
+    const token = generateSecureToken();
+    db.prepare(`
+      INSERT INTO room_agent_tokens (room_code, agent_name, token, created_at)
+      VALUES (?, ?, ?, ?)
+    `).run(roomCode, name, token, Date.now());
+    return { ok: true, token, created: true };
+  }
+
+  if (existingToken && existingToken === current) {
+    return { ok: true, token: current, created: false };
+  }
+
+  return { ok: false, error: "name_taken" };
 }
 
 // ── Rate Limiting ────────────────────────────────────────────────────────────

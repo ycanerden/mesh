@@ -9,6 +9,9 @@ import {
   getRoomCount,
   publishCard,
   messageEvents,
+  claimAgentName,
+  setRoomReadOnly,
+  db,
 } from "./rooms.js";
 
 // Reset module state between tests by re-importing fresh — not possible with
@@ -91,7 +94,24 @@ test("getMessages: empty room returns []", () => {
   joinRoom(code, "alice");
   const result = getMessages(code, "alice");
   expect(result.ok).toBe(true);
-  if (result.ok) expect(result.messages).toHaveLength(0);
+  if (result.ok) {
+    expect(result.messages).toHaveLength(0);
+    expect(result.quiet_ms).toBeNull();
+  }
+});
+
+test("getMessages: quiet_ms is time since the last message in the room", () => {
+  const { code } = createRoom();
+  joinRoom(code, "alice");
+  joinRoom(code, "bob");
+  appendMessage(code, "alice", "hi");
+  const result = getMessages(code, "bob");
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.quiet_ms).not.toBeNull();
+    expect(result.quiet_ms!).toBeGreaterThanOrEqual(0);
+    expect(result.quiet_ms!).toBeLessThan(10_000);
+  }
 });
 
 test("getMessages: unknown room returns room_expired error", () => {
@@ -197,11 +217,55 @@ test("publishCard: system message is posted on card update", () => {
 });
 
 test("sweepExpiredRooms: does not delete active rooms", () => {
-  const before = getRoomCount();
   createRoom();
   const after = getRoomCount();
   sweepExpiredRooms(); // nothing is expired
   expect(getRoomCount()).toBe(after);
+});
+
+test("sweepExpiredRooms: keeps rooms that have claimed bot names", () => {
+  const { code } = createRoom();
+  const claimed = claimAgentName(code, "can-grok");
+  expect(claimed.ok).toBe(true);
+  db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(
+    Date.now() - 80 * 60 * 60 * 1000,
+    code
+  );
+  sweepExpiredRooms();
+  expect(getRoomStatus(code, "can-grok").ok).toBe(true);
+});
+
+test("sweepExpiredRooms: keeps rooms that have messages", () => {
+  const { code } = createRoom();
+  joinRoom(code, "alice");
+  appendMessage(code, "alice", "still here next week");
+  db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(
+    Date.now() - 80 * 60 * 60 * 1000,
+    code
+  );
+  sweepExpiredRooms();
+  expect(getRoomStatus(code, "alice").ok).toBe(true);
+});
+
+test("sweepExpiredRooms: deletes empty unused rooms after 72h", () => {
+  const { code } = createRoom();
+  db.prepare("UPDATE rooms SET last_activity = ? WHERE code = ?").run(
+    Date.now() - 80 * 60 * 60 * 1000,
+    code
+  );
+  sweepExpiredRooms();
+  expect(getRoomStatus(code, "alice").ok).toBe(false);
+});
+
+test("appendMessage: read-only rooms reject agent messages", () => {
+  const { code } = createRoom();
+  joinRoom(code, "alice");
+  setRoomReadOnly(code, true);
+  const blocked = appendMessage(code, "alice", "should fail");
+  expect(blocked.ok).toBe(false);
+  if (!blocked.ok) expect(blocked.error).toBe("room_read_only");
+  const system = appendMessage(code, "system", "room is now read-only");
+  expect(system.ok).toBe(true);
 });
 
 test("appendMessage: emits messageEvents for SSE streaming", async () => {
