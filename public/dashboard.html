@@ -21,23 +21,20 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 24px; height: var(--topbar-h);
       border-bottom: 1px solid var(--border);
-      background: var(--surface);
+      background: var(--bg);
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-      backdrop-filter: blur(24px);
     }
     .topbar-left { display: flex; align-items: center; gap: 14px; }
     .logo {
-      width: 28px; height: 28px; border-radius: 6px;
-      background: var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 600; color: #fff;
-      text-decoration: none;
+      font-size: 14px; font-weight: 500; letter-spacing: -0.3px;
+      color: var(--text); text-decoration: none;
+      width: auto; height: auto; background: none; border-radius: 0;
     }
     .topbar-title {
       text-decoration: none; color: inherit;
     }
     .topbar-title h1 {
-      font-size: 15px; font-weight: 600; letter-spacing: -0.3px;
+      font-size: 14px; font-weight: 500; letter-spacing: -0.3px;
       color: var(--text);
     }
     .topbar-title .subtitle {
@@ -53,7 +50,7 @@
     .room-input:focus { border-color: var(--accent); }
     .room-input::placeholder { color: var(--text3); }
     .invite-btn {
-      background: var(--accent); border: none; color: #fff;
+      background: var(--accent); border: none; color: var(--on-accent);
       border-radius: 6px; padding: 6px 12px; font-size: 12px; font-weight: 500;
       cursor: pointer; font-family: inherit;
     }
@@ -63,7 +60,7 @@
       border-radius: 6px; padding: 6px 12px; font-size: 12px;
       cursor: pointer; font-family: inherit; text-decoration: none;
     }
-    .ghost-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .ghost-btn:hover { border-color: var(--border-strong); color: var(--text); }
     .topbar-right { display: flex; align-items: center; gap: 12px; }
     .conn-badge {
       display: flex; align-items: center; gap: 6px;
@@ -93,7 +90,7 @@
     /* ===== SIDEBAR ===== */
     .sidebar {
       border-right: 1px solid var(--border);
-      background: var(--surface);
+      background: var(--bg);
       display: flex; flex-direction: column;
       overflow: hidden;
     }
@@ -155,7 +152,7 @@
       font-size: 11px; font-weight: 500; cursor: pointer;
       transition: all .15s;
     }
-    .admin-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .admin-btn:hover { border-color: var(--border-strong); color: var(--text); }
     .admin-btn.danger:hover { border-color: var(--red); color: var(--red); }
     .admin-toggle {
       display: flex; align-items: center; gap: 8px;
@@ -241,17 +238,17 @@
     .empty-text { font-size: 14px; }
 
     .mention {
-      background: rgba(91,106,240,.12); color: var(--accent2);
-      border-radius: 3px; padding: 0 3px; font-weight: 600; font-size: .92em;
+      background: var(--accent-dim); color: var(--text);
+      border-radius: 3px; padding: 0 3px; font-weight: 500; font-size: .92em;
     }
     .mention-self {
-      background: rgba(91,106,240,.25); color: #fff;
+      background: var(--border-light); color: var(--text);
     }
 
     /* Composer */
     .composer {
       padding: 12px 24px 16px; border-top: 1px solid var(--border);
-      background: var(--surface); display: flex; gap: 8px; align-items: flex-end;
+      background: var(--bg); display: flex; gap: 8px; align-items: flex-end;
     }
     .composer-fields {
       display: flex; flex-direction: column; gap: 4px;
@@ -274,7 +271,7 @@
     .composer-input::placeholder { color: var(--text3); }
     .send-btn {
       width: 38px; height: 38px; border-radius: 6px;
-      background: var(--accent); border: none; color: #fff;
+      background: var(--accent); border: none; color: var(--on-accent);
       cursor: pointer; font-size: 15px;
       display: flex; align-items: center; justify-content: center;
       transition: opacity .15s; flex-shrink: 0;
@@ -320,7 +317,7 @@
   <div class="topbar">
     <div class="topbar-left">
       <button class="mobile-menu-btn" id="menu-btn" onclick="toggleSidebar()">&#9776;</button>
-      <a href="/" class="logo">M</a>
+      <a href="/" class="logo">mesh</a>
       <a href="/" class="topbar-title">
         <h1 id="header-title">Mesh</h1>
         <div class="subtitle" id="header-subtitle">Group chat</div>
