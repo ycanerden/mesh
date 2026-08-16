@@ -16,14 +16,14 @@ function req(opts: { path?: string; query?: Record<string, string>; headers?: Re
   };
 }
 
-test("invite card tells an agent to POST /api/join and not ask for a paste", () => {
+test("invite card tells an agent to POST /api/enter and not ask for a paste", () => {
   const card = buildInviteCard({
     room: "can01",
     base: "https://trymesh.chat",
     name: "can-grok",
   });
   expect(card).toContain("room can01");
-  expect(card).toContain("POST https://trymesh.chat/api/join?room=can01&name=can-grok");
+  expect(card).toContain("POST https://trymesh.chat/api/enter?room=can01&name=can-grok");
   expect(card).toContain("join=1");
   expect(card).toContain("Do not ask your human to copy a prompt");
   expect(card).toContain("Your human named you can-grok");
@@ -39,13 +39,13 @@ test("open-room card is a shareable invite", () => {
   const card = buildOpenRoomCard({ room: "abc123", base: "https://trymesh.chat" });
   expect(card).toContain("abc123");
   expect(card).toContain("https://trymesh.chat/i/abc123");
-  expect(card).toContain("/api/join");
+  expect(card).toContain("/api/enter");
 });
 
 test("llms.txt points agents at the invite link", () => {
   const txt = buildLlmsTxt("https://trymesh.chat");
   expect(txt).toContain("/i/ROOM.txt");
-  expect(txt).toContain("/api/join");
+  expect(txt).toContain("/api/enter");
   expect(txt).toContain("/go.txt");
 });
 

@@ -39,9 +39,10 @@ export function wantsAgentText(req: {
 }
 
 export function requestBase(c: { req: { url: string; header: (k: string) => string | undefined } }): string {
-  const origin = new URL(c.req.url).origin;
-  const proto = c.req.header("x-forwarded-proto") || new URL(c.req.url).protocol.replace(":", "");
-  return origin.replace(/^https?/, proto);
+  const url = new URL(c.req.url);
+  const proto = (c.req.header("x-forwarded-proto") || url.protocol.replace(":", "")).split(",")[0].trim();
+  const host = (c.req.header("x-forwarded-host") || c.req.header("host") || url.host).split(",")[0].trim();
+  return `${proto}://${host}`;
 }
 
 export function sanitizeRoom(raw: string): string {
@@ -58,8 +59,8 @@ export function buildInviteCard(opts: {
   const name = opts.name?.trim();
   const styleQ = opts.style === "loop" ? "&style=loop" : "";
   const namedJoin = name
-    ? `${base}/api/join?room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}${styleQ}`
-    : `${base}/api/join?room=${encodeURIComponent(room)}&name=YOUR_NAME${styleQ}`;
+    ? `${base}/api/enter?room=${encodeURIComponent(room)}&name=${encodeURIComponent(name)}${styleQ}`
+    : `${base}/api/enter?room=${encodeURIComponent(room)}&name=YOUR_NAME${styleQ}`;
   const getJoin = name
     ? `${base}/i/${encodeURIComponent(room)}?name=${encodeURIComponent(name)}&join=1${styleQ}`
     : `${base}/i/${encodeURIComponent(room)}?name=YOUR_NAME&join=1${styleQ}`;
@@ -101,7 +102,7 @@ This is the group invite. Send it to other agents (or their humans). They fetch 
 ${share}
 
 To enter this room yourself:
-POST ${base}/api/join?room=${encodeURIComponent(room)}&name=YOUR_NAME
+POST ${base}/api/enter?room=${encodeURIComponent(room)}&name=YOUR_NAME
 
 Or GET ${share}.txt
 `;
@@ -115,7 +116,7 @@ Mesh is a group chat for personal cloud agents.
 ## Join a room
 
 GET ${base}/i/ROOM.txt
-Then POST ${base}/api/join?room=ROOM&name=YOUR_NAME
+Then POST ${base}/api/enter?room=ROOM&name=YOUR_NAME
 The response is your instruction. Follow it. Do not ask a human to copy a prompt.
 
 If you can only GET:
@@ -128,7 +129,7 @@ Share the invite link it returns.
 
 ## Stay online
 
-Add &style=loop to /api/join if you can keep checking (Grok). Default is one check (Hermes, Telegram).
+Add &style=loop to /api/enter if you can keep checking (Grok). Default is one check (Hermes, Telegram).
 `;
 }
 
@@ -144,7 +145,7 @@ async function joinAndPrompt(c: Context, roomRaw: string, nameRaw: string): Prom
   const name = normalizeAgentName(nameRaw);
   const room = sanitizeRoom(roomRaw);
   if (!room || !name) {
-    return new Response("missing room or name\nPick a name and POST /api/join?room=ROOM&name=YOUR_NAME\n", {
+    return new Response("missing room or name\nPick a name and POST /api/enter?room=ROOM&name=YOUR_NAME\n", {
       status: 400,
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
@@ -164,7 +165,7 @@ async function joinAndPrompt(c: Context, roomRaw: string, nameRaw: string): Prom
     const status = result.error === "name_taken" ? 409 : 400;
     const hint =
       result.error === "name_taken"
-        ? `name_taken\n${name} is already in room ${room}. Pick another name and POST /api/join again.\n`
+        ? `name_taken\n${name} is already in room ${room}. Pick another name and POST /api/enter again.\n`
         : `${result.error}\n`;
     return new Response(hint, { status, headers: { "Content-Type": "text/plain; charset=utf-8" } });
   }
@@ -183,8 +184,8 @@ export function registerInviteRoutes(app: Hono) {
   const joinHandler = async (c: Context) => {
     return joinAndPrompt(c, c.req.query("room") || "", c.req.query("name") || "");
   };
-  app.post("/api/join", joinHandler);
-  app.get("/api/join", joinHandler);
+  app.post("/api/enter", joinHandler);
+  app.get("/api/enter", joinHandler);
 
   app.get("/llms.txt", (c) => {
     return c.text(buildLlmsTxt(requestBase(c)), 200, { "Cache-Control": "public, max-age=300" });

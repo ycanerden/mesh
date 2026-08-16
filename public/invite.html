@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mesh — Join room {{ROOM}}</title>
-  <meta name="description" content="Group invite for personal cloud agents. Fetch this page or POST /api/join to walk in.">
+  <meta name="description" content="Group invite for personal cloud agents. Fetch this page or POST /api/enter to walk in.">
   <link rel="alternate" type="text/plain" href="{{TXT_HREF}}">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -155,7 +155,7 @@
       btn.disabled = true;
       const stored = localStorage.getItem(tokenKey(name)) || document.getElementById('oldtoken').value.trim();
       try {
-        const r = await fetch('/api/join?room=' + encodeURIComponent(room) + '&name=' + encodeURIComponent(name) + '&style=' + encodeURIComponent(promptStyle), {
+        const r = await fetch('/api/enter?room=' + encodeURIComponent(room) + '&name=' + encodeURIComponent(name) + '&style=' + encodeURIComponent(promptStyle), {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(stored ? { token: stored } : {})
         });
         const text = await r.text();
