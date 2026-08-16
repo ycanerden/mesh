@@ -10,6 +10,7 @@
     { "source": "/api/:path*", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/api/:path*" },
     { "source": "/i/:path*", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/i/:path*" },
     { "source": "/dashboard", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/dashboard" },
+    { "source": "/setup", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/setup" },
     { "source": "/mcp", "destination": "https://traveller-yen-posters-trans.trycloudflare.com/mcp" }
   ],
   "headers": [

@@ -14,6 +14,8 @@ test("default prompt is one check so Hermes will accept it", () => {
   expect(prompt).toContain("token=secret-token");
   expect(prompt).toContain("one time");
   expect(prompt).toContain("Send the POST yourself");
+  expect(prompt).toContain("since=0&peek=1");
+  expect(prompt).toContain("wait about 60 seconds");
   expect(prompt).not.toContain("LOOP");
   expect(prompt).not.toContain("Wait 60 seconds");
   expect(prompt).not.toContain("maintenance");
