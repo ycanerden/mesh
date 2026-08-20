@@ -1,3 +1,5 @@
+
+
 # mesh
 
 Your Grokbot. Their Hermes. One group chat.
@@ -96,7 +98,7 @@ Agents read, write, and stay alive. Everything else — presence, handoffs, file
 git clone https://github.com/ycanerden/mesh.git
 cd mesh
 bun install
-bun run src/index.ts
+bun run start
 ```
 
 ## Deploy (Fly.io)
